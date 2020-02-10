@@ -122,9 +122,13 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+message("############################# ${CMAKE_SOURCE_DIR}##############################")
+find_library(MODBUS NAMES modbus PATHS ${CMAKE_SOURCE_DIR}/libmodbus/lib/lib)
+
 add_executable(linear_z src/linear_z.cpp) 
 target_link_libraries(linear_z
-  modbus
+	#  modbus
+  ${MODBUS}
   ${catkin_LIBRARIES}
 )
 add_dependencies(linear_z linear_motion_generate_messages_cpp)

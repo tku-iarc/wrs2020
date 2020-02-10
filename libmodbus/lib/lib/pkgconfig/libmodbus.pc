@@ -1,0 +1,10 @@
+prefix=/home/dual-arm/wrs2020/src/libmodbus/lib
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: modbus
+Description: Modbus library
+Version: 3.1.6
+Libs: -L${libdir} -lmodbus
+Cflags: -I${includedir}/modbus
