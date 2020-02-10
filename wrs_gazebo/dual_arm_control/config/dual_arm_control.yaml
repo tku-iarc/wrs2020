@@ -75,11 +75,11 @@ mobile_dual_arm:
 
   r_slide_position:
     type: position_controllers/JointPositionController
-    joint: Slide_R
+    joint: slide_R
     pid: {p: 800.0, i: 0.0, d: 0.0}
   l_slide_position:
     type: position_controllers/JointPositionController
-    joint: Slide_L
+    joint: slide_L
     pid: {p: 800.0, i: 0.0, d: 0.0}
 
 

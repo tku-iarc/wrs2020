@@ -38,12 +38,12 @@ class SuctionTask:
         if 'gazebo' in self.name:
             if 'right' in self.name:
                 self.suction_pub = rospy.Publisher(
-                    '/mobile_dual_arm/r_suction_joint_position/command',
+                    'mobile_dual_arm/r_suction_joint_position/command',
                     Float64,
                     queue_size=1
                 )
                 self.is_grip_sub = rospy.Subscriber(
-                    '/robot/right_gazebo/vacuum_gripper1/grasping',
+                    'robot/right_gazebo/vacuum_gripper1/grasping',
                     Bool,
                     self.is_grip_callback,
                     queue_size=1
@@ -51,19 +51,19 @@ class SuctionTask:
                 print 'nameeeee = ', self.name
             elif 'left' in self.name :
                 self.suction_pub = rospy.Publisher(
-                    '/mobile_dual_arm/l_suction_joint_position/command',
+                    'mobile_dual_arm/l_suction_joint_position/command',
                     Float64,
                     queue_size=1
                 )
                 self.is_grip_sub = rospy.Subscriber(
-                    '/robot/left_gazebo/vacuum_gripper1/grasping',
+                    'robot/left_gazebo/vacuum_gripper1/grasping',
                     Bool,
                     self.is_grip_callback,
                     queue_size=1
                 )
         else:
             self.is_grip_sub = rospy.Subscriber(
-                self.name + '/is_grip',
+                self.name + 'is_grip',
                 Bool,
                 self.is_grip_callback,
                 queue_size=1
@@ -77,9 +77,9 @@ class SuctionTask:
         if 'gazebo' in self.name:
             for i in range(1, 5):
                 if 'On' in cmd:
-                    suction_service = '/robot/' + self.name + '/vacuum_gripper' + str(i) + '/on'
+                    suction_service = 'robot/' + self.name + '/vacuum_gripper' + str(i) + '/on'
                 elif 'Off' in cmd:
-                    suction_service = '/robot/' + self.name + '/vacuum_gripper' + str(i) + '/off'
+                    suction_service = 'robot/' + self.name + '/vacuum_gripper' + str(i) + '/off'
                 rospy.wait_for_service(suction_service)
                 try:
                     client = rospy.ServiceProxy(

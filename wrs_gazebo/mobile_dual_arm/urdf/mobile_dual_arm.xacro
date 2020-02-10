@@ -2,7 +2,7 @@
 <robot name="mobile_dual_arm" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <xacro:include filename="$(find single_arm_description)/urdf/single_arm.xacro" />
-  <xacro:include filename="$(find Slide_rail)/urdf/Slide_rail.xacro" />
+  <xacro:include filename="$(find slide_rail)/urdf/slide_rail.xacro" />
   <xacro:include filename="$(find suction_urdf)/urdf/suction_urdf.xacro" />
   <!--xacro:include filename="$(find single_arm_description)/urdf/materials.xacro" /-->
   <xacro:include filename="$(find mobile_dual_arm)/urdf/mobile_dual_arm.gazebo" />
@@ -120,7 +120,7 @@
 
   <transmission name="tran1_slide_R">
     <type>transmission_interface/SimpleTransmission</type>
-    <joint name="Slide_R">
+    <joint name="slide_R">
       <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor1_slide_R">
@@ -131,7 +131,7 @@
 
   <transmission name="tran_slide_L">
     <type>transmission_interface/SimpleTransmission</type>
-    <joint name="Slide_L">
+    <joint name="slide_L">
       <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_slide_L">

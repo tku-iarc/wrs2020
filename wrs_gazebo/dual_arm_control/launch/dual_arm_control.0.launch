@@ -1,13 +1,11 @@
-<?xml version="1.0"?>
 <launch>
 
   <!-- Load joint controller configurations from YAML file to parameter server -->
   <rosparam file="$(find dual_arm_control)/config/dual_arm_control.yaml" command="load"/>
 
-<group ns="mobile_dual_arm">
   <!-- load the controllers -->
   <node name="" pkg="controller_manager" type="spawner" respawn="false"
-	output="screen" args="joint_state_controller
+	output="screen" ns="/mobile_dual_arm" args="joint_state_controller
 					  r_joint1_position
 					  r_joint2_position
 					  r_joint3_position
@@ -26,11 +24,13 @@
 					  l_slide_position
 					  r_suction_joint_position
 					  l_suction_joint_position"/>
+
   <!-- convert joint states to TF transforms for rviz, etc -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
 	respawn="false" output="screen">
+    <remap from="/joint_states" to="/mobile_dual_arm/joint_states" />
   </node>
-</group>
+
 </launch>
 
  	

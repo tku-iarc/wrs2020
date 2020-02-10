@@ -62,17 +62,17 @@ bool QNode::init() {
   ros::NodeHandle n;
 
   // Add your ros communications here.
-  ini_pose_msg_pub_ = n.advertise<std_msgs::String>("/robotis/base/ini_pose_msg", 0);
-  set_mode_msg_pub_ = n.advertise<std_msgs::String>("/robotis/base/set_mode_msg", 0);
+  ini_pose_msg_pub_ = n.advertise<std_msgs::String>("robotis/base/ini_pose_msg", 0);
+  set_mode_msg_pub_ = n.advertise<std_msgs::String>("robotis/base/set_mode_msg", 0);
 
-  joint_pose_msg_pub_ = n.advertise<manipulator_h_base_module_msgs::JointPose>("/robotis/base/joint_pose_msg", 0);
-  kinematics_pose_msg_pub_ = n.advertise<manipulator_h_base_module_msgs::KinematicsPose>("/robotis/base/kinematics_pose_msg", 0);
-  p2p_pose_msg_pub_ = n.advertise<manipulator_h_base_module_msgs::P2PPose>("/robotis/base/p2p_pose_msg", 0);
+  joint_pose_msg_pub_ = n.advertise<manipulator_h_base_module_msgs::JointPose>("robotis/base/joint_pose_msg", 0);
+  kinematics_pose_msg_pub_ = n.advertise<manipulator_h_base_module_msgs::KinematicsPose>("robotis/base/kinematics_pose_msg", 0);
+  p2p_pose_msg_pub_ = n.advertise<manipulator_h_base_module_msgs::P2PPose>("robotis/base/p2p_pose_msg", 0);
 
-  get_joint_pose_client_ = n.serviceClient<manipulator_h_base_module_msgs::GetJointPose>("/robotis/base/get_joint_pose", 0);
-  get_kinematics_pose_client_ = n.serviceClient<manipulator_h_base_module_msgs::GetKinematicsPose>("/robotis/base/get_kinematics_pose", 0);
+  get_joint_pose_client_ = n.serviceClient<manipulator_h_base_module_msgs::GetJointPose>("robotis/base/get_joint_pose", 0);
+  get_kinematics_pose_client_ = n.serviceClient<manipulator_h_base_module_msgs::GetKinematicsPose>("robotis/base/get_kinematics_pose", 0);
 
-  status_msg_sub_ = n.subscribe("/robotis/status", 10, &QNode::statusMsgCallback, this);
+  status_msg_sub_ = n.subscribe("robotis/status", 10, &QNode::statusMsgCallback, this);
 
   start();
   return true;

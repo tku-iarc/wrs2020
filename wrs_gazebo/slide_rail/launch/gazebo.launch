@@ -14,7 +14,7 @@
     name="spawn_model"
     pkg="gazebo_ros"
     type="spawn_model"
-    args="-file $(find Slide_rail)/urdf/Slide_rail.xacro -urdf -model Slide_rail"
+    args="-file $(find slide_rail)/urdf/slide_rail.xacro -urdf -model slide_rail"
     output="screen" />
   <node
     name="fake_joint_calibration"
