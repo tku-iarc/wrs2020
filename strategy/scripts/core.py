@@ -6,6 +6,7 @@ from std_msgs.msg import String
 from my_state_machine import MyStateMachine
 import dynamic_reconfigure.client
 
+
 class Strategy(object):
   def __init__(self, sim=False):
     rospy.init_node('core', anonymous=True)
@@ -18,14 +19,16 @@ class Strategy(object):
       if not self.robot.start:
         self.robot.toIdle()
       else:
-        pass
+        self.robot.toMove("ROOMA")
 
         if rospy.is_shutdown():
           break
 
+        """
         ## Keep Current State Running
         keepState = 'to' + self.robot.current_state.name
         getattr(self.robot, keepState)
+        """
 
         self.rate.sleep()
 
