@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import re
 import json
 import requests
 
@@ -15,15 +16,35 @@ class Request(object):
   def __call__(self, f):
     def wrapper(obj, *args, **kwargs):
       payload = f(obj, *args, **kwargs)
-      res = requests.request(self.method, \
-                               url = "http://{}/{}".format(obj.host, self.path), \
-                               headers = self.h,
-                               data = json.dumps(payload))
+      URL = "{}{}".format(obj.host, self.path)
+      if payload is not None:
+        try:
+          res = requests.request(self.method,                \
+                                 url = URL,                  \
+                                 headers = self.h,           \
+                                 data = json.dumps(payload), \
+                                 timeout = 3)
+        except requests.RequestException as e:
+          print(e)
+          return
+      else:
+        try:
+          res = requests.request(self.method,      \
+                                 url = URL,        \
+                                 headers = self.h, \
+                                 timeout = 3)
+        except requests.RequestException as e:
+          print(e)
+          return
+      print(res)
+      print(res.text)
       return res
     return wrapper
 
 class MIR(object):
   def __init__(self, host):
+    if not "http" in host:
+      print("WARRING: Maybe the host name is error.")
     self.host = host
 
   @Request(method = "get", path = "/status")

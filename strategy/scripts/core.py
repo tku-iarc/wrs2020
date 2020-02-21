@@ -16,13 +16,15 @@ class Strategy(object):
 
   def main(self):
     while not rospy.is_shutdown():
-      if not self.robot.start:
+      if not self.robot.is_idle and not self.robot.start:
         self.robot.toIdle()
-      else:
-        self.robot.toMove("ROOMA")
 
-        if rospy.is_shutdown():
-          break
+      if self.robot.is_idle:
+        if self.robot.start:
+          self.robot.toMove("ROOMA")
+
+      if rospy.is_shutdown():
+        break
 
         """
         ## Keep Current State Running

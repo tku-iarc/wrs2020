@@ -29,9 +29,12 @@ class MyStateMachine(Robot, StateMachine):
     pass
 
   def on_toMove(self, position):
+    print("to Move {}".format(position))
     if position is "ROOMA":
-      self.mir.MissionQueue("0bec3a34-4f56-11ea-82bd-f44d30609d1f")
+      r = self.mir.MissionQueue("0bec3a34-4f56-11ea-82bd-f44d30609d1f")
     elif position is "HOME":
-      self.mir.MissionQueue("6c94d08a-4f59-11ea-82bd-f44d30609d1f")
+      r = self.mir.MissionQueue("6c94d08a-4f59-11ea-82bd-f44d30609d1f")
     else:
       print("Unknown position")
+
+    print(r)
