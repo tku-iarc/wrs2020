@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
+  dynamic_reconfigure
 )
 
 ## System dependencies are found with CMake's conventions
@@ -71,6 +72,10 @@ generate_messages(
   std_msgs
 )
 
+generate_dynamic_reconfigure_options(
+  cfg/Robot.cfg
+)
+
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
 ################################################
@@ -103,8 +108,8 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES strategy
-  CATKIN_DEPENDS geometry_msgs roscpp rospy std_msgs message_runtime #message_generation
-#  DEPENDS system_lib
+  CATKIN_DEPENDS geometry_msgs roscpp rospy std_msgs message_runtime dynamic_reconfigure#message_generation
+  DEPENDS system_lib
 )
 
 ###########
