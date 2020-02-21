@@ -1,3 +1,4 @@
+import json
 from statemachine import StateMachine, State
 from dynamic_reconfigure.server import Server as DynamicReconfigureServer
 from strategy.cfg import RobotConfig
@@ -16,6 +17,7 @@ class MyStateMachine(Robot, StateMachine):
 
   def Callback(self, config, level):
     self.start = config['start']
+    self.go_home = config['go_home']
 
     return config
 
@@ -26,9 +28,12 @@ class MyStateMachine(Robot, StateMachine):
   toMove   = idle.to(move)| move.to.itself()
 
   def on_toIdle(self):
-    pass
+    print("to IDLE, change MiR to 'Pause'")
+    r = self.mir.Status("Pause")
+    print(r)
 
   def on_toMove(self, position):
+    self.mir.Status("Ready")
     print("to Move {}".format(position))
     if position is "ROOMA":
       r = self.mir.MissionQueue("0bec3a34-4f56-11ea-82bd-f44d30609d1f")
@@ -38,3 +43,16 @@ class MyStateMachine(Robot, StateMachine):
       print("Unknown position")
 
     print(r)
+
+  def GetMirState(self):
+    r = self.mir.GetStatus()
+    rjson = json.loads(r.text)
+    d = {
+      "mir_state": rjson.get("state_text"),
+      "mir_position": {
+        "x"  : rjson.get("position").get("x"),
+        "y"  : rjson.get("position").get("y"),
+        "yaw": rjson.get("position").get("yaw"),
+      }
+    }
+    return d

@@ -36,8 +36,6 @@ class Request(object):
         except requests.RequestException as e:
           print(e)
           return
-      print(res)
-      print(res.text)
       return res
     return wrapper
 
@@ -48,8 +46,22 @@ class MIR(object):
     self.host = host
 
   @Request(method = "get", path = "/status")
-  def Status(self):
+  def GetStatus(self):
     pass
+
+  @Request(method = "put", path = "/status")
+  def Status(self, state):
+    STATE = {"Ready": 3, "Pause": 4}
+    if isinstance(state, (str, int)):
+      if isinstance(state, str):
+        s = STATE.get(state, 4)
+    else:
+      print("ERROR type of state")
+      return
+    body = {
+      "state_id": s
+    }
+    return body
 
   @Request(method = "get", path = "/system/info")
   def SystemInfo(self):
@@ -71,3 +83,7 @@ class MIR(object):
       "mission_id": mission
     }
     return body
+
+    ## TODO: Clear Mission queue, Get position(sha) from name
+    ## TODO: Positions
+    ## TODO: Understand action to achieve related move?

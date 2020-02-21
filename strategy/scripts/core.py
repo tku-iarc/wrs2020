@@ -9,13 +9,20 @@ import dynamic_reconfigure.client
 
 class Strategy(object):
   def __init__(self, sim=False):
-    rospy.init_node('core', anonymous=True)
+    rospy.init_node('core', anonymous=False)
     self.rate = rospy.Rate(200)
     self.robot = MyStateMachine(sim)
+    self.dclient = dynamic_reconfigure.client.Client("core", timeout=30, config_callback=None)
     self.main()
 
   def main(self):
     while not rospy.is_shutdown():
+      s = self.robot.GetMirState()
+      #print(s)
+      if self.robot.go_home:
+        self.robot.toMove("HOME")
+        self.dclient.update_configuration({"go_home": False})
+
       if not self.robot.is_idle and not self.robot.start:
         self.robot.toIdle()
 
@@ -36,6 +43,6 @@ class Strategy(object):
 
 if __name__ == '__main__':
   try:
-      s = Strategy(True) # True is simulated mode
+    s = Strategy(True) # True is simulated mode
   except rospy.ROSInterruptException:
     pass 
