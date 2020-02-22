@@ -8,9 +8,9 @@ import message_filters
 import actionlib
 
 class Robot(object):
-  
-  def __init__(self, sim = False):
-    if not sim :
-      pass
-    else:
-      pass
+
+    def __init__(self, sim=False):
+        if not sim:
+            pass
+        else:
+            pass
