@@ -43,7 +43,7 @@
     </collision>
   </link>
   <link
-    name="Arm_Base_R_Link">
+    name="slide_right">
     <inertial>
       <origin
         xyz="0 0.022625966524659 0"
@@ -83,7 +83,7 @@
     </collision>
   </link>
   <joint
-    name="slide_R"
+    name="joint_right"
     type="prismatic">
     <origin
       xyz="-0.08 -0.0925 0.88886"
@@ -91,7 +91,7 @@
     <parent
       link="base_link" />
     <child
-      link="Arm_Base_R_Link" />
+      link="slide_right" />
     <axis
       xyz="0 0 1" />
     <limit
@@ -101,7 +101,7 @@
       velocity="100" />
   </joint>
   <link
-    name="Arm_Base_L_Link">
+    name="slide_left">
     <inertial>
       <origin
         xyz="0 -0.022625966524659 0"
@@ -141,7 +141,7 @@
     </collision>
   </link>
   <joint
-    name="slide_L"
+    name="joint_left"
     type="prismatic">
     <origin
       xyz="-0.08 0.0925 0.88886"
@@ -149,7 +149,7 @@
     <parent
       link="base_link" />
     <child
-      link="Arm_Base_L_Link" />
+      link="slide_left" />
     <axis
       xyz="0 0 1" />
     <limit
@@ -158,27 +158,27 @@
       effort="500"
       velocity="100" />
   </joint>
-<!--
-  <transmission name="tran1">
+
+  <transmission name="slide_tran_r">
     <type>transmission_interface/SimpleTransmission</type>
-    <joint name="slide_R">
-      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    <joint name="joint_right">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
-    <actuator name="motor1">
-      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    <actuator name="slide_motor_r">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
 
-  <transmission name="tran2">
+  <transmission name="slide_tran_l">
     <type>transmission_interface/SimpleTransmission</type>
-    <joint name="slide_L">
-      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    <joint name="joint_left">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
-    <actuator name="motor2">
-      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    <actuator name="slide_motor_l">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
--->
+
 </robot>

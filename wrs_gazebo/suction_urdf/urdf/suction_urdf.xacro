@@ -14,13 +14,9 @@
           rpy="0 0 0" />
         <mass
           value="0.11123" />
-        <inertia
-          ixx="8.4875E-05"
-          ixy="4.1003E-07"
-          ixz="4.0241E-06"
-          iyy="0.00010438"
-          iyz="6.5325E-07"
-          izz="4.7593E-05" />
+        <inertia ixx="0.0001" ixy="0.000"  ixz="0.000"  
+         iyy="0.0001" iyz="0.000"
+         izz="0.0001" />
       </inertial>
       <visual>
         <origin
@@ -54,13 +50,9 @@
           rpy="0 0 0" />
         <mass
           value="0.033438" />
-        <inertia
-          ixx="2.0813E-05"
-          ixy="1.7379E-08"
-          ixz="9.2823E-08"
-          iyy="1.8619E-05"
-          iyz="4.6462E-06"
-          izz="5.6779E-06" />
+        <inertia ixx="0.0001" ixy="0.000"  ixz="0.000"  
+         iyy="0.0001" iyz="0.000"
+         izz="0.0001" />
       </inertial>
       <visual>
         <origin
@@ -100,9 +92,10 @@
         xyz="0 1 0" />
       <limit
         lower="-3.14"
-	      upper="3.14"
-        effort="5"
-        velocity="0.5" />
+	    upper="3.14"
+        effort="1000"
+        velocity="6.5" />
+      <dynamics damping="0.7"/>
     </joint>
 
     <link
@@ -114,13 +107,9 @@
           rpy="0 0 0" />
         <mass
           value="0.0001" />
-        <inertia
-          ixx="2.0813E-05"
-          ixy="1.7379E-08"
-          ixz="9.2823E-08"
-          iyy="1.8619E-05"
-          iyz="4.6462E-06"
-          izz="5.6779E-06" />
+        <inertia ixx="0.0001" ixy="0.000"  ixz="0.000"  
+         iyy="0.0001" iyz="0.000"
+         izz="0.0001" />
       </inertial>
       <visual>
         <origin
@@ -147,8 +136,8 @@
         <limit
             lower="0"
 	    upper="0"
-            effort="5"
-            velocity="5" />
+            effort="1000"
+            velocity="6.5" />
         <dynamics damping="0.0" friction="10"/>
     </joint>
 
@@ -161,13 +150,9 @@
           rpy="0 0 0" />
         <mass
           value="0.0001" />
-        <inertia
-          ixx="2.0813E-05"
-          ixy="1.7379E-08"
-          ixz="9.2823E-08"
-          iyy="1.8619E-05"
-          iyz="4.6462E-06"
-          izz="5.6779E-06" />
+        <inertia ixx="0.0001" ixy="0.000"  ixz="0.000"  
+         iyy="0.0001" iyz="0.000"
+         izz="0.0001" />
       </inertial>
       <visual>
         <origin
@@ -194,8 +179,8 @@
         <limit
             lower="0"
 	    upper="0"
-            effort="5"
-            velocity="5" />
+            effort="1000"
+            velocity="6.5" />
         <dynamics damping="0.0" friction="10"/>
     </joint>
 
@@ -208,13 +193,9 @@
           rpy="0 0 0" />
         <mass
           value="0.0001" />
-        <inertia
-          ixx="2.0813E-05"
-          ixy="1.7379E-08"
-          ixz="9.2823E-08"
-          iyy="1.8619E-05"
-          iyz="4.6462E-06"
-          izz="5.6779E-06" />
+        <inertia ixx="0.0001" ixy="0.000"  ixz="0.000"  
+         iyy="0.0001" iyz="0.000"
+         izz="0.0001" />
       </inertial>
       <visual>
         <origin
@@ -241,8 +222,8 @@
         <limit
             lower="0"
 	    upper="0"
-            effort="5"
-            velocity="5" />
+            effort="1000"
+            velocity="6.5" />
         <dynamics damping="0.0" friction="10"/>
     </joint>
 
@@ -255,13 +236,9 @@
           rpy="0 0 0" />
         <mass
           value="0.0001" />
-        <inertia
-          ixx="2.0813E-05"
-          ixy="1.7379E-08"
-          ixz="9.2823E-08"
-          iyy="1.8619E-05"
-          iyz="4.6462E-06"
-          izz="5.6779E-06" />
+        <inertia ixx="0.0001" ixy="0.000"  ixz="0.000"  
+         iyy="0.0001" iyz="0.000"
+         izz="0.0001" />
       </inertial>
       <visual>
         <origin
@@ -288,8 +265,8 @@
         <limit
             lower="0"
 	    upper="0"
-            effort="5"
-            velocity="5" />
+            effort="1000"
+            velocity="6.5" />
         <dynamics damping="0.0" friction="10"/>
     </joint>
 
@@ -302,13 +279,9 @@
           rpy="0 0 0" />
         <mass
           value="0.0001" />
-        <inertia
-          ixx="2.0813E-05"
-          ixy="1.7379E-08"
-          ixz="9.2823E-08"
-          iyy="1.8619E-05"
-          iyz="4.6462E-06"
-          izz="5.6779E-06" />
+        <inertia ixx="0.0001" ixy="0.000"  ixz="0.000"  
+         iyy="0.0001" iyz="0.000"
+         izz="0.0001" />
       </inertial>
       <visual>
         <origin
@@ -334,9 +307,9 @@
             xyz="1 0 0" />
         <limit
             lower="0"
-	    upper="0"
-            effort="5"
-            velocity="5" />
+	        upper="0"
+            effort="1000"
+            velocity="6.5" />
         <dynamics damping="0.0" friction="10"/>
     </joint>
 

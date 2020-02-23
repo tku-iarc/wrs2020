@@ -11,7 +11,7 @@
         <arg name="en_sim" value="$(arg en_sim)"/>
     </include>
     <include file="$(find mobile_dual_arm)/launch/mobile_dual_arm.launch" if="$(arg en_sim)">
-        <arg name="paused" default="false"/>
+        <arg name="paused" default="true"/>
 	<arg name="use_sim_time" default="true"/>
 	<arg name="gui" default="true"/>
 	<arg name="headless" default="false"/>

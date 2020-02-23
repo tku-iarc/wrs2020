@@ -6,6 +6,7 @@
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
       <robotNamespace>/urdf_0129</robotNamespace>
       <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+      <legacyModeNS>true</legacyModeNS>
     </plugin>
   </gazebo-->
 
@@ -62,6 +63,29 @@
     <material>Gazebo/Orange</material>
     <selfCollide>false</selfCollide>
   </gazebo>
+
+  <gazebo reference="${side}_joint_1">
+    <implicitSpringDamper>True</implicitSpringDamper>
+  </gazebo>
+  <gazebo reference="${side}_joint_2">
+    <implicitSpringDamper>True</implicitSpringDamper>
+  </gazebo>
+  <gazebo reference="${side}_joint_3">
+    <implicitSpringDamper>True</implicitSpringDamper>
+  </gazebo>
+  <gazebo reference="${side}_joint_4">
+    <implicitSpringDamper>True</implicitSpringDamper>
+  </gazebo>
+  <gazebo reference="${side}_joint_5">
+    <implicitSpringDamper>True</implicitSpringDamper>
+  </gazebo>
+  <gazebo reference="${side}_joint_6">
+    <implicitSpringDamper>True</implicitSpringDamper>
+  </gazebo>
+  <gazebo reference="${side}_joint_7">
+    <implicitSpringDamper>True</implicitSpringDamper>
+  </gazebo>
+
   <!-- <gazebo reference="${side}_Link_7">
     <mu1>0.2</mu1>
     <mu2>0.2</mu2>
