@@ -19,10 +19,10 @@ class Strategy(object):
     def main(self):
         while not rospy.is_shutdown():
             s = self.robot.get_mir_status()
-            # print(s)
+            # print(s['mir_state'])
 
             if self.robot.go_home:
-                self.robot.toMove("HOME")
+                self.robot.toMove("TKU_ToHOME")
                 self.dclient.update_configuration({"go_home": False})
 
             if not self.robot.is_idle and not self.robot.start:
@@ -30,19 +30,23 @@ class Strategy(object):
 
             if self.robot.is_idle:
                 if self.robot.start:
-                    self.robot.toMove("ROOMA")
+                    self.robot.toMove("TKU_ToROOMA")
+
+            if self.robot.is_move:
+                if s['mir_state'] == "Ready":
+                    self.robot.toMove("TKU_ToSHELF")
+                    #self.dclient.update_configuration({"start": False})
+                    ## TODO: How to detect MiR arrived/completed position/mission
+                else:
+                    print(type(s['mir_state']))
+                    print(s['mir_state'])
+                    print(s['mir_state'] is "Ready")
+                    print(s['mir_state'] == "Ready")
 
             if rospy.is_shutdown():
                 break
 
-        """
-        ## Keep Current State Running
-        keepState = 'to' + self.robot.current_state.name
-        getattr(self.robot, keepState)
-        """
-
-                self.rate.sleep()
-
+            self.rate.sleep()
 
 if __name__ == '__main__':
     try:
