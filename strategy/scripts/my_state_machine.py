@@ -29,31 +29,29 @@ class MyStateMachine(Robot, StateMachine):
 
     def on_toIdle(self):
         print("to IDLE, change MiR to 'Pause'")
-        r = self.mir.status("Pause")
-        print(r)
+        self.mir.status("Pause")
+        self.mir.clear_mission_queue()
 
-    def on_toMove(self, position):
+    def on_toMove(self, mission):
         self.mir.status("Ready")
-        print("to Move {}".format(position))
+        print("to Move with mission {}".format(mission))
 
-        if position is "ROOMA":
-            r = self.mir.mission_queue("0bec3a34-4f56-11ea-82bd-f44d30609d1f")
-        elif position is "HOME":
-            r = self.mir.mission_queue("6c94d08a-4f59-11ea-82bd-f44d30609d1f")
+        guid = self.mir.get_mission_guid(mission)
+        if guid is None:
+            print("[WARRING] No this position name!!!!!")
         else:
-            print("Unknown position")
-
-        print(r)
+            r = self.mir.mission_queue(guid.encode('utf-8'))
+            print(r.text)
 
     def get_mir_status(self):
         r = self.mir.get_status()
         rjson = json.loads(r.text)
         d = {
-            "mir_state": rjson.get("state_text"),
+            "mir_state": rjson.get("state_text").encode('utf-8'),
             "mir_position": {
                 "x": rjson.get("position").get("x"),
                 "y": rjson.get("position").get("y"),
-                "yaw": rjson.get("position").get("yaw"),
+                "yaw": rjson.get("position").get("yaw")
             }
         }
         return d

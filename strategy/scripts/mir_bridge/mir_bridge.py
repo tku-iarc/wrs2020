@@ -3,6 +3,7 @@ import re
 import json
 import requests
 
+MAP_NAME = "HOME_AREA"
 
 class Request(object):
     def __init__(self, method, path):
@@ -54,15 +55,15 @@ class MIR(object):
         pass
 
     @Request(method="put", path="/status")
-    def status(self, state):
+    def status(self, set_state):
         STATE = {"Ready": 3, "Pause": 4}
 
-        # Check whether input 'state' is correct
-        if isinstance(state, (str, int)):
-            if isinstance(state, str):
-                s = STATE.get(state, 4)
+        # Check whether input 'set_state' is correct
+        if isinstance(set_state, (str, int)):
+            if isinstance(set_state, str):
+                s = STATE.get(set_state, 4)
         else:
-            print("ERROR type of state")
+            print("ERROR type of set_state")
             return
 
         body = {
@@ -74,23 +75,78 @@ class MIR(object):
     def system_info(self):
         pass
 
-    @Request(method="get", path="/positions")
-    def positions(self):
+    @Request(method="get", path="/missions")
+    def get_missions(self):
         pass
 
+    def get_mission_guid(self, mission):
+        r = self.get_missions()
+        rjson = json.loads(r.text)
+        for l in rjson:
+            if l.get("name") == mission:
+                return l.get("guid")
+        print("No this mission")
+        print(r.text)
+        return None
+
     @Request(method="get", path="/mission_queue")
-    def mission_queue(self):
+    def get_mission_queue(self):
         pass
 
     @Request(method="post", path="/mission_queue")
     def mission_queue(self, mission):
-        # To ROOMA "0bec3a34-4f56-11ea-82bd-f44d30609d1f"
-        # To Home  "6c94d08a-4f59-11ea-82bd-f44d30609d1f"
         body = {
             "mission_id": mission
         }
         return body
 
-    ## TODO: Clear Mission queue, Get position(sha) from name
-    ## TODO: Positions
+    @Request(method="delete", path="/mission_queue")
+    def clear_mission_queue(self):
+        pass
+
+    @Request(method="get", path="/positions")
+    def get_positions(self):
+        pass
+
+    def get_position_guid(self, position_name):
+        print("Position {} is :".format(position_name))
+        r = self.get_positions()
+        rjson = json.loads(r.text)
+        for l in rjson:
+            if l.get("name") == position_name:
+                return l.get("guid")
+        print("No this position")
+        return None
+
+    @Request(method="get", path="/maps")
+    def get_maps(self):
+        pass
+
+    def get_map_guid(self, map_name):
+        r = self.get_maps()
+        rjson = json.loads(r.text)
+        for l in rjson:
+            if l.get("name") == map_name:
+                return l.get("guid")
+        print("No this position")
+        return None
+
+    @Request(method="post", path="/positions")
+    def add_position(self, name, x, y, yaw, position_type=0):
+        map_guid = self.get_map_guid(MAP_NAME)
+        body = {
+            "map_id": map_guid,
+            "name": name,
+            "orientation": yaw,
+            "pos_x": x,
+            "pos_y": y,
+            "type_id": position_type
+        }
+        return body
+
     ## TODO: Understand action to achieve related move?
+    # Use post /missions to add new mission
+    # Use post /missions/{mission_id}/actions to add new action
+    # Use put /missions/{mission_id}/actions/{guid} to modify value of action
+    # Use put /mission/{guid} to modify value of mission
+    ##TODO: Clear ERROR Code
