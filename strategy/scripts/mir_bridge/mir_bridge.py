@@ -21,6 +21,8 @@ class Request(object):
             URL = "{}{}".format(obj.host, self.path)
 
             if payload is not None:
+                if payload.has_key("PATH"):
+                    URL = "{}{}".format(URL, payload.get("PATH"))
                 try:
                     res = requests.request(self.method,
                                            url=URL,
@@ -86,7 +88,7 @@ class MIR(object):
             if l.get("name") == mission:
                 return l.get("guid")
         print("No this mission")
-        print(r.text)
+        #print(r.text)
         return None
 
     @Request(method="get", path="/mission_queue")
@@ -108,25 +110,15 @@ class MIR(object):
     def get_positions(self):
         pass
 
+    @Request(method="get", path="/positions")
+    def get_position_by_id(self, guid):
+        return {"PATH": "/" + guid}
+
     def get_position_guid(self, position_name):
-        print("Position {} is :".format(position_name))
         r = self.get_positions()
         rjson = json.loads(r.text)
         for l in rjson:
             if l.get("name") == position_name:
-                return l.get("guid")
-        print("No this position")
-        return None
-
-    @Request(method="get", path="/maps")
-    def get_maps(self):
-        pass
-
-    def get_map_guid(self, map_name):
-        r = self.get_maps()
-        rjson = json.loads(r.text)
-        for l in rjson:
-            if l.get("name") == map_name:
                 return l.get("guid")
         print("No this position")
         return None
@@ -143,6 +135,19 @@ class MIR(object):
             "type_id": position_type
         }
         return body
+
+    @Request(method="get", path="/maps")
+    def get_maps(self):
+        pass
+
+    def get_map_guid(self, map_name):
+        r = self.get_maps()
+        rjson = json.loads(r.text)
+        for l in rjson:
+            if l.get("name") == map_name:
+                return l.get("guid")
+        print("No this position")
+        return None
 
     ## TODO: Understand action to achieve related move?
     # Use post /missions to add new mission
