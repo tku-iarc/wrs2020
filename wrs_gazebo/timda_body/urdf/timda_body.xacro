@@ -10,10 +10,10 @@
     name="base_link">
     <inertial>
       <origin
-        xyz="-0.12772 4.4082E-06 0.38955"
+        xyz="0.0 0 0"
         rpy="0 0 0" />
       <mass
-        value="29.072" />
+        value="2.072" />
       <inertia
         ixx="1"
         ixy="0"
@@ -101,7 +101,7 @@
     <limit
       lower="-0.8"
       upper="0"
-      effort="1000"
+      effort="9000"
       velocity="6.5" />
     <dynamics damping="7"/>
   </joint>
@@ -160,7 +160,7 @@
     <limit
       lower="-0.8"
       upper="0"
-      effort="1000"
+      effort="9000"
       velocity="6.5" />
     <dynamics damping="7"/>
   </joint>

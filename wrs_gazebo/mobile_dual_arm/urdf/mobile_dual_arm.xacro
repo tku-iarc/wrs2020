@@ -24,7 +24,7 @@
   <joint name="fixed3" type="fixed">
     <origin
       xyz="0.037646 0.0 0.355"
-      rpy="0 0 3.1415926" />
+      rpy="0 0 0" />
     <!--0.037646-->
     <!--<origin
       xyz="0 0 0.562"

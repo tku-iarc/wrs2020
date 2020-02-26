@@ -76,11 +76,11 @@ mobile_dual_arm:
   r_slide_position:
     type: effort_controllers/JointPositionController
     joint: joint_right
-    pid: {p: 800.0, i: 0.0, d: 0.0}
+    pid: {p: 8000.0, i: 0.1, d: 500.0}
   l_slide_position:
     type: effort_controllers/JointPositionController
     joint: joint_left
-    pid: {p: 800.0, i: 0.0, d: 0.0}
+    pid: {p: 8000.0, i: 0.1, d: 500.0}
 
   # gazebo_ros_control:
   #   pid_gains:

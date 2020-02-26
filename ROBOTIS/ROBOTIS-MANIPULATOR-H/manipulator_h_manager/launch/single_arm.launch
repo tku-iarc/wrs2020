@@ -7,6 +7,7 @@
     <group ns="$(arg side)_arm">
 	  <node name="manipulator_h_manager" pkg="manipulator_h_manager" type="manipulator_h_manager" output="screen">
               <param name="en_sim"                   value="$(arg en_sim)" />
+              <param name="side"                     value="$(arg side)" />
               <param name="robot_file_path"          value="$(find manipulator_h_manager)/config/ROBOTIS_$(arg side).robot" />
               <param name="gazebo_robot_name"        value="mobile_dual_arm" />
               <param name="offset_table"             value="$(find manipulator_h_manager)/config/offset.yaml" />
