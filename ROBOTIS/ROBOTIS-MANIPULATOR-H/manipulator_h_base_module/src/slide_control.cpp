@@ -43,5 +43,5 @@ void slide_control::slide_pub()
 void slide_control::slideFeedback(const linear_motion::Slide_Feedback::ConstPtr& msg)
 {
     is_busy = msg->is_busy;
-    slide_pos = -(double)msg->curr_pos / 100000.0;
+    slide_pos = (double)msg->curr_pos / 100000.0 - 0.8;
 }

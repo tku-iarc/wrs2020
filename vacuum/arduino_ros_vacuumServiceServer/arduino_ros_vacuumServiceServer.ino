@@ -22,6 +22,8 @@ std_msgs::String str_msg;
 std_msgs::Int32 int32;
 ros::Publisher chatter("rfid", &str_msg);
 ros::Publisher costII("consume", &str_msg);
+ros::Publisher arduinoPrint("print", &str_msg);
+
 
 #define ID_right  1
 #define ID_left   2
@@ -45,6 +47,8 @@ ros::Publisher isStop("robot/is_stop", &is_stop_msg);
 void callback(const VacuumCmd::Request& , VacuumCmd::Response& ,bool);
 void callback_right(const VacuumCmd::Request& , VacuumCmd::Response& );
 void callback_left(const VacuumCmd::Request& , VacuumCmd::Response& );
+//bool callback_right(const VacuumCmd::Request& , VacuumCmd::Response& );
+//bool callback_left(const VacuumCmd::Request& , VacuumCmd::Response& );
 void armTaskCallback(const std_msgs::Bool& msg);
 ros::ServiceServer<VacuumCmd::Request, VacuumCmd::Response> vac_srv_right("right/suction_cmd", &callback_right);
 ros::ServiceServer<VacuumCmd::Request, VacuumCmd::Response> vac_srv_left("left/suction_cmd", &callback_left);
@@ -95,6 +99,7 @@ void setup()
   nh.advertise(isGripL);
   nh.advertise(isStop);
   nh.subscribe(armTask_sub);
+  nh.advertise(arduinoPrint);
   
   nh.advertiseService(vac_srv_right);
   nh.advertiseService(vac_srv_left);
@@ -133,7 +138,8 @@ void setup()
   MinPos_left = MinPos_H_left << 8 | MinPos_L_left;
 
 #ifdef SERIAL_PRINT
-  Serial.begin(57600);
+  //Serial.begin(57600);
+  Serial.begin(9600);
   while (!Serial);    // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
 #endif
 
@@ -171,6 +177,14 @@ void callback_right(const VacuumCmd::Request& req, VacuumCmd::Response& res)
   MaxPos = MaxPos_right;
   MinPos = MinPos_right;
   callback(req, res, isRight);
+  str_msg.data = "FUCKING IN callback";
+  if (res.success == true) {
+    str_msg.data = "FUCKING TRUEEEEEE";
+  }else {
+    str_msg.data = "FUCKING FALSEEEEE";
+  }
+  arduinoPrint.publish(&str_msg);
+  return;
 }
 
 void callback_left(const VacuumCmd::Request& req, VacuumCmd::Response& res)
@@ -181,10 +195,13 @@ void callback_left(const VacuumCmd::Request& req, VacuumCmd::Response& res)
   MaxPos = MaxPos_left;
   MinPos = MinPos_left;
   callback(req, res, isRight);
+  return;
 }
 
 void callback(const VacuumCmd::Request& req, VacuumCmd::Response& res, bool isRight)
 {
+  str_msg.data = req.cmd;
+  arduinoPrint.publish(&str_msg);
   if (strcmp(req.cmd, "setMaxPos") == 0)
   {
     MaxPos = wDxl(isRight).readPosition(ID) - ADJ_STEP;
@@ -274,7 +291,9 @@ void callback(const VacuumCmd::Request& req, VacuumCmd::Response& res, bool isRi
     }
   }
   else if (strcmp(req.cmd, "vacuumOn") == 0)
-  {   
+  {
+    str_msg.data = "FUCKFUCK";
+    arduinoPrint.publish(&str_msg);
     digitalWrite(vac_pin, HIGH);
     digitalWrite(led_pin, HIGH);
   }
@@ -300,6 +319,8 @@ void callback(const VacuumCmd::Request& req, VacuumCmd::Response& res, bool isRi
       }
     }
   }
+  str_msg.data = "FUCKKKKKK";
+  arduinoPrint.publish(&str_msg);
   res.success = true;
 }
 

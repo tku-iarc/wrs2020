@@ -120,10 +120,11 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}/lib/libmodbus/lib/include
 )
 
 message("############################# ${CMAKE_SOURCE_DIR}##############################")
-find_library(MODBUS NAMES modbus PATHS ${CMAKE_SOURCE_DIR}/libmodbus/lib/lib)
+find_library(MODBUS NAMES modbus PATHS ${CMAKE_SOURCE_DIR}/lib/libmodbus/lib/lib)
 
 add_executable(linear_z src/linear_z.cpp) 
 target_link_libraries(linear_z

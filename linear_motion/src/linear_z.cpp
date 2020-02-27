@@ -2,7 +2,7 @@
 
 void slide_callback(const manipulator_h_base_module_msgs::SlideCommand::ConstPtr& msg)
 {
-    goal_pos = -(double)100000.0*msg->pos;
+    goal_pos = (double)100000.0*(msg->pos+0.8);
 
     cmd_arr[4] = goal_pos>>16;
     cmd_arr[5] = goal_pos;
@@ -99,7 +99,7 @@ int main(int argc, char **argv)
     //========================= Initialize Modbus_RTU ============================= 
     std::cout << "Preparing connection slide" << std::endl;
 
-    int id = side_str == "right" ? 1 : 3;
+    int id = side_str == "right" ? 3 : 2;
     ct = init_modbus_rtu(id, "/dev/wrs/slide_" + side_str, baud_rate);
     if (!ct)
     {
@@ -118,8 +118,8 @@ int main(int argc, char **argv)
 
     // ============================= Subscribe message =============================
     ros::NodeHandle n;
-    ros::Subscriber sub = n.subscribe("/slide_command_msg", 1, slide_callback);
-    ros::Publisher  pub = n.advertise<linear_motion::Slide_Feedback>("/slide_feedback_msg", 1);
+    ros::Subscriber sub = n.subscribe("slide_command_msg", 1, slide_callback);
+    ros::Publisher  pub = n.advertise<linear_motion::Slide_Feedback>("slide_feedback_msg", 1);
     ros::Rate loop_rate(125);
 
     // ============================= ROS Loop =============================

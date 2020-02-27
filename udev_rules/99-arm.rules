@@ -1,2 +1,2 @@
-SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="A5052MJD", MODE="0666", SYMLINK+="wrs/arm_right"
-SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="A105HPEH", MODE="0666", SYMLINK+="wrs/arm_left"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", ATTRS{serial}=="FT3M9MV7", MODE="0666", SYMLINK+="wrs/arm_right"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", ATTRS{serial}=="FT2MZYQN", MODE="0666", SYMLINK+="wrs/arm_left"
