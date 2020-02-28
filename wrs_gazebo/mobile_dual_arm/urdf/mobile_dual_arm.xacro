@@ -35,7 +35,7 @@
 
   <xacro:mir_100 prefix="mobile_"/>
   
-  <xacro:single_arm side="r"  parent="slide_right" child="r_tool_link" toolrot="1.57">
+  <xacro:single_arm side="r"  parent="slide_right" child="r_tool_link" toolrot="-1.57">
     <origin xyz="0.0 0.1151 0.0" rpy="1.57 3.1415926 3.1415926" />
   </xacro:single_arm>
 
@@ -43,7 +43,7 @@
     <origin xyz="0 -0.016 0" rpy="0 0 -1.57" />
   </xacro:suction>
 
-  <xacro:single_arm side="l"  parent="slide_left" child="l_tool_link" toolrot="-1.57">
+  <xacro:single_arm side="l"  parent="slide_left" child="l_tool_link" toolrot="1.57">
     <origin xyz="0.0 0.1151 0.0" rpy="-1.57 0 0" />
   </xacro:single_arm>
 
@@ -75,80 +75,56 @@
     <parent link="Arm_Base_R_Link"/>
     <child link="Arm_Base_R"/>
   </joint-->
-<!--
+
   <link name="Bin">
     <inertial>
       <origin
-	xyz="0 0 0"
-	rpy="0 0 0" />
+      	xyz="0 0 0"
+      	rpy="0 0 0" />
       <mass
-	value="0.823603974032196" />
+      	value="0.823603974032196" />
       <inertia
-	ixx="0"
-	ixy="0"
-	ixz="0"
-	iyy="0"
-	iyz="0"
-	izz="0" />
+      	ixx="1"
+      	ixy="0"
+      	ixz="0"
+      	iyy="1"
+      	iyz="0"
+      	izz="1" />
     </inertial>
     <visual>
       <origin
-	xyz="0 0 0"
-	rpy="0 0 0" />
+      	xyz="0 0 0"
+      	rpy="0 0 0" />
       <geometry>
-	<mesh
-          scale="0.001 0.001 0.001"
-	  filename="package://mobile_dual_arm/scene/meshes/bin.STL" />
+	    <mesh
+        scale="0.001 0.001 0.001"
+	      filename="package://mobile_dual_arm/scene/meshes/bin.STL" />
       </geometry>
       <material
-	name="blue_">
-	<color
-	  rgba="0.4 0.66 0.99 1" />
+      	name="blue_">
+       	<color
+       	  rgba="0.4 0.66 0.99 1" />
       </material>
     </visual>
     <collision>
       <origin
-	xyz="0 0 0"
-	rpy="0 0 0" />
+	      xyz="0 0 0"
+      	rpy="0 0 0" />
       <geometry>
-	<mesh
+      	<mesh
           scale="0.001 0.001 0.001"
-	  filename="package://mobile_dual_arm/scene/meshes/bin.STL" />
+	        filename="package://mobile_dual_arm/scene/meshes/bin.STL" />
       </geometry>
     </collision>
   </link>
 
   <joint name="fixed4" type="fixed">
     <origin
-      xyz="-0.175 -0.31 0.06"
+      xyz="0.35 -0.31 0.26"
       rpy="0 0 1.5708" />
-    <parent link="mobile_base"/>
+    <parent link="base_link"/>
     <child link="Bin"/>
   </joint>
--->
-
-  <!-- <transmission name="tran1_slide_R">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="joint_right">
-      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-    </joint>
-    <actuator name="motor1_slide_R">
-      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-  </transmission>
-
-  <transmission name="tran_slide_L">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="joint_left">
-      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-    </joint>
-    <actuator name="motor_slide_L">
-      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-  </transmission> -->
-
 </robot>
 
 

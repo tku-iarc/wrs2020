@@ -119,31 +119,31 @@ void BaseModule::queueThread()
   ros_node.setCallbackQueue(&callback_queue);
 
   /* publish topics */
-  status_msg_pub_ = ros_node.advertise<robotis_controller_msgs::StatusMsg>("robotis/status", 1);
+  status_msg_pub_ = ros_node.advertise<robotis_controller_msgs::StatusMsg>("status", 1);
   set_ctrl_module_pub_ = ros_node.advertise<std_msgs::String>("robotis/enable_ctrl_module", 1);
 
   /* subscribe topics */
-  ros::Subscriber stop_sub = ros_node.subscribe("robot/is_stop", 5,
+  ros::Subscriber stop_sub = ros_node.subscribe("/robot/is_stop", 5,
                                                 &BaseModule::stopMsgCallback, this);
-  ros::Subscriber wait_sub = ros_node.subscribe("robot/wait", 5,
+  ros::Subscriber wait_sub = ros_node.subscribe("wait", 5,
                                                 &BaseModule::waitMsgCallback, this);
-  ros::Subscriber clear_cmd_sub = ros_node.subscribe("robot/clear_cmd",5,
+  ros::Subscriber clear_cmd_sub = ros_node.subscribe("clear_cmd",5,
                                                      &BaseModule::clearCmdCallback, this);
-  ros::Subscriber ini_pose_msg_sub = ros_node.subscribe("robotis/base/ini_pose_msg", 5,
+  ros::Subscriber ini_pose_msg_sub = ros_node.subscribe("ini_pose_msg", 5,
                                                         &BaseModule::initPoseMsgCallback, this);
-  ros::Subscriber set_mode_msg_sub = ros_node.subscribe("robotis/base/set_mode_msg", 5,
+  ros::Subscriber set_mode_msg_sub = ros_node.subscribe("set_mode_msg", 5,
                                                         &BaseModule::setModeMsgCallback, this);
 
-  ros::Subscriber joint_pose_msg_sub = ros_node.subscribe("robotis/base/joint_pose_msg", 5,
+  ros::Subscriber joint_pose_msg_sub = ros_node.subscribe("joint_pose_msg", 5,
                                                           &BaseModule::jointPoseMsgCallback, this);
-  ros::Subscriber kinematics_pose_msg_sub = ros_node.subscribe("robotis/base/kinematics_pose_msg", 5,
+  ros::Subscriber kinematics_pose_msg_sub = ros_node.subscribe("kinematics_pose_msg", 5,
                                                                &BaseModule::kinematicsPoseMsgCallback, this);
-  ros::Subscriber p2p_pose_msg_sub = ros_node.subscribe("robotis/base/p2p_pose_msg", 5,
+  ros::Subscriber p2p_pose_msg_sub = ros_node.subscribe("p2p_pose_msg", 5,
                                                                &BaseModule::p2pPoseMsgCallback, this);
 
-  ros::ServiceServer get_joint_pose_server = ros_node.advertiseService("robotis/base/get_joint_pose",
+  ros::ServiceServer get_joint_pose_server = ros_node.advertiseService("get_joint_pose",
                                                                        &BaseModule::getJointPoseCallback, this);
-  ros::ServiceServer get_kinematics_pose_server = ros_node.advertiseService("robotis/base/get_kinematics_pose",
+  ros::ServiceServer get_kinematics_pose_server = ros_node.advertiseService("get_kinematics_pose",
                                                                             &BaseModule::getKinematicsPoseCallback, this);
   slide_->slide_fdb_sub = ros_node.subscribe("slide_feedback_msg", 10, &slide_control::slideFeedback, slide_);
 

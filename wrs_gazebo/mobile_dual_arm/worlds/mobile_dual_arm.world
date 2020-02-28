@@ -20,14 +20,14 @@
     </physics>
 
     <model name="shelf">
-      <pose>0.93 -0.4625 -0.05  0 0 0</pose>
+      <pose>-0.50 0.4625 -0.05  0 0 3.1416</pose>
       <static>true</static>
       <link name="shelf">
         <visual name="visual">
           <geometry>
             <mesh>
                <scale>0.001 0.001 0.001</scale>
-               <uri>model://mobile_dual_arm/scene/meshes/shelf.STL</uri>
+               <uri>model://mobile_dual_arm/scene/meshes/shelf_new.STL</uri>
             </mesh>
           </geometry>
         </visual>
@@ -36,7 +36,7 @@
           <geometry>
             <mesh>
                <scale>0.001 0.001 0.001</scale>
-               <uri>model://mobile_dual_arm/scene/meshes/shelfForColison.STL</uri>
+               <uri>model://mobile_dual_arm/scene/meshes/shelf_new.STL</uri>
             </mesh>
           </geometry>
           <surface>
@@ -62,7 +62,7 @@
           <geometry>
             <mesh>
                <scale>0.001 0.001 0.001</scale>
-               <uri>model://mobile_dual_arm/scene/meshes/shelf_dis.STL</uri>
+               <uri>model://mobile_dual_arm/scene/meshes/shelf_new.STL</uri>
             </mesh>
           </geometry>
         </visual>
@@ -71,7 +71,7 @@
           <geometry>
             <mesh>
                <scale>0.001 0.001 0.001</scale>
-               <uri>model://mobile_dual_arm/scene/meshes/shelf_dis.STL</uri>
+               <uri>model://mobile_dual_arm/scene/meshes/shelf_new.STL</uri>
             </mesh>
           </geometry>
           <surface>
@@ -90,7 +90,7 @@
     </model>
 
     <model name="lunchbox1">
-      <pose>-0.5 -0.1625 10  0 0 0</pose>
+      <pose> 0.09 -0.1625 0.685  0 0 0</pose>
       <static>false</static>
       <link name="lunchbox1">
         <inertial>
@@ -116,8 +116,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>0.5</mu>
-                <mu2>0.5</mu2>
+                <mu>5</mu>
+                <mu2>5</mu2>
               </ode>
             </friction>
             <contact>
@@ -137,7 +137,7 @@
     </model>
 
     <model name="lunchbox2">
-      <pose>-0.5 -0.1625 11  0 0 0</pose>
+      <pose>0.09 -0.1625 0.74  0 0 0</pose>
       <static>false</static>
       <link name="lunchbox2">
         <inertial>
@@ -163,8 +163,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>0.5</mu>
-                <mu2>0.5</mu2>
+                <mu>5</mu>
+                <mu2>5</mu2>
               </ode>
             </friction>
             <contact>
@@ -184,7 +184,7 @@
     </model>
 
     <model name="lunchbox3">
-      <pose>-0.5 -0.1625 12  0 0 0</pose>
+      <pose>0.09 0.1625 0.685  0 0 0</pose>
       <static>false</static>
       <link name="lunchbox3">
         <inertial>
@@ -210,8 +210,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>0.5</mu>
-                <mu2>0.5</mu2>
+                <mu>5</mu>
+                <mu2>5</mu2>
               </ode>
             </friction>
             <contact>
@@ -231,7 +231,7 @@
     </model>
 
     <model name="lunchbox4">
-      <pose>-0.5 -0.1625 13  0 0 0</pose>
+      <pose>0.09 0.1625 0.74  0 0 0</pose>
       <static>false</static>
       <link name="lunchbox4">
         <inertial>
@@ -257,8 +257,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>0.5</mu>
-                <mu2>0.5</mu2>
+                <mu>5</mu>
+                <mu2>5</mu2>
               </ode>
             </friction>
             <contact>
@@ -280,7 +280,7 @@
 
 
     <model name="riceball1">
-      <pose>-0.5 0.0 10  0 0 0</pose>
+      <pose>0.22 0.2 0.67  0 1.57 0</pose>
       <static>false</static>
       <link name="riceball1">
         <inertial>
@@ -306,8 +306,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>0.5</mu>
-                <mu2>0.5</mu2>
+                <mu>5</mu>
+                <mu2>5</mu2>
               </ode>
             </friction>
             <contact>
@@ -327,7 +327,7 @@
     </model>
 
     <model name="riceball2">
-      <pose>-0.5 0.0 11  0 0 0</pose>
+      <pose>0.22 0.08 0.67  0 1.57 0</pose>
       <static>false</static>
       <link name="riceball2">
         <inertial>
@@ -353,8 +353,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>0.5</mu>
-                <mu2>0.5</mu2>
+                <mu>5</mu>
+                <mu2>5</mu2>
               </ode>
             </friction>
             <contact>
@@ -374,7 +374,7 @@
     </model>
 
     <model name="riceball3">
-      <pose>-0.5 0.0 12  0 0 0</pose>
+      <pose>0.31 0.08 0.67  0 1.57 0</pose>
       <static>false</static>
       <link name="riceball3">
         <inertial>
@@ -400,8 +400,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>0.5</mu>
-                <mu2>0.5</mu2>
+                <mu>5</mu>
+                <mu2>5</mu2>
               </ode>
             </friction>
             <contact>
@@ -421,7 +421,7 @@
     </model>
 
     <model name="riceball4">
-      <pose>-0.5 0.0 13  0 0 0</pose>
+      <pose>0.31 0.2 0.67  0 1.57 0</pose>
       <static>false</static>
       <link name="riceball4">
         <inertial>
@@ -447,8 +447,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>0.5</mu>
-                <mu2>0.5</mu2>
+                <mu>5</mu>
+                <mu2>5</mu2>
               </ode>
             </friction>
             <contact>
@@ -468,7 +468,7 @@
     </model>
 
     <model name="drink1">
-      <pose>-0.3 0.1 10  0 0 0</pose>
+      <pose>0.23 -0.2 0.74  0 0 0</pose>
       <static>false</static>
       <link name="drink1">
         <inertial>
@@ -494,8 +494,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>0.5</mu>
-                <mu2>0.5</mu2>
+                <mu>5</mu>
+                <mu2>5</mu2>
               </ode>
             </friction>
             <contact>
@@ -515,7 +515,7 @@
     </model>
 
     <model name="drink2">
-      <pose>-0.3 0.1 11  0 0 0</pose>
+      <pose>0.23 -0.08 0.74  0 0 0</pose>
       <static>false</static>
       <link name="drink2">
         <inertial>
@@ -541,8 +541,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>0.5</mu>
-                <mu2>0.5</mu2>
+                <mu>5</mu>
+                <mu2>5</mu2>
               </ode>
             </friction>
             <contact>
@@ -562,7 +562,7 @@
     </model>
 
     <model name="drink3">
-      <pose>-0.3 0.1 12  0 0 0</pose>
+      <pose>0.32 -0.08 0.74  0 0 0</pose>
       <static>false</static>
       <link name="drink3">
         <inertial>
@@ -588,8 +588,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>0.5</mu>
-                <mu2>0.5</mu2>
+                <mu>5</mu>
+                <mu2>5</mu2>
               </ode>
             </friction>
             <contact>
@@ -609,7 +609,7 @@
     </model>
 
     <model name="drink4">
-      <pose>-0.3 0.1 13  0 0 0</pose>
+      <pose>0.32 -0.2 0.74  0 0 0</pose>
       <static>false</static>
       <link name="drink4">
         <inertial>
@@ -635,8 +635,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>0.5</mu>
-                <mu2>0.5</mu2>
+                <mu>5</mu>
+                <mu2>5</mu2>
               </ode>
             </friction>
             <contact>

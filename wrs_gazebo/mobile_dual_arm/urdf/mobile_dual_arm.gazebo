@@ -15,7 +15,7 @@
   </gazebo>
 
   <gazebo>
-    <plugin name="gazebo_ros_vacuum_gripper" filename="libgazebo_ros_vacuum.so">
+    <plugin name="gazebo_ros_vacuum_gripper" filename="libgazebo_ros_vacuum_gripper.so">
       <robotNamespace>/robot/left_gazebo/vacuum_gripper1</robotNamespace>
       <bodyName>l_end_Link1</bodyName>
       <topicName>grasping</topicName>
@@ -122,6 +122,13 @@
       <maxDistance>0.05</maxDistance>
       <minDistance>0.01</minDistance>
     </plugin>
+  </gazebo>
+
+  <gazebo reference="Bin">
+    <mu1>100</mu1>
+    <mu2>100</mu2>
+    <material>Gazebo/Blue</material>
+    <selfCollide>false</selfCollide>
   </gazebo>
   
 <!--====================================================================================
