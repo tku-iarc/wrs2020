@@ -102,6 +102,8 @@ public:
     void sendJointPoseMsg(manipulator_h_base_module_msgs::JointPose msg);
     void sendKinematicsPoseMsg(manipulator_h_base_module_msgs::KinematicsPose msg);
     void sendP2PPoseMsg( manipulator_h_base_module_msgs::P2PPose msg );
+    void getCurrPose(double (&data)[7]);
+    inline QString getName(){return self_name_;}
 
 
 public Q_SLOTS:
@@ -118,6 +120,8 @@ Q_SIGNALS:
 private:
     int     init_argc_;
     char**  init_argv_;
+    std::string  name_;
+    QString self_name_;
 
     ros::Publisher      chatter_publisher_;
     QStringListModel    logging_model_;

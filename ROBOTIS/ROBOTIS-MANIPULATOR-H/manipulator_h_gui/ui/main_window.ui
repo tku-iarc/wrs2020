@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1047</width>
-    <height>612</height>
+    <width>1100</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -552,8 +552,279 @@
        </layout>
       </widget>
      </item>
+     <!-- ===================================================================================== -->
      <item row="1" column="0">
-      <widget class="QFrame" name="frame_2">
+      <widget class="QGroupBox" name="relative_movement">
+       <property name="title">
+        <string>Relative Movement</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QLabel" name="relative_pos_label">
+            <property name="text">
+             <string>Position [m]</string>
+            </property>
+            <property name="alignment">
+             <enum>Qt::AlignCenter</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="relative_movement_spinbox">
+            <property name="value">
+             <double>0.010000000000000</double>
+            </property>
+            <property name="minimum">
+             <double>0.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>0.200000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.010000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="relative_ori_label">
+            <property name="text">
+             <string>Orientation [deg]</string>
+            </property>
+            <property name="alignment">
+             <enum>Qt::AlignCenter</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="relative_rotation_spinbox">
+            <property name="value">
+             <double>5.000000000000000</double>
+            </property>
+            <property name="minimum">
+             <double>0.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>30.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>1.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QPushButton" name="relative_xp_button">
+            <property name="text">
+             <string>+</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="relative_yp_button">
+            <property name="text">
+             <string>+</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="relative_zp_button">
+            <property name="text">
+             <string>+</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="relative_ap_button">
+            <property name="text">
+             <string>+</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="relative_rollp_button">
+            <property name="text">
+             <string>+</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="relative_pitchp_button">
+            <property name="text">
+             <string>+</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="relative_yawp_button">
+            <property name="text">
+             <string>+</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="relative_phip_button">
+            <property name="text">
+             <string>+</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QLabel" name="x">
+            <property name="text">
+             <string>X</string>
+            </property>
+            <property name="alignment">
+             <enum>Qt::AlignCenter</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="y">
+            <property name="text">
+             <string>Y</string>
+            </property>
+            <property name="alignment">
+             <enum>Qt::AlignCenter</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="z">
+            <property name="text">
+             <string>Z</string>
+            </property>
+            <property name="alignment">
+             <enum>Qt::AlignCenter</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="a">
+            <property name="text">
+             <string>A</string>
+            </property>
+            <property name="alignment">
+             <enum>Qt::AlignCenter</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="roll">
+            <property name="text">
+             <string>Roll</string>
+            </property>
+            <property name="alignment">
+             <enum>Qt::AlignCenter</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="pitch">
+            <property name="text">
+             <string>Pitch</string>
+            </property>
+            <property name="alignment">
+             <enum>Qt::AlignCenter</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="yaw">
+            <property name="text">
+             <string>Yaw</string>
+            </property>
+            <property name="alignment">
+             <enum>Qt::AlignCenter</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="phi">
+            <property name="text">
+             <string>Phi</string>
+            </property>
+            <property name="alignment">
+             <enum>Qt::AlignCenter</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QPushButton" name="relative_xm_button">
+            <property name="text">
+             <string>-</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="relative_ym_button">
+            <property name="text">
+             <string>-</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="relative_zm_button">
+            <property name="text">
+             <string>-</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="relative_am_button">
+            <property name="text">
+             <string>-</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="relative_rollm_button">
+            <property name="text">
+             <string>-</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="relative_pitchm_button">
+            <property name="text">
+             <string>-</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="relative_yawm_button">
+            <property name="text">
+             <string>-</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="relative_phim_button">
+            <property name="text">
+             <string>-</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <!-- =============================================================================================== -->
+     <item row="2" column="0">
+      <widget class="QFrame" name="frame_3">
        <property name="enabled">
         <bool>true</bool>
        </property>

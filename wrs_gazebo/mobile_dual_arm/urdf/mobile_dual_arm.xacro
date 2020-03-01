@@ -12,15 +12,15 @@
   <xacro:include filename="$(find mobile_dual_arm)/urdf/mobile_dual_arm.gazebo" />
   <!--xacro:include filename="$(find mobile_table)/urdf/mobile_table.xacro" /-->
 
-  <!--<link name="world"/-->
+  <link name="world"/>
 
-  <!-- <joint name="fixed1" type="fixed">
+  <joint name="fixed1" type="fixed">
     <origin
-      xyz="0 0 0.562"
+      xyz="0 0 0"
       rpy="0 0 0" />
     <parent link="world"/>
-    <child link="base_link"/>
-  </joint> -->
+    <child link="mobile_base_footprint"/>
+  </joint>
   <joint name="fixed3" type="fixed">
     <origin
       xyz="0.037646 0.0 0.355"

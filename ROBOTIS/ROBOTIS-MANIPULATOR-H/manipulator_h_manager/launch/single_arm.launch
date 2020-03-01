@@ -15,7 +15,9 @@
               <param name="link_file_path"           value="$(find manipulator_h_kinematics_dynamics)/config/link_param_$(arg side).yaml" />
           </node>
 
-          <node pkg="manipulator_h_gui" type="manipulator_h_gui" name="gui_$(arg side)" output="screen"/>
+          <node pkg="manipulator_h_gui" type="manipulator_h_gui" name="$(arg side)_gui" output="screen">
+                <param name="robot_name"             value="$(arg side)_arm"/>
+          </node>
 
           <node pkg="linear_motion" type="linear_z" name="slide_$(arg side)" output="screen" unless="$(arg en_sim)">
                 <param name="side"               value="$(arg side)" />

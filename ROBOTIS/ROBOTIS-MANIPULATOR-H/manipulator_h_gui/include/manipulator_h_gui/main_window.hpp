@@ -74,6 +74,9 @@ public:
     Eigen::MatrixXd quaternion2rpy( Eigen::Quaterniond quaternion );
     Eigen::MatrixXd quaternion2rotation( Eigen::Quaterniond quaternion );
 
+    void relative_movement();
+    void get_curr_pos();
+
 public Q_SLOTS:
     /******************************************
         ** Auto-connections (connectSlotsByName())
@@ -89,6 +92,22 @@ public Q_SLOTS:
 
     void on_ini_pose_button_clicked( bool check );
     void on_set_mode_button_clicked( bool check );
+    void on_relative_xp_button_clicked( bool check );
+    void on_relative_xm_button_clicked( bool check );
+    void on_relative_yp_button_clicked( bool check );
+    void on_relative_ym_button_clicked( bool check );
+    void on_relative_zp_button_clicked( bool check );
+    void on_relative_zm_button_clicked( bool check );
+    void on_relative_ap_button_clicked( bool check );
+    void on_relative_am_button_clicked( bool check );
+    void on_relative_rollp_button_clicked( bool check );
+    void on_relative_rollm_button_clicked( bool check );
+    void on_relative_pitchp_button_clicked( bool check );
+    void on_relative_pitchm_button_clicked( bool check );
+    void on_relative_yawp_button_clicked( bool check );
+    void on_relative_yawm_button_clicked( bool check );
+    void on_relative_phip_button_clicked( bool check );
+    void on_relative_phim_button_clicked( bool check );
 
     /******************************************
     ** Manual connections
@@ -105,6 +124,8 @@ private:
     std::vector<std::string> joint_name;
 
     QList<QAbstractSpinBox *> joint_spinbox;
+
+    double relative_movement_data[7];
 };
 
 }  // namespace manipulator_h_gui

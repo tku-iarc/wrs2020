@@ -125,8 +125,8 @@
   </gazebo>
 
   <gazebo reference="Bin">
-    <mu1>100</mu1>
-    <mu2>100</mu2>
+    <mu1>200</mu1>
+    <mu2>200</mu2>
     <material>Gazebo/Blue</material>
     <selfCollide>false</selfCollide>
   </gazebo>

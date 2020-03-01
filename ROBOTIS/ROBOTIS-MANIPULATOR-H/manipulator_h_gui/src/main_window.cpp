@@ -91,6 +91,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     ** Auto Start
     **********************/
   qnode.init();
+  setWindowTitle(qnode.getName());
+
 }
 
 MainWindow::~MainWindow() {}
@@ -98,7 +100,50 @@ MainWindow::~MainWindow() {}
 /*****************************************************************************
 ** Implementation [Slots]
 *****************************************************************************/
+void MainWindow::relative_movement()
+{
+  manipulator_h_base_module_msgs::P2PPose msg;
 
+  msg.name = "arm";
+
+  msg.speed           = ui.speed_spinbox->value();
+  msg.pose.position.x = this->relative_movement_data[0];
+  msg.pose.position.y = this->relative_movement_data[1];
+  msg.pose.position.z = this->relative_movement_data[2];
+  
+  double roll  = this->relative_movement_data[3] * M_PI / 180.0;
+  double pitch = this->relative_movement_data[4] * M_PI / 180.0;
+  double yaw   = this->relative_movement_data[5] * M_PI / 180.0;
+  double phi   = this->relative_movement_data[6] * M_PI / 180.0;
+  
+  Eigen::Quaterniond QR = rpy2quaternion( roll, pitch, yaw );
+
+  msg.pose.orientation.x = QR.x();
+  msg.pose.orientation.y = QR.y();
+  msg.pose.orientation.z = QR.z();
+  msg.pose.orientation.w = QR.w();
+  msg.phi = phi;
+
+  qnode.sendP2PPoseMsg( msg );
+  return;
+}
+
+// void MainWindow::qnode.getCurrPose(this->relative_movement_data)
+// {
+//   std::string group_name = "arm";
+//   qnode.getKinematicsPose( group_name );
+
+//   this->relative_movement_data[0] = ui.pos_x_spinbox->value();
+//   this->relative_movement_data[1] = ui.pos_y_spinbox->value();
+//   this->relative_movement_data[2] = ui.pos_z_spinbox->value();
+  
+//   this->relative_movement_data[3] = ui.ori_roll_spinbox->value();
+//   this->relative_movement_data[4] = ui.ori_pitch_spinbox->value();
+//   this->relative_movement_data[5] = ui.ori_yaw_spinbox->value();
+//   this->relative_movement_data[6] = ui.ori_phi_spinbox->value();
+
+//   return;
+// }
 void MainWindow::on_curr_joint_button_clicked( bool check )
 {
   qnode.getJointPose( joint_name );
@@ -195,6 +240,115 @@ void MainWindow::on_set_mode_button_clicked( bool check )
   msg.data ="set_mode";
 
   qnode.sendSetModeMsg( msg );
+}
+
+void MainWindow::on_relative_xp_button_clicked( bool check )
+{
+  qnode.getCurrPose(this->relative_movement_data);
+  this->relative_movement_data[0] += ui.relative_movement_spinbox->value();
+  relative_movement();
+}
+void MainWindow::on_relative_xm_button_clicked( bool check )
+{
+  qnode.getCurrPose(this->relative_movement_data);
+  this->relative_movement_data[0] -= ui.relative_movement_spinbox->value();
+  relative_movement();
+}
+void MainWindow::on_relative_yp_button_clicked( bool check )
+{
+  qnode.getCurrPose(this->relative_movement_data);
+  this->relative_movement_data[1] += ui.relative_movement_spinbox->value();
+  relative_movement();
+}
+void MainWindow::on_relative_ym_button_clicked( bool check )
+{
+  qnode.getCurrPose(this->relative_movement_data);
+  this->relative_movement_data[1] -= ui.relative_movement_spinbox->value();
+  relative_movement();
+}
+void MainWindow::on_relative_zp_button_clicked( bool check )
+{
+  qnode.getCurrPose(this->relative_movement_data);
+  this->relative_movement_data[2] += ui.relative_movement_spinbox->value();
+  relative_movement();
+}
+void MainWindow::on_relative_zm_button_clicked( bool check )
+{
+  qnode.getCurrPose(this->relative_movement_data);
+  this->relative_movement_data[2] -= ui.relative_movement_spinbox->value();
+  relative_movement();
+}
+void MainWindow::on_relative_ap_button_clicked( bool check )
+{
+  qnode.getCurrPose(this->relative_movement_data);
+  double roll  = this->relative_movement_data[3] * DEGREE2RADIAN;
+  double pitch = this->relative_movement_data[4] * DEGREE2RADIAN;
+  double yaw   = this->relative_movement_data[5] * DEGREE2RADIAN;
+  Eigen::MatrixXd rotation = rpy2rotation( roll, pitch, yaw );
+  this->relative_movement_data[0] += rotation.coeff( 0,2 ) * ui.relative_movement_spinbox->value();
+  this->relative_movement_data[1] += rotation.coeff( 1,2 ) * ui.relative_movement_spinbox->value();
+  this->relative_movement_data[2] += rotation.coeff( 2,2 ) * ui.relative_movement_spinbox->value();
+  std::cout<<rotation.coeff( 0,2 )<<" "<<rotation.coeff( 1,2 )<<" "<<rotation.coeff( 2,2 )<<std::endl;
+  relative_movement();
+}
+void MainWindow::on_relative_am_button_clicked( bool check )
+{
+  qnode.getCurrPose(this->relative_movement_data);
+  double roll  = this->relative_movement_data[3] * DEGREE2RADIAN;
+  double pitch = this->relative_movement_data[4] * DEGREE2RADIAN;
+  double yaw   = this->relative_movement_data[5] * DEGREE2RADIAN;
+  Eigen::MatrixXd rotation = rpy2rotation( roll, pitch, yaw );  this->relative_movement_data[0] -= rotation.coeff( 0,2 ) * ui.relative_movement_spinbox->value();
+  this->relative_movement_data[1] -= rotation.coeff( 1,2 ) * ui.relative_movement_spinbox->value();
+  this->relative_movement_data[2] -= rotation.coeff( 2,2 ) * ui.relative_movement_spinbox->value();
+  relative_movement();
+}
+void MainWindow::on_relative_rollp_button_clicked( bool check )
+{
+  qnode.getCurrPose(this->relative_movement_data);
+  this->relative_movement_data[3] += ui.relative_rotation_spinbox->value();
+  relative_movement();
+}
+void MainWindow::on_relative_rollm_button_clicked( bool check )
+{
+  qnode.getCurrPose(this->relative_movement_data);
+  this->relative_movement_data[3] -= ui.relative_rotation_spinbox->value();
+  relative_movement();
+}
+void MainWindow::on_relative_pitchp_button_clicked( bool check )
+{
+  qnode.getCurrPose(this->relative_movement_data);
+  this->relative_movement_data[4] += ui.relative_rotation_spinbox->value();
+  relative_movement();
+}
+void MainWindow::on_relative_pitchm_button_clicked( bool check )
+{
+  qnode.getCurrPose(this->relative_movement_data);
+  this->relative_movement_data[4] -= ui.relative_rotation_spinbox->value();
+  relative_movement();
+}
+void MainWindow::on_relative_yawp_button_clicked( bool check )
+{
+  qnode.getCurrPose(this->relative_movement_data);
+  this->relative_movement_data[5] += ui.relative_rotation_spinbox->value();
+  relative_movement();
+}
+void MainWindow::on_relative_yawm_button_clicked( bool check )
+{
+  qnode.getCurrPose(this->relative_movement_data);
+  this->relative_movement_data[5] -= ui.relative_rotation_spinbox->value();
+  relative_movement();
+}
+void MainWindow::on_relative_phip_button_clicked( bool check )
+{
+  qnode.getCurrPose(this->relative_movement_data);
+  this->relative_movement_data[6] += ui.relative_rotation_spinbox->value();
+  relative_movement();
+}
+void MainWindow::on_relative_phim_button_clicked( bool check )
+{
+  qnode.getCurrPose(this->relative_movement_data);
+  this->relative_movement_data[6] -= ui.relative_rotation_spinbox->value();
+  relative_movement();
 }
 
 void MainWindow::updateCurrJointPoseSpinbox( manipulator_h_base_module_msgs::JointPose msg )

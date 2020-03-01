@@ -60,6 +60,7 @@ bool QNode::init() {
 
   ros::start(); // explicitly needed since our nodehandle is going out of scope.
   ros::NodeHandle n;
+  ros::NodeHandle n_private("~");
 
   // Add your ros communications here.
   ini_pose_msg_pub_ = n.advertise<std_msgs::String>("ini_pose_msg", 0);
@@ -73,6 +74,9 @@ bool QNode::init() {
   get_kinematics_pose_client_ = n.serviceClient<manipulator_h_base_module_msgs::GetKinematicsPose>("get_kinematics_pose", 0);
 
   status_msg_sub_ = n.subscribe("status", 10, &QNode::statusMsgCallback, this);
+
+  name_ = n_private.param<std::string>("robot_name", "FUCK");
+  self_name_ = QString::fromUtf8(name_.c_str());
 
   start();
   return true;
@@ -226,4 +230,27 @@ void QNode::getKinematicsPose ( std::string group_name )
     log(Error, "fail to get kinematcis pose.");
 }
 
+void QNode::getCurrPose(double (&data)[7])
+{
+  manipulator_h_base_module_msgs::GetKinematicsPose _get_kinematics_pose;
+ 
+  // request
+  _get_kinematics_pose.request.group_name = "arm";
+
+  // response
+  if ( get_kinematics_pose_client_.call( _get_kinematics_pose ) )
+  {
+    data[0] = _get_kinematics_pose.response.group_pose.position.x;
+    data[1] = _get_kinematics_pose.response.group_pose.position.y;
+    data[2] = _get_kinematics_pose.response.group_pose.position.z;
+    data[3] = _get_kinematics_pose.response.euler[0] * RADIAN2DEGREE;
+    data[4] = _get_kinematics_pose.response.euler[1] * RADIAN2DEGREE;
+    data[5] = _get_kinematics_pose.response.euler[2] * RADIAN2DEGREE;
+    data[6] = _get_kinematics_pose.response.phi * RADIAN2DEGREE;
+  } 
+  else
+    log(Error, "fail to get current pose.");
+  return;
+    
+}
 }  // namespace manipulator_h_gui

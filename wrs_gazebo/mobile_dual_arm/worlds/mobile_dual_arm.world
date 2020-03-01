@@ -20,15 +20,16 @@
     </physics>
 
     <model name="shelf">
-      <pose>-0.50 0.4625 -0.05  0 0 3.1416</pose>
+      <pose>-0.65 0.4625 -0.05  0 0 3.1416</pose>
       <static>true</static>
       <link name="shelf">
         <visual name="visual">
           <geometry>
             <mesh>
                <scale>0.001 0.001 0.001</scale>
-               <uri>model://mobile_dual_arm/scene/meshes/shelf_new.STL</uri>
+               <uri>model://mobile_dual_arm/scene/meshes/shelf_higher.STL</uri>
             </mesh>
+            <material>Gazebo/Blue</material>
           </geometry>
         </visual>
         <collision name="collision">
@@ -36,7 +37,7 @@
           <geometry>
             <mesh>
                <scale>0.001 0.001 0.001</scale>
-               <uri>model://mobile_dual_arm/scene/meshes/shelf_new.STL</uri>
+               <uri>model://mobile_dual_arm/scene/meshes/shelf_higher.STL</uri>
             </mesh>
           </geometry>
           <surface>
@@ -55,14 +56,14 @@
     </model>
 
     <model name="shelf1">
-      <pose>0.947 0.66 0  0 0 1.5708</pose>
+      <pose>0.947 0.9 0  0 0 1.5708</pose>
       <static>true</static>
       <link name="shelf1">
         <visual name="visual">
           <geometry>
             <mesh>
                <scale>0.001 0.001 0.001</scale>
-               <uri>model://mobile_dual_arm/scene/meshes/shelf_new.STL</uri>
+               <uri>model://mobile_dual_arm/scene/meshes/shelf_higher.STL</uri>
             </mesh>
           </geometry>
         </visual>
@@ -71,7 +72,7 @@
           <geometry>
             <mesh>
                <scale>0.001 0.001 0.001</scale>
-               <uri>model://mobile_dual_arm/scene/meshes/shelf_new.STL</uri>
+               <uri>model://mobile_dual_arm/scene/meshes/shelf_higher.STL</uri>
             </mesh>
           </geometry>
           <surface>
@@ -95,15 +96,15 @@
       <link name="lunchbox1">
         <inertial>
           <pose>8.6736E-18 0 -0.025 0 0 0</pose>
-          <mass>0.535</mass>
+          <mass>1.0</mass>
           <inertia> <!-- inertias are tricky to compute -->
             <!-- http://gazebosim.org/tutorials?tut=inertia&cat=build_robot -->
-            <ixx>0.00371</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
+            <ixx>0.001</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
             <ixy>0.0</ixy>         <!-- for a box: ixy = 0 -->
             <ixz>0.0</ixz>         <!-- for a box: ixz = 0 -->
-            <iyy>0.0021609</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
+            <iyy>0.001</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
             <iyz>0.0</iyz>         <!-- for a box: iyz = 0 -->
-            <izz>0.0048427</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
+            <izz>0.001</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
           </inertia>
         </inertial>
         <collision name="collision">
@@ -116,8 +117,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>5</mu>
-                <mu2>5</mu2>
+                <mu>25</mu>
+                <mu2>25</mu2>
               </ode>
             </friction>
             <contact>
@@ -142,15 +143,15 @@
       <link name="lunchbox2">
         <inertial>
           <pose>8.6736E-18 0 -0.025 0 0 0</pose>
-          <mass>0.535</mass>
+          <mass>1.0</mass>
           <inertia> <!-- inertias are tricky to compute -->
             <!-- http://gazebosim.org/tutorials?tut=inertia&cat=build_robot -->
-            <ixx>0.00371</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
+            <ixx>0.001</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
             <ixy>0.0</ixy>         <!-- for a box: ixy = 0 -->
             <ixz>0.0</ixz>         <!-- for a box: ixz = 0 -->
-            <iyy>0.0021609</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
+            <iyy>0.001</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
             <iyz>0.0</iyz>         <!-- for a box: iyz = 0 -->
-            <izz>0.0048427</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
+            <izz>0.001</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
           </inertia>
         </inertial>
         <collision name="collision">
@@ -163,8 +164,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>5</mu>
-                <mu2>5</mu2>
+                <mu>25</mu>
+                <mu2>25</mu2>
               </ode>
             </friction>
             <contact>
@@ -189,15 +190,15 @@
       <link name="lunchbox3">
         <inertial>
           <pose>8.6736E-18 0 -0.025 0 0 0</pose>
-          <mass>0.535</mass>
+          <mass>1.0</mass>
           <inertia> <!-- inertias are tricky to compute -->
             <!-- http://gazebosim.org/tutorials?tut=inertia&cat=build_robot -->
-            <ixx>0.00371</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
+            <ixx>0.001</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
             <ixy>0.0</ixy>         <!-- for a box: ixy = 0 -->
             <ixz>0.0</ixz>         <!-- for a box: ixz = 0 -->
-            <iyy>0.0021609</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
+            <iyy>0.001</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
             <iyz>0.0</iyz>         <!-- for a box: iyz = 0 -->
-            <izz>0.0048427</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
+            <izz>0.001</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
           </inertia>
         </inertial>
         <collision name="collision">
@@ -210,8 +211,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>5</mu>
-                <mu2>5</mu2>
+                <mu>25</mu>
+                <mu2>25</mu2>
               </ode>
             </friction>
             <contact>
@@ -236,15 +237,15 @@
       <link name="lunchbox4">
         <inertial>
           <pose>8.6736E-18 0 -0.025 0 0 0</pose>
-          <mass>0.535</mass>
+          <mass>1.0</mass>
           <inertia> <!-- inertias are tricky to compute -->
             <!-- http://gazebosim.org/tutorials?tut=inertia&cat=build_robot -->
-            <ixx>0.00371</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
+            <ixx>0.001</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
             <ixy>0.0</ixy>         <!-- for a box: ixy = 0 -->
             <ixz>0.0</ixz>         <!-- for a box: ixz = 0 -->
-            <iyy>0.0021609</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
+            <iyy>0.001</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
             <iyz>0.0</iyz>         <!-- for a box: iyz = 0 -->
-            <izz>0.0048427</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
+            <izz>0.001</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
           </inertia>
         </inertial>
         <collision name="collision">
@@ -257,8 +258,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>5</mu>
-                <mu2>5</mu2>
+                <mu>25</mu>
+                <mu2>25</mu2>
               </ode>
             </friction>
             <contact>
@@ -285,15 +286,15 @@
       <link name="riceball1">
         <inertial>
           <pose>0.0175 0 0.00014145 0 0 0</pose>
-          <mass>0.11</mass>
+          <mass>0.48</mass>
           <inertia> <!-- inertias are tricky to compute -->
             <!-- http://gazebosim.org/tutorials?tut=inertia&cat=build_robot -->
-            <ixx>7.011E-05</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
+            <ixx>0.001</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
             <ixy>0.0</ixy>         <!-- for a box: ixy = 0 -->
             <ixz>2.7E-07</ixz>         <!-- for a box: ixz = 0 -->
-            <iyy>8.42E-05</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
+            <iyy>0.001</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
             <iyz>0.0</iyz>         <!-- for a box: iyz = 0 -->
-            <izz>7.871E-05</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
+            <izz>0.001</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
           </inertia>
         </inertial>
         <collision name="collision">
@@ -306,8 +307,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>5</mu>
-                <mu2>5</mu2>
+                <mu>25</mu>
+                <mu2>25</mu2>
               </ode>
             </friction>
             <contact>
@@ -332,15 +333,15 @@
       <link name="riceball2">
         <inertial>
           <pose>0.0175 0 0.00014145 0 0 0</pose>
-          <mass>0.11</mass>
+          <mass>0.48</mass>
           <inertia> <!-- inertias are tricky to compute -->
             <!-- http://gazebosim.org/tutorials?tut=inertia&cat=build_robot -->
-            <ixx>7.011E-05</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
+            <ixx>0.001</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
             <ixy>0.0</ixy>         <!-- for a box: ixy = 0 -->
             <ixz>2.7E-07</ixz>         <!-- for a box: ixz = 0 -->
-            <iyy>8.42E-05</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
+            <iyy>0.001</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
             <iyz>0.0</iyz>         <!-- for a box: iyz = 0 -->
-            <izz>7.871E-05</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
+            <izz>0.001</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
           </inertia>
         </inertial>
         <collision name="collision">
@@ -353,8 +354,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>5</mu>
-                <mu2>5</mu2>
+                <mu>25</mu>
+                <mu2>25</mu2>
               </ode>
             </friction>
             <contact>
@@ -379,15 +380,15 @@
       <link name="riceball3">
         <inertial>
           <pose>0.0175 0 0.00014145 0 0 0</pose>
-          <mass>0.11</mass>
+          <mass>0.48</mass>
           <inertia> <!-- inertias are tricky to compute -->
             <!-- http://gazebosim.org/tutorials?tut=inertia&cat=build_robot -->
-            <ixx>7.011E-05</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
+            <ixx>0.001</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
             <ixy>0.0</ixy>         <!-- for a box: ixy = 0 -->
             <ixz>2.7E-07</ixz>         <!-- for a box: ixz = 0 -->
-            <iyy>8.42E-05</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
+            <iyy>0.001</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
             <iyz>0.0</iyz>         <!-- for a box: iyz = 0 -->
-            <izz>7.871E-05</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
+            <izz>0.001</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
           </inertia>
         </inertial>
         <collision name="collision">
@@ -400,8 +401,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>5</mu>
-                <mu2>5</mu2>
+                <mu>25</mu>
+                <mu2>25</mu2>
               </ode>
             </friction>
             <contact>
@@ -426,15 +427,15 @@
       <link name="riceball4">
         <inertial>
           <pose>0.0175 0 0.00014145 0 0 0</pose>
-          <mass>0.11</mass>
+          <mass>0.48</mass>
           <inertia> <!-- inertias are tricky to compute -->
             <!-- http://gazebosim.org/tutorials?tut=inertia&cat=build_robot -->
-            <ixx>7.011E-05</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
+            <ixx>0.001</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
             <ixy>0.0</ixy>         <!-- for a box: ixy = 0 -->
             <ixz>2.7E-07</ixz>         <!-- for a box: ixz = 0 -->
-            <iyy>8.42E-05</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
+            <iyy>0.001</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
             <iyz>0.0</iyz>         <!-- for a box: iyz = 0 -->
-            <izz>7.871E-05</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
+            <izz>0.001</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
           </inertia>
         </inertial>
         <collision name="collision">
@@ -447,8 +448,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>5</mu>
-                <mu2>5</mu2>
+                <mu>25</mu>
+                <mu2>25</mu2>
               </ode>
             </friction>
             <contact>
@@ -468,34 +469,34 @@
     </model>
 
     <model name="drink1">
-      <pose>0.23 -0.2 0.74  0 0 0</pose>
+      <pose>0.23 -0.2 0.74  -1.57 0 0</pose>
       <static>false</static>
       <link name="drink1">
         <inertial>
-          <pose>0 -0.0019956 -0.050688 0 0 0</pose>
-          <mass>0.26</mass>
+          <pose>0 0.05 0.0 0 0 0</pose>
+          <mass>0.48</mass>
           <inertia> <!-- inertias are tricky to compute -->
             <!-- http://gazebosim.org/tutorials?tut=inertia&cat=build_robot -->
-            <ixx>0.00109</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
+            <ixx>0.001</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
             <ixy>0.0</ixy>         <!-- for a box: ixy = 0 -->
             <ixz>0</ixz>         <!-- for a box: ixz = 0 -->
-            <iyy>0.0010888</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
+            <iyy>0.001</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
             <iyz>2.589E-05</iyz>         <!-- for a box: iyz = 0 -->
-            <izz>0.00027699</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
+            <izz>0.001</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
           </inertia>
         </inertial>
         <collision name="collision">
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
-               <uri>model://mobile_dual_arm/scene/meshes/drink.STL</uri>
+               <uri>model://mobile_dual_arm/scene/meshes/drink_.STL</uri>
             </mesh>
           </geometry>
           <surface>
             <friction>
               <ode>
-                <mu>5</mu>
-                <mu2>5</mu2>
+                <mu>25</mu>
+                <mu2>25</mu2>
               </ode>
             </friction>
             <contact>
@@ -507,7 +508,7 @@
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
-               <uri>model://mobile_dual_arm/scene/meshes/drink.STL</uri>
+               <uri>model://mobile_dual_arm/scene/meshes/drink_.STL</uri>
             </mesh>
           </geometry>
         </visual>
@@ -515,34 +516,34 @@
     </model>
 
     <model name="drink2">
-      <pose>0.23 -0.08 0.74  0 0 0</pose>
+      <pose>0.23 -0.08 0.74  -1.57 0 0</pose>
       <static>false</static>
       <link name="drink2">
         <inertial>
-          <pose>0 -0.0019956 -0.050688 0 0 0</pose>
-          <mass>0.26</mass>
+          <pose>0 0.05 0.0 0 0 0</pose>
+          <mass>0.48</mass>
           <inertia> <!-- inertias are tricky to compute -->
             <!-- http://gazebosim.org/tutorials?tut=inertia&cat=build_robot -->
-            <ixx>0.00109</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
+            <ixx>0.001</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
             <ixy>0.0</ixy>         <!-- for a box: ixy = 0 -->
             <ixz>0</ixz>         <!-- for a box: ixz = 0 -->
-            <iyy>0.0010888</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
+            <iyy>0.001</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
             <iyz>2.589E-05</iyz>         <!-- for a box: iyz = 0 -->
-            <izz>0.00027699</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
+            <izz>0.001</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
           </inertia>
         </inertial>
         <collision name="collision">
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
-               <uri>model://mobile_dual_arm/scene/meshes/drink.STL</uri>
+               <uri>model://mobile_dual_arm/scene/meshes/drink_.STL</uri>
             </mesh>
           </geometry>
           <surface>
             <friction>
               <ode>
-                <mu>5</mu>
-                <mu2>5</mu2>
+                <mu>25</mu>
+                <mu2>25</mu2>
               </ode>
             </friction>
             <contact>
@@ -554,7 +555,7 @@
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
-               <uri>model://mobile_dual_arm/scene/meshes/drink.STL</uri>
+               <uri>model://mobile_dual_arm/scene/meshes/drink_.STL</uri>
             </mesh>
           </geometry>
         </visual>
@@ -562,34 +563,34 @@
     </model>
 
     <model name="drink3">
-      <pose>0.32 -0.08 0.74  0 0 0</pose>
+      <pose>0.32 -0.08 0.74  -1.57 0 0</pose>
       <static>false</static>
       <link name="drink3">
         <inertial>
-          <pose>0 -0.0019956 -0.050688 0 0 0</pose>
-          <mass>0.26</mass>
+          <pose>0 0.05 0.0 0 0 0</pose>
+          <mass>0.48</mass>
           <inertia> <!-- inertias are tricky to compute -->
             <!-- http://gazebosim.org/tutorials?tut=inertia&cat=build_robot -->
-            <ixx>0.00109</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
+            <ixx>0.001</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
             <ixy>0.0</ixy>         <!-- for a box: ixy = 0 -->
             <ixz>0</ixz>         <!-- for a box: ixz = 0 -->
-            <iyy>0.0010888</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
+            <iyy>0.001</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
             <iyz>2.589E-05</iyz>         <!-- for a box: iyz = 0 -->
-            <izz>0.00027699</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
+            <izz>0.001</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
           </inertia>
         </inertial>
         <collision name="collision">
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
-               <uri>model://mobile_dual_arm/scene/meshes/drink.STL</uri>
+               <uri>model://mobile_dual_arm/scene/meshes/drink_.STL</uri>
             </mesh>
           </geometry>
           <surface>
             <friction>
               <ode>
-                <mu>5</mu>
-                <mu2>5</mu2>
+                <mu>25</mu>
+                <mu2>25</mu2>
               </ode>
             </friction>
             <contact>
@@ -601,7 +602,7 @@
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
-               <uri>model://mobile_dual_arm/scene/meshes/drink.STL</uri>
+               <uri>model://mobile_dual_arm/scene/meshes/drink_.STL</uri>
             </mesh>
           </geometry>
         </visual>
@@ -609,34 +610,34 @@
     </model>
 
     <model name="drink4">
-      <pose>0.32 -0.2 0.74  0 0 0</pose>
+      <pose>0.32 -0.2 0.74  -1.57 0 0</pose>
       <static>false</static>
       <link name="drink4">
         <inertial>
-          <pose>0 -0.0019956 -0.050688 0 0 0</pose>
-          <mass>0.26</mass>
+          <pose>0 0.05 0.0 0 0 0</pose>
+          <mass>0.48</mass>
           <inertia> <!-- inertias are tricky to compute -->
             <!-- http://gazebosim.org/tutorials?tut=inertia&cat=build_robot -->
-            <ixx>0.00109</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
+            <ixx>0.001</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
             <ixy>0.0</ixy>         <!-- for a box: ixy = 0 -->
             <ixz>0</ixz>         <!-- for a box: ixz = 0 -->
-            <iyy>0.0010888</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
+            <iyy>0.001</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
             <iyz>2.589E-05</iyz>         <!-- for a box: iyz = 0 -->
-            <izz>0.00027699</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
+            <izz>0.001</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
           </inertia>
         </inertial>
         <collision name="collision">
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
-               <uri>model://mobile_dual_arm/scene/meshes/drink.STL</uri>
+               <uri>model://mobile_dual_arm/scene/meshes/drink_.STL</uri>
             </mesh>
           </geometry>
           <surface>
             <friction>
               <ode>
-                <mu>5</mu>
-                <mu2>5</mu2>
+                <mu>25</mu>
+                <mu2>25</mu2>
               </ode>
             </friction>
             <contact>
@@ -648,7 +649,7 @@
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
-               <uri>model://mobile_dual_arm/scene/meshes/drink.STL</uri>
+               <uri>model://mobile_dual_arm/scene/meshes/drink_.STL</uri>
             </mesh>
           </geometry>
         </visual>

@@ -52,15 +52,15 @@ objectName = ['lunchbox', 'lunchbox', 'lunchbox', 'lunchbox',
               'drink',    'drink',    'drink',    'drink',
               'riceball', 'riceball', 'riceball', 'riceball']
 
-lunchboxPos = [[-0.25,  0.15, -0.75],
-               [-0.25,  0.15, -0.75],
-               [-0.25,  0.15, -0.75],
-               [-0.25,  0.15, -0.75]]
+lunchboxPos = [[-0.25,  0.15, -0.78],
+               [-0.25,  0.15, -0.78],
+               [-0.25,  0.15, -0.78],
+               [-0.25,  0.15, -0.78]]
 
-drinkPos =    [[-0.4, 0.1, -0.7],
-               [-0.495, 0.1, -0.7],                   
-               [-0.4, 0.22, -0.7],                              
-               [-0.495, 0.22, -0.7]]
+drinkPos =    [[-0.4, 0.1, -0.73],
+               [-0.495, 0.1, -0.73],                   
+               [-0.4, 0.22, -0.73],                              
+               [-0.495, 0.22, -0.73]]
 
 riceballPos = [[-0.39,  -0.22, -0.8],
                [-0.47,  -0.22, -0.8],
@@ -78,12 +78,12 @@ riceballEu   = [30, 0, 0]
 objectPos = [lunchboxPos, drinkPos, riceballPos]
 objectEu  = [lunchboxEu,  drinkEu,  riceballEu]
 
-topRight    = [0.465, -0.1, -0.19]
-topLeft     = [0.465,  0.1, -0.19]
-middleRight = [0.545, -0.1, -0.53]
-middleLeft  = [0.545,  0.1, -0.53]
-bottomRight = [0.6, -0.2, -0.93]
-bottomLeft  = [0.6,  0.2, -0.93]
+topRight    = [0.465, -0.1, -0.2]
+topLeft     = [0.465,  0.1, -0.2]
+middleRight = [0.545, -0.1, -0.47]
+middleLeft  = [0.545,  0.1, -0.47]
+bottomRight = [0.6, -0.2, -0.925]
+bottomLeft  = [0.6,  0.2, -0.925]
 
 topRightEu    = [-175, 35, 25]
 topLeftEu     = [-160, 45, 35]
@@ -96,8 +96,8 @@ topRightPhi    = 0
 topLeftPhi     = 0
 middleRightPhi = 40
 middleLeftPhi  = 45
-bottomRightPhi = 25
-bottomLeftPhi  = 25
+bottomRightPhi = -25
+bottomLeftPhi  = -25
 
 topRightSuc   = -68 
 topLeftSuc    = -60
@@ -296,9 +296,9 @@ class stockingTask:
             self.state = busy
             self.nextState = leaveShelf
             if 'riceball' in objectName[self.pickList]:
-                self.arm.relative_move('line', self.euler, [-0.02, 0, 0.04], self.phi)
+                self.arm.relative_move('line', self.euler, [-0.02, 0, 0.02], self.phi)
             else:
-                self.arm.noa_move_suction('line', suction_angle=self.sucAngle, n=0, o=0, a=-0.04)
+                self.arm.noa_move_suction('line', suction_angle=self.sucAngle, n=0, o=0, a=-0.01)
 
         elif self.state == safePose3:
             self.state = busy
@@ -379,9 +379,9 @@ class stockingTask:
                 self.euler[0] = 0
             self.pos[0] = 0.52
             if 'lunchbox' in objectName[self.pickList]:
-                self.pos[2] += 0.02
+                self.pos[2] += 0.01
             else:
-                self.pos[2] += 0.03
+                self.pos[2] += 0.01
             self.arm.set_speed(self.speed)
             self.arm.noa_relative_pos('line', self.pos, self.euler, self.phi, suction_angle=0, n=0, o=0, a=-0.15)
             if 'riceball' not in objectName[self.pickList]:
@@ -394,7 +394,7 @@ class stockingTask:
             self.state = busy
             self.nextState = moveIn2Shelf
             self.getPlacePos()
-            self.pos[2] += 0.03
+            self.pos[2] += 0.01
             self.arm.set_speed(self.speed)
             print 'euler = ', self.euler
             self.arm.move_euler('line', self.euler)
@@ -405,9 +405,9 @@ class stockingTask:
             self.nextState = move2PlacedPos
             self.getPlacePos()
             if 'lunchbox' in objectName[self.pickList]:
-                self.pos[2] += 0.02
+                self.pos[2] += 0.01
             else:
-                self.pos[2] += 0.03
+                self.pos[2] += 0.01
             if self.pickList == 5:
                 self.arm.set_speed(10)
             else:    
@@ -452,7 +452,7 @@ class stockingTask:
             else:
                 self.euler[0] = 0
             self.pos[0] = 0.36
-            self.pos[2] += 0.1
+            self.pos[2] += 0.01
             self.arm.set_speed(self.speed)
             self.arm.noa_relative_pos('line', self.pos, self.euler, self.phi, suction_angle=0, n=0, o=0, a=-0.15)
             self.pickList += 1
