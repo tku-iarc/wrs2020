@@ -8,7 +8,8 @@ from strategy.cfg import RobotConfig
 from my_ros_bridge.my_ros_bridge import Robot
 from mir_bridge.mir_bridge import MIR
 
-HOST = "http://192.168.50.220:8080/v2.0.0"
+#HOST = "http://192.168.50.220:8080/v2.0.0"
+HOST = "http://192.168.12.20:8080/v2.0.0"
 
 class MyStateMachine(Robot, StateMachine):
 

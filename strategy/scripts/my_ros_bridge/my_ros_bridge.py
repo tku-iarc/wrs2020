@@ -46,6 +46,10 @@ class Robot(object):
     def callback_feedback(self, feedback):
         rospy.loginfo("Feedback:%s" % str(feedback))
 
-    @property
     def action_state(self):
         return self._ac.get_state()
+
+    @property
+    def action_result(self):
+        return self._ac.get_result()
+

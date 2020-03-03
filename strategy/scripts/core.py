@@ -6,9 +6,11 @@ from std_msgs.msg import String
 from my_state_machine import MyStateMachine
 import dynamic_reconfigure.client
 from mir_bridge.mir_bridge import MIR
+from my_ros_bridge.my_ros_bridge import Robot
 
 
-HOST = "http://192.168.50.220:8080/v2.0.0"
+#HOST = "http://192.168.50.220:8080/v2.0.0"
+HOST = "http://192.168.12.20:8080/v2.0.0"
 
 class Strategy(object):
     def __init__(self, sim=False):
@@ -16,6 +18,7 @@ class Strategy(object):
         rospy.init_node('core', anonymous=False)
         self.rate = rospy.Rate(200)
         self.robot = MyStateMachine(sim)
+        self.my_ros = Robot(sim)
         self.mir = MIR(HOST)
         self.dclient = dynamic_reconfigure.client.Client(
             "core", timeout=30, config_callback=None)
@@ -51,7 +54,12 @@ class Strategy(object):
                     self.robot.toArm("stocking")
 
             if self.robot.is_arm:
-                print(self.action_state)
+                ## TODO: Get result from action server
+                print("RESULT: {}".format(self.my_ros.action_result))
+                r = self.my_ros.action_result
+                if r is not None:
+                    if r['finish']:
+                        self.robot.toHome()
 
             if rospy.is_shutdown():
                 break
