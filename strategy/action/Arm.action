@@ -5,4 +5,5 @@ string cmd
 bool finish
 ---
 #feedback
-string status
+string right_status
+string left_status
