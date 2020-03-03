@@ -1,5 +1,6 @@
 import json
 import math
+import warnings
 from statemachine import StateMachine, State
 from dynamic_reconfigure.server import Server as DynamicReconfigureServer
 from dynamic_reconfigure.client import Client as DynamicReconfigureClient
@@ -35,7 +36,7 @@ class MyStateMachine(Robot, StateMachine):
 
     def on_toIdle(self):
         print("to IDLE, change MiR to 'Pause'")
-        self.mir.status("Pause")
+        self.mir.set_status("Pause")
         self.mir.clear_mission_queue()
         self.dclient.update_configuration({"start": False})
         self.dclient.update_configuration({"go_home": False})
@@ -44,42 +45,11 @@ class MyStateMachine(Robot, StateMachine):
         self.toMove("TKU_ToHOME")
 
     def on_toMove(self, mission):
-        self.mir.status("Ready")
+        self.mir.set_status("Ready")
         print("to Move with mission {}".format(mission))
 
         guid = self.mir.get_mission_guid(mission)
         if guid is None:
-            print("[WARRING] No this position name!!!!!")
+            warnings.warn("[WARRING] No this position name!!!!!")
         else:
-            r = self.mir.mission_queue(guid.encode('utf-8'))
-            #print(r.text)
-
-    def get_mir_status(self):
-        r = self.mir.get_status()
-        rjson = json.loads(r.text)
-        d = {
-            "mir_state": rjson.get("state_text").encode('utf-8'),
-            "mir_position": {
-                "x": rjson.get("position").get("x"),
-                "y": rjson.get("position").get("y"),
-                "yaw": rjson.get("position").get("orientation")
-            }
-        }
-        return d
-
-    def arrived_position(self, position_name):
-        id = self.mir.get_position_guid(position_name)
-        r = self.mir.get_position_by_id(id)
-        rjson = json.loads(r.text)
-
-        if rjson.get("name") == position_name:
-            rs = self.mir.get_status()
-            rsjson = json.loads(rs.text)
-            dx = rjson.get("pos_x") - rsjson.get("position").get("x")
-            dy = rjson.get("pos_y") - rsjson.get("position").get("y")
-            dyaw = rjson.get("orientation") - rsjson.get("position").get("orientation")
-            if math.hypot(dx, dy) < 0.1 and abs(dyaw) < 3:
-                print("Distanse is short enough. {}, {}, {}".format(dx, dy, dyaw))
-                return True
-            else:
-                return False
+            self.mir.add_mission_to_queue(guid.encode('utf-8'))
