@@ -2,6 +2,8 @@
 import re
 import json
 import requests
+import warnings
+import math
 
 MAP_NAME = "HOME_AREA"
 
@@ -48,16 +50,22 @@ class Request(object):
 class MIR(object):
     def __init__(self, host):
         if not "http" in host:
-            print("WARRING: Maybe the host name is error.")
+            warnings.warn("WARRING: Maybe the host name is error.")
 
         self.host = host
+
+    def check_response_status_code(self, res):
+        if str(res.status_code).startswith("20"):
+            print("[Response OK]")
+        else:
+            raise Exception("Response ERROR")
 
     @Request(method="get", path="/status")
     def get_status(self):
         pass
 
     @Request(method="put", path="/status")
-    def status(self, set_state):
+    def set_status(self, set_state):
         STATE = {"Ready": 3, "Pause": 4}
 
         # Check whether input 'set_state' is correct
@@ -74,7 +82,7 @@ class MIR(object):
         return body
 
     @Request(method="get", path="/system/info")
-    def system_info(self):
+    def get_system_info(self):
         pass
 
     @Request(method="get", path="/missions")
@@ -96,11 +104,15 @@ class MIR(object):
         pass
 
     @Request(method="post", path="/mission_queue")
-    def mission_queue(self, mission):
+    def post_mission_queue(self, mission):
         body = {
             "mission_id": mission
         }
         return body
+
+    def add_mission_to_queue(self, mission):
+        r = self.post_mission_queue(mission)
+        self.check_response_status_code(r)
 
     @Request(method="delete", path="/mission_queue")
     def clear_mission_queue(self):
@@ -116,6 +128,7 @@ class MIR(object):
 
     def get_position_guid(self, position_name):
         r = self.get_positions()
+        self.check_response_status_code(r)
         rjson = json.loads(r.text)
         for l in rjson:
             if l.get("name") == position_name:
@@ -149,9 +162,44 @@ class MIR(object):
         print("No this position")
         return None
 
+    @property
+    def status(self):
+        r = self.get_status()
+        self.check_response_status_code(r)
+        rjson = json.loads(r.text)
+        d = {
+            "mir_state": rjson.get("state_text").encode('utf-8'),
+            "mir_position": {
+                "x": rjson.get("position").get("x"),
+                "y": rjson.get("position").get("y"),
+                "yaw": rjson.get("position").get("orientation")
+            }
+        }
+        return d
+
+    def arrived_position(self, position_name):
+        id = self.get_position_guid(position_name)
+        r = self.get_position_by_id(id)
+        self.check_response_status_code(r)
+        rjson = json.loads(r.text)
+
+        if rjson.get("name") == position_name:
+            rs = self.get_status()
+            rsjson = json.loads(rs.text)
+            dx = rjson.get("pos_x") - rsjson.get("position").get("x")
+            dy = rjson.get("pos_y") - rsjson.get("position").get("y")
+            dyaw = rjson.get("orientation") - rsjson.get("position").get("orientation")
+
+            if math.hypot(dx, dy) < 0.1 and abs(dyaw) < 10:
+                print("Distanse is short enough. {}, {}, {}".format(dx, dy, dyaw))
+                return True
+            else:
+                return False
+
     ## TODO: Understand action to achieve related move?
     # Use post /missions to add new mission
     # Use post /missions/{mission_id}/actions to add new action
     # Use put /missions/{mission_id}/actions/{guid} to modify value of action
     # Use put /mission/{guid} to modify value of mission
     ##TODO: Clear ERROR Code
+    ## TODO: Check mission queue is empty?
