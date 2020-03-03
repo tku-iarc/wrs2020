@@ -63,7 +63,7 @@ class SuctionTask:
                 )
         else:
             self.is_grip_sub = rospy.Subscriber(
-                self.name + 'is_grip',
+                self.name + '/is_grip',
                 Bool,
                 self.is_grip_callback,
                 queue_size=1
@@ -179,6 +179,7 @@ class SuctionTask:
         else:
             self.fail_cnt = 0
             self.gripped = True
+	    print("FUCK grippedgrippedgrippedgrippedgrippedgripped")
 
     @property
     def is_grip(self):

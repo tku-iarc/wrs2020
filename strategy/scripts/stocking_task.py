@@ -17,8 +17,8 @@ from arm_control import ArmTask, SuctionTask
 
 
 PICKORDER = 0
-SPEED_R     = 500
-SPEED_L     = 500
+SPEED_R     = 30
+SPEED_L     = 30
 LUNCHBOX_H = 0.045
 # The lesser one
 lunchQuan = 2              
@@ -54,20 +54,20 @@ objectName = ['lunchbox', 'lunchbox', 'lunchbox', 'lunchbox',
               'drink',    'drink',    'drink',    'drink',
               'riceball', 'riceball', 'riceball', 'riceball']
 
-lunchboxPos = [[-0.25,  0.15, -0.78],
-               [-0.25,  0.15, -0.78],
-               [-0.25,  0.15, -0.78],
-               [-0.25,  0.15, -0.78]]
+lunchboxPos = [[-0.25,  0.15, -0.77],
+               [-0.25,  0.15, -0.77],
+               [-0.25,  0.15, -0.77],
+               [-0.25,  0.15, -0.77]]
 
-drinkPos =    [[-0.4, 0.1, -0.73],
-               [-0.495, 0.1, -0.73],                   
-               [-0.4, 0.22, -0.73],                              
-               [-0.495, 0.22, -0.73]]
+drinkPos =    [[-0.4, 0.1, -0.72],
+               [-0.495, 0.1, -0.72],                   
+               [-0.4, 0.22, -0.72],                              
+               [-0.495, 0.22, -0.72]]
 
-riceballPos = [[-0.39,  -0.22, -0.8],
-               [-0.47,  -0.22, -0.8],
-               [-0.39,  -0.1, -0.8],                             
-               [-0.47,  -0.1, -0.8]]
+riceballPos = [[-0.38,  -0.2, -0.796],
+               [-0.46,  -0.2, -0.796],
+               [-0.38,  -0.08, -0.796],                             
+               [-0.46,  -0.08, -0.796]]
 
 lunchboxEu = [135, 0, 0]
 
@@ -80,12 +80,12 @@ riceballEu   = [30, 0, 0]
 objectPos = [lunchboxPos, drinkPos, riceballPos]
 objectEu  = [lunchboxEu,  drinkEu,  riceballEu]
 
-topRight    = [0.465, -0.1, -0.2]
-topLeft     = [0.465,  0.1, -0.2]
-middleRight = [0.545, -0.1, -0.47]
-middleLeft  = [0.545,  0.1, -0.47]
-bottomRight = [0.6, -0.2, -0.925]
-bottomLeft  = [0.6,  0.2, -0.925]
+topRight    = [0.465, -0.1, -0.18]
+topLeft     = [0.465,  0.1, -0.18]
+middleRight = [0.545, -0.1, -0.43]
+middleLeft  = [0.545,  0.1, -0.43]
+bottomRight = [0.6, -0.2, -0.883]
+bottomLeft  = [0.6,  0.2, -0.883]
 
 topRightEu    = [-175, 35, 25]
 topLeftEu     = [-160, 45, 35]
@@ -450,7 +450,7 @@ class StockingTask:
                 if self.pickList == 8:
                     self.pos[2] += 0.003
             if 'lunchbox' in objectName[self.pickList]:
-                self.arm.set_speed(80)
+                self.arm.set_speed(60)
             else:    
                 self.arm.set_speed(self.speed)
             self.arm.ikMove('line', self.pos, self.euler, self.phi)
@@ -462,7 +462,7 @@ class StockingTask:
             print "state 5-1"
             # rospy.sleep(1)
             if 'lunchbox' in objectName[self.pickList]:
-                self.arm.set_speed(30)
+                self.arm.set_speed(20)
             else:
                 self.arm.set_speed(3)
             print "state 5-2"
@@ -555,10 +555,6 @@ if __name__ == '__main__':
     rospy.sleep(.3)
     right.setQuantity()
     # left.setQuantity()
-
-    while not rospy.is_shutdown() and not is_start:
-        rospy.loginfo('waiting for start signal')
-        rospy.sleep(.5)
     
     SuctionTask.switch_mode(True)
 

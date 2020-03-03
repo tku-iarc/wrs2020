@@ -18,8 +18,8 @@ from arm_control import ArmTask, SuctionTask
 
 
 PICKORDER = 0
-SPEED_R     = 500
-SPEED_L     = 500
+SPEED_R     = 20
+SPEED_L     = 20
 LUNCHBOX_H = 0.045
 # The lesser one
 lunchQuan = 1              
@@ -331,7 +331,7 @@ class DisposingTask:
             self.nextStatus = Status.move2PlacedPos
             self.getPlacePos()
             self.pos[2] += 0.02
-            self.arm.set_speed(self.speed)
+            self.arm.set_speed(self.speed-10)
             self.arm.ikMove('line', self.pos, self.euler, self.phi)
             self.suction.gripper_suction_deg(-90)
 
@@ -392,7 +392,7 @@ class DisposingTask:
         elif self.status == Status.pickObject:
             self.status = Status.grasping
             self.suction.gripper_vaccum_on()
-            self.arm.set_speed(self.speed)
+            self.arm.set_speed(5)
             self.arm.noa_move_suction('line', suction_angle=0, n=0, o=0, a=0.03)
             rospy.sleep(.1)
                         
