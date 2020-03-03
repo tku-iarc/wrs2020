@@ -29,10 +29,12 @@ class MyStateMachine(Robot, StateMachine):
     idle = State('Idle', initial=True)
     home = State('Home')
     move = State('Move')
+    arm = State('Arm')
 
-    toIdle = move.to(idle) | home.to(idle)
-    toHome = idle.to(home) | move.to(home) | home.to.itself()
-    toMove = idle.to(move) | home.to(move) | move.to.itself()
+    toIdle = move.to(idle) | home.to(idle) | arm.to(idle)
+    toHome = idle.to(home) | move.to(home) | home.to.itself() | arm.to(home)
+    toMove = idle.to(move) | home.to(move) | move.to.itself() | arm.to(move)
+    toArm = move.to(arm)
 
     def on_toIdle(self):
         print("to IDLE, change MiR to 'Pause'")
@@ -53,3 +55,7 @@ class MyStateMachine(Robot, StateMachine):
             warnings.warn("[WARRING] No this position name!!!!!")
         else:
             self.mir.add_mission_to_queue(guid.encode('utf-8'))
+
+    def on_toArm(self, mission):
+        print("Call Arm")
+        self.call_arm(mission)

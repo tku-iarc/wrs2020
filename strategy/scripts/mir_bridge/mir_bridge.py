@@ -3,6 +3,7 @@ import re
 import json
 import requests
 import warnings
+import math
 
 MAP_NAME = "HOME_AREA"
 
@@ -188,7 +189,8 @@ class MIR(object):
             dx = rjson.get("pos_x") - rsjson.get("position").get("x")
             dy = rjson.get("pos_y") - rsjson.get("position").get("y")
             dyaw = rjson.get("orientation") - rsjson.get("position").get("orientation")
-            if math.hypot(dx, dy) < 0.1 and abs(dyaw) < 3:
+
+            if math.hypot(dx, dy) < 0.1 and abs(dyaw) < 10:
                 print("Distanse is short enough. {}, {}, {}".format(dx, dy, dyaw))
                 return True
             else:
