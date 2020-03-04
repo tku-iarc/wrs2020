@@ -35,7 +35,7 @@ class MyStateMachine(Robot, StateMachine):
     toIdle = move.to(idle) | home.to(idle) | arm.to(idle)
     toHome = idle.to(home) | move.to(home) | home.to.itself() | arm.to(home)
     toMove = idle.to(move) | home.to(move) | move.to.itself() | arm.to(move)
-    toArm = move.to(arm)
+    toArm = move.to(arm) | idle.to(arm)
 
     def on_toIdle(self):
         print("to IDLE, change MiR to 'Pause'")

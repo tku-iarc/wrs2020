@@ -6,7 +6,6 @@ from std_msgs.msg import String
 from my_state_machine import MyStateMachine
 import dynamic_reconfigure.client
 from mir_bridge.mir_bridge import MIR
-from my_ros_bridge.my_ros_bridge import Robot
 
 
 #HOST = "http://192.168.50.220:8080/v2.0.0"
@@ -18,7 +17,6 @@ class Strategy(object):
         rospy.init_node('core', anonymous=False)
         self.rate = rospy.Rate(200)
         self.robot = MyStateMachine(sim)
-        self.my_ros = Robot(sim)
         self.mir = MIR(HOST)
         self.dclient = dynamic_reconfigure.client.Client(
             "core", timeout=30, config_callback=None)
@@ -44,7 +42,8 @@ class Strategy(object):
             if self.robot.is_idle:
                 if self.robot.start:
                     # self.robot.toMove("TKU_ToROOMA")
-                    self.robot.toMove("TKU_ToSHELF")
+                    # self.robot.toMove("TKU_ToSHELF")
+                    self.robot.toArm("Go")
 
             if self.robot.is_move:
                 # if s['mir_state'] == "Ready" and self.robot.arrived_position("SHELF"):
@@ -54,12 +53,11 @@ class Strategy(object):
                     self.robot.toArm("stocking")
 
             if self.robot.is_arm:
-                ## TODO: Get result from action server
-                print("RESULT: {}".format(self.my_ros.action_result))
-                r = self.my_ros.action_result
-                if r is not None:
-                    if r['finish']:
-                        self.robot.toHome()
+                if self.robot.arm_result is not None:
+                    if self.robot.arm_result.finish:
+                        print("YES")
+                    else:
+                        print("NO")
 
             if rospy.is_shutdown():
                 break

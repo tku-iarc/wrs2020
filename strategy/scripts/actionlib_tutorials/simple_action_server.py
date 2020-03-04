@@ -17,13 +17,15 @@ class Arm(object):
         r = rospy.Rate(1)
         success = True
         
-        self._feedback.status = "STATUS"
+        self._feedback.left_status = "STATUS"
+        self._feedback.right_status = "STATUS"
         
-        rospy.loginfo('%s: Executing, creating fibonacci sequence of cmd: %s with status: %s' % (self._action_name, goal.cmd, self._feedback.status))
+        rospy.loginfo('%s: Executing, creating fibonacci sequence of cmd: %s with status: %s, %s' % (self._action_name, goal.cmd, self._feedback.left_status, self._feedback.right_status))
         
         if goal.cmd == "Go":
-            for i in range(1, 50):
-                self._feedback.status = str(i)
+            for i in range(1, 10):
+                self._feedback.left_status = str(i)
+                self._feedback.right_status = str(i*i)
                 self._as.publish_feedback(self._feedback)
                 r.sleep()
 
@@ -34,8 +36,9 @@ class Arm(object):
                     break
 
         if goal.cmd == "EJECT":
-            for i in range(1, 50):
-                self._feedback.status = str(i)
+            for i in range(1, 10):
+                self._feedback.left_status = str(i)
+                self._feedback.right_status = str(i*i)
                 self._as.publish_feedback(self._feedback)
                 r.sleep()
                 if i == 5:
