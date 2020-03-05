@@ -66,3 +66,9 @@ class Robot(object):
             9: "LOST"
         }
         return gsd.get(self._ac.get_state())
+
+    def cancel_arm_task(self, method="all"):
+        if method is "all":
+            self._ac.cancel_all_goals()
+        else:
+            self._ac.cancel_goal()

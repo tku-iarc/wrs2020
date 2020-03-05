@@ -22,7 +22,8 @@ class Arm(object):
         
         rospy.loginfo('%s: Executing, creating fibonacci sequence of cmd: %s with status: %s, %s' % (self._action_name, goal.cmd, self._feedback.left_status, self._feedback.right_status))
         
-        if goal.cmd == "Go":
+        print(goal.cmd)
+        if goal.cmd == "disposing":
             for i in range(1, 10):
                 self._feedback.left_status = str(i)
                 self._feedback.right_status = str(i*i)
@@ -35,7 +36,7 @@ class Arm(object):
                     success = False
                     break
 
-        if goal.cmd == "EJECT":
+        elif goal.cmd == "EJECT":
             for i in range(1, 10):
                 self._feedback.left_status = str(i)
                 self._feedback.right_status = str(i*i)
