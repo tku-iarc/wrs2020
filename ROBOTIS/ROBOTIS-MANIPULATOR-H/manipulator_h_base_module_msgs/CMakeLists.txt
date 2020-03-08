@@ -34,6 +34,7 @@ add_service_files(
   FILES
   GetJointPose.srv
   GetKinematicsPose.srv
+  CheckRangeLimit.srv
 )
 
 generate_messages(

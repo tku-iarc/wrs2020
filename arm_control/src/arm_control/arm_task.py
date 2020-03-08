@@ -1,10 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #-*- coding: utf-8 -*-
 
 """Use to generate arm task and run."""
 
 import rospy
 import tf
+import queue
 # import object_distribtion
 
 from math import radians, degrees, sin, cos, pi
@@ -18,21 +19,45 @@ from robotis_controller_msgs.msg import StatusMsg
 from manipulator_h_base_module_msgs.msg import P2PPose, JointPose, KinematicsPose
 from manipulator_h_base_module_msgs.srv import GetKinematicsPose, GetKinematicsPoseResponse
 from manipulator_h_base_module_msgs.srv import GetJointPose, GetJointPoseResponse
+from manipulator_h_base_module_msgs.srv import CheckRangeLimit, CheckRangeLimitResponse
 from vacuum_cmd_msg.srv import VacuumCmd
 
 
 _POS = (0, 0, 0)
 _ORI = (0, 0, 0)
 _PHI = 45
-_suction_angle = 0
 
+class Status(IntEnum):
+    idle            = 0
+    busy            = 1
+    emergency_stop  = 2
+    ik_fail         = 3
+    disable         = 4
+    grasping        = 5
+
+
+class Command(dict):
+
+    def __init__(self):
+        self['cmd']    : "ikMove"
+        self['mode']   : "p2p"
+        self['pos']    : None
+        self['euler']  : None
+        self['phi']    : None
+        self['n']      : None
+        self['o']      : None
+        self['a']      : None
+        self['suc_cmd']: None
+        self['jpos']   : None
+        self['speed']  : None
 
 class ArmTask:
     """Running arm task class."""
 
-    def __init__(self, _name = '/robotis'):
+    def __init__(self, _name = '/robotis', en_sim):
         """Inital object."""
         self.name = _name
+        self.en_sim = en_sim
         self.init()
 
     def init(self):
@@ -44,6 +69,13 @@ class ArmTask:
         self.__is_stop = False
         self.__is_wait = False
         self.__speed = 50
+        self.suction_angle = 0
+        self.status = Status.disable
+        self.__cmd_queue = queue.Queue()
+        if self.en_sim:
+            self.suction = SuctionTask(self.name + '_gazebo')
+        else:
+            self.suction = SuctionTask(self.name)
 
     def __set_pubSub(self):
         print "[Arm] name space : " + str(self.name) 
@@ -102,17 +134,37 @@ class ArmTask:
         if 'IK Failed' in msg.status_msg:
             rospy.logwarn('ik fail')
             self.__ik_fail = True
+            self.status = Status.ik_fail
 
         elif 'End Trajectory' in msg.status_msg:
             self.__is_busy = False
+            if self.__cmd_queue.empty():
+                self.status = Status.idle
             print('Arm task receive End Trajectory')
 
     def __stop_callback(self, msg):
         if msg.data:
             self.__is_stop = True
+            self.status = Status.emergency_stop
         
     def back_home(self):
         self.jointMove(0,(0, 0, 0, 0, 0, 0, 0))
+
+    @property
+    def cmd_queue(self):
+        return self.__cmd_queue
+    
+    @cmd_queue.setter
+    def cmd_queue(self, cmd_q):
+        self.__cmd_queue = cmd_q
+
+    @property
+    def cmd_queue_empty(self):
+        return self.__cmd_queue.empty()
+
+    @property
+    def status(self):
+        return self.status
 
     @property
     def is_busy(self):
@@ -142,6 +194,10 @@ class ArmTask:
     def set_speed(self,i_speed):
         self.__speed = i_speed
 
+    def cmd_queue_put(self, cmd_q):
+        while not cmd_q.empty():
+            self.__cmd_queue(cmd_q.get())
+
     def jointMove(self, slide_pos = 0,cmd=[0, 0, 0, 0, 0, 0, 0]):
         """Publish msg of joint cmd (rad) to manager node."""
         name  = list()
@@ -154,6 +210,7 @@ class ArmTask:
 
         self.__joint_pub.publish(JointPose(name, value, slide_pos, speed))
         self.__is_busy = True
+        self.status = Status.busy
 
     def singleJointMove(self, index=-1, pos=0):
         fb = self.get_joint()
@@ -199,6 +256,7 @@ class ArmTask:
         yaw   = yaw  * pi/ 180
 
         self.__is_busy = True
+        self.status = Status.busy
 
         msg = KinematicsPose()
         msg.name = 'arm'
@@ -269,7 +327,36 @@ class ArmTask:
         except rospy.ServiceException, e:
             print "Service call failed: %s" % e
 
-    def noa_move_suction(self, mode='p2p', suction_angle=_suction_angle, n=0, o=0, a=0):
+    def check_range_limit(self, pos=_POS, euler=_ORI, phi=_PHI):
+        roll, pitch, yaw = euler
+        roll  = roll * pi/ 180
+        pitch = pitch* pi/ 180
+        yaw   = yaw  * pi/ 180
+
+        req = CheckRangeLimit()
+        req.pose.position.x = pos[0]
+        req.pose.position.y = pos[1]
+        req.pose.position.z = pos[2]
+
+        quaternion = self.euler2quaternion((roll, pitch, yaw))
+        req.pose.orientation.x = quaternion[0]
+        req.pose.orientation.y = quaternion[1]
+        req.pose.orientation.z = quaternion[2]
+        req.pose.orientation.w = quaternion[3]
+        req.phi = radians(phi)
+        
+        rospy.wait_for_service(self.name + '/check_range_limit')
+        try:
+            range_limit = rospy.ServiceProxy(
+                self.name + '/check_range_limit',
+                CheckRangeLimit
+            )
+            res = range_limit(req)jointMove(self, slide_pos = 0,cmd=[0, 0, 0, 0, 0, 0, 0])
+            return res
+        except rospy.ServiceException, e:
+            print "Service call failed: %s" % e
+
+    def noa_move_suction(self, mode='p2p', suction_angle=self.suction_angle, n=0, o=0, a=0):
         suction_angle = suction_angle * pi/180
         suction_rot = np.matrix([[cos(suction_angle),  0.0, sin(suction_angle)],
                                [0.0,                 1.0,                0.0],
@@ -297,7 +384,7 @@ class ArmTask:
             degrees(phi)
         )
 
-    def noa_relative_pos(self, mode='p2p', pos=_POS, euler=_ORI, phi=_PHI, suction_angle=_suction_angle, n=0, o=0, a=0):
+    def noa_relative_pos(self, mode='p2p', pos=_POS, euler=_ORI, phi=_PHI, suction_angle=self.suction_angle, n=0, o=0, a=0):
         #由a點移動至基於b點延noa向量移動後的c點
         suction_angle = suction_angle * pi/180
         suction_rot = np.matrix([[cos(suction_angle),  0.0, sin(suction_angle)],
@@ -339,7 +426,7 @@ class ArmTask:
             degrees(phi)
         )
 
-    def relative_move(self, mode='p2p', euler=_ORI, pos = _POS, phi=_PHI):
+    def relative_move(self, mode='p2p', pos = _POS, euler=_ORI, phi=_PHI):
         fb = self.get_fb()
         curr_pos = fb.group_pose.position
         pos[0] += curr_pos.x
@@ -403,6 +490,55 @@ class ArmTask:
 
     def clear_cmd(self):
         self.__clear_pub.publish(True)
+
+    def process(self):
+        if self.status is Status.emergency_stop or self.status is Status.ik_fail:
+            return
+        if self.status is Status.grasping and self.suction.is_grip:
+            self.clear_cmd()
+            rospy.sleep(0.1)
+        
+
+        cmd = self.__cmd_queue.get()
+        if cmd['speed'] is not None:
+            self.set_speed(cmd['speed'])
+
+        if cmd['suc_cmd'] is not None:
+            if 'Off' in cmd['suc_cmd']:
+                self.suction.gripper_vacuum_off()
+            elif 'On' in cmd['suc_cmd']:
+                self.suction.gripper_vacuum_on()
+            elif 'calibration' in cmd['suc_cmd']:
+                self.suction.gripper_calibration()
+            elif type(cmd['suc_cmd']) is not 'str':
+                self.suction.gripper_suction_deg(cmd['suc_cmd'])
+                self.suction_angle = cmd['suc_cmd']
+
+
+        if cmd['cmd'] is 'ikMove':
+            self.ikMove(cmd['mode'], cmd['pos'], cmd['euler'], cmd['phi'])
+
+        elif cmd['cmd'] is 'jointMove':
+            self.jointMove(cmd['jpos'][0] cmd['jpos'][1:7])
+
+        elif cmd['cmd'] is 'noaMove':
+            self.noa_move_suction(cmd['mode'], n=cmd['n'], o=cmd['o'], a=cmd['a'])
+
+        elif cmd['cmd'] is 'fromtNoaTarget':
+            self.noa_relative_pos(cmd['mode'], cmd['pos'], cmd['euler'], cmd['phi'], n=cmd['n'], o=cmd['o'], a=cmd['a']):
+        
+        elif cmd['cmd'] is 'relativeMove':
+            self.relative_move(cmd['mode'], cmd['pos'], cmd['euler'], cmd['phi'])
+
+        elif cmd['cmd'] is 'relativePos':
+            self.relative_move_pose(cmd['mode'], cmd['pos'])
+
+        elif cmd['cmd'] is 'relativeEuler':
+            self.move_euler(cmd['mode'], cmd['euler'])
+
+        elif cmd['cmd'] is 'grasping':
+            self.noa_move_suction(cmd['mode'], n=cmd['n'], o=cmd['o'], a=cmd['a'])
+            self.status = Status.grasping
 
 # if __name__ == '__main__':
 #     rospy.init_node('test_arm_task')

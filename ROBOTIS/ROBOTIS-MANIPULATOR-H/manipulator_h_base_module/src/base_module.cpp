@@ -145,6 +145,8 @@ void BaseModule::queueThread()
                                                                        &BaseModule::getJointPoseCallback, this);
   ros::ServiceServer get_kinematics_pose_server = ros_node.advertiseService("get_kinematics_pose",
                                                                             &BaseModule::getKinematicsPoseCallback, this);
+  ros::ServiceServer check_range_limit_server = ros_node.advertiseService("check_range_limit",
+                                                                            &BaseModule::checkRangeLimitCallback, this);
   slide_->slide_fdb_sub = ros_node.subscribe("slide_feedback_msg", 10, &slide_control::slideFeedback, slide_);
 
   while (ros_node.ok())
@@ -271,6 +273,29 @@ bool BaseModule::getKinematicsPoseCallback(manipulator_h_base_module_msgs::GetKi
 
   // std::cout<<"euler = "<<manipulator_->manipulator_link_data_[END_LINK]->euler *180/M_PI<<std::endl;
 
+  return true;
+}
+
+bool BaseModule::checkRangeLimitCallback(manipulator_h_base_module_msgs::CheckRangeLimit::Request &req,
+                                           manipulator_h_base_module_msgs::CheckRangeLimit::Response &res)
+{
+  Eigen::Vector3d positoin;
+  Eigen::Matrix3d rotation;
+
+  positoin << robotis_->p2p_pose_msg_.pose.position.x, 
+              robotis_->p2p_pose_msg_.pose.position.y, 
+              robotis_->p2p_pose_msg_.pose.position.z;
+
+  Eigen::Quaterniond quaterniond(robotis_->p2p_pose_msg_.pose.orientation.w,
+                                 robotis_->p2p_pose_msg_.pose.orientation.x,
+                                 robotis_->p2p_pose_msg_.pose.orientation.y,
+                                 robotis_->p2p_pose_msg_.pose.orientation.z);
+
+  rotation = robotis_framework::convertQuaternionToRotation(quaterniond);
+  
+  res.limit_value = manipulator_->limit_check(positoin, rotation);
+  res.is_limit = (res.limit_value >= 0)? true : false;
+  
   return true;
 }
 

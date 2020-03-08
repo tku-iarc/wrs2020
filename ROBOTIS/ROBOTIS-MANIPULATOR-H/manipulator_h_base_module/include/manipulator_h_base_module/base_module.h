@@ -48,6 +48,7 @@
 
 #include "manipulator_h_base_module_msgs/GetJointPose.h"
 #include "manipulator_h_base_module_msgs/GetKinematicsPose.h"
+#include "manipulator_h_base_module_msgs/CheckRangeLimit.h"
 
 #include "manipulator_h_kinematics_dynamics/manipulator_h_kinematics_dynamics.h"
 #include "robotis_state.h"
@@ -122,6 +123,8 @@ public:
                             manipulator_h_base_module_msgs::GetJointPose::Response &res);
   bool getKinematicsPoseCallback(manipulator_h_base_module_msgs::GetKinematicsPose::Request &req,
                                  manipulator_h_base_module_msgs::GetKinematicsPose::Response &res);
+  bool checkRangeLimitCallback(manipulator_h_base_module_msgs::CheckRangeLimit::Request &req,
+                               manipulator_h_base_module_msgs::CheckRangeLimit::Response &res);
 
   /* ROS Calculation Functions */
   void generateInitPoseTrajProcess();

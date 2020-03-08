@@ -34,7 +34,7 @@ class SuctionTask:
         self.name    = _name
         self.fail_cnt = 0
         self.gripped = False
-        print 'name = ', self.name
+        print('name = ', self.name)
         if 'gazebo' in self.name:
             if 'right' in self.name:
                 self.suction_pub = rospy.Publisher(
@@ -112,14 +112,14 @@ class SuctionTask:
             except rospy.ServiceException, e:
                 print "Service call (Vacuum) failed: %s" % e
 
-    def gripper_vaccum_on(self):
+    def gripper_vacuum_on(self):
         self.robot_cmd_client('vacuumOn')
-        print('Vaccum On', self.gripped)
+        print('Vacuum On', self.gripped)
         rospy.sleep(0.5)
 
-    def gripper_vaccum_off(self):
+    def gripper_vacuum_off(self):
         self.robot_cmd_client('vacuumOff')
-        print('Vaccum Off')
+        print('Vacuum Off')
         rospy.sleep(0.3)
 
     def gripper_calibration(self):
@@ -196,11 +196,11 @@ if __name__ == '__main__':
 
     while not rospy.is_shutdown():
         for gripper in [right_gripper, left_gripper]:
-            gripper.gripper_vaccum_on()
+            gripper.gripper_vacuum_on()
             print('is grip: {}'.format(gripper.gripped))
             rospy.sleep(2)
 
-            gripper.gripper_vaccum_off()
+            gripper.gripper_vacuum_off()
 
             gripper.gripper_suction_up()
             rospy.sleep(2)
@@ -211,8 +211,8 @@ if __name__ == '__main__':
             gripper.gripper_suction_deg(-90)
             rospy.sleep(2)
 
-    # right_gripper.gripper_vaccum_on()
-    # right_gripper.gripper_vaccum_off()
+    # right_gripper.gripper_vacuum_on()
+    # right_gripper.gripper_vacuum_off()
 
     # right_gripper.gripper_calibration()
     # right_gripper.gripper_set_max()

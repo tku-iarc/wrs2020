@@ -1,0 +1,6 @@
+geometry_msgs/Pose  pose
+float64             phi
+
+---
+float64             limit_value
+bool                is_limit

@@ -279,13 +279,13 @@ class StockingTask:
             self.pickList += 1
             self.euler[2] = 90
             self.euler[0] = -10
-            self.arm.relative_move('line', self.euler, [0, -0.1, -0.3], self.phi)
+            self.arm.relative_move('line', [0, -0.1, -0.3], self.euler, self.phi)
 
         elif self.status == Status.leavePlacePos:
             self.status = Status.busy
             self.nextStatus = Status.leaveShelf
             if 'riceball' in objectName[self.pickList]:
-                self.arm.relative_move('line', self.euler, [-0.02, 0, 0.02], self.phi)
+                self.arm.relative_move('line', [-0.02, 0, 0.02], self.euler, self.phi)
             else:
                 self.arm.noa_move_suction('line', suction_angle=self.sucAngle, n=0, o=0, a=-0.01)
 
