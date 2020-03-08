@@ -8,7 +8,9 @@ from strategy.cfg import RobotConfig
 from my_ros_bridge.my_ros_bridge import Robot
 from mir_bridge.mir_bridge import MIR
 
+## SSID: ASUS_TKU_5G_2
 #HOST = "http://192.168.50.220:8080/v2.0.0"
+## Wired Connected
 HOST = "http://192.168.12.20:8080/v2.0.0"
 
 class MyStateMachine(Robot, StateMachine):
@@ -21,9 +23,14 @@ class MyStateMachine(Robot, StateMachine):
                        "core", timeout=30, config_callback=None)
         self.mir = MIR(HOST)
 
+    def __del__(self):
+        self.dclient.update_configuration({"start": False})
+        self.dclient.update_configuration({"go_home": False})
+
     def callback(self, config, level):
         self.start = config['start']
         self.go_home = config['go_home']
+        self.arm_task = config['arm_task']
 
         return config
 
@@ -35,12 +42,18 @@ class MyStateMachine(Robot, StateMachine):
     toIdle = move.to(idle) | home.to(idle) | arm.to(idle)
     toHome = idle.to(home) | move.to(home) | home.to.itself() | arm.to(home)
     toMove = idle.to(move) | home.to(move) | move.to.itself() | arm.to(move)
-    toArm = move.to(arm)
+    toArm = move.to(arm) | idle.to(arm)
 
     def on_toIdle(self):
-        print("to IDLE, change MiR to 'Pause'")
+        print("To IDLE")
+        ## TODO: STOP the robot arm
+        # self.call_arm("stop")
+        print("[IDLE] cancel arm task")
+        self.cancel_arm_task()
+        print("[IDLE] change MiR to 'Pause'")
         self.mir.set_status("Pause")
         self.mir.clear_mission_queue()
+        print("[IDLE] reset configures")
         self.dclient.update_configuration({"start": False})
         self.dclient.update_configuration({"go_home": False})
 
@@ -57,6 +70,9 @@ class MyStateMachine(Robot, StateMachine):
         else:
             self.mir.add_mission_to_queue(guid.encode('utf-8'))
 
-    def on_toArm(self, mission):
-        print("Call Arm")
+    def on_toArm(self, mission=None):
+        if mission is None:
+            mission = self.arm_task
+
+        print("Call Arm with mission '{}'".format(mission))
         self.call_arm(mission)

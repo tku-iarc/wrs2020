@@ -12,6 +12,7 @@ class Robot(object):
 
     def __init__(self, sim=False):
         self._ac = actionlib.SimpleActionClient('arm_server', strategy.msg.ArmAction)
+
         if not sim:
             pass
         else:
@@ -32,8 +33,6 @@ class Robot(object):
                            feedback_cb=self.callback_feedback,
                            done_cb=self.callback_done)
 
-        # action_state = client.get_state()
-        # print(action_state)
         # self._ac.wait_for_result()
         # return self._ac.get_result()
 
@@ -41,15 +40,35 @@ class Robot(object):
         rospy.loginfo("Action server is processing the goal")
 
     def callback_done(self, state, result):
+        ## state: 3 is finish?
         rospy.loginfo("Action server is done. State: %s, result: %s" % (str(state), str(result)))
 
     def callback_feedback(self, feedback):
         rospy.loginfo("Feedback:%s" % str(feedback))
 
-    def action_state(self):
-        return self._ac.get_state()
-
     @property
-    def action_result(self):
+    def arm_result(self):
         return self._ac.get_result()
 
+    @property
+    def arm_state(self):
+        ## According actionlib_msgs/GoalStatus
+        gsd = {
+            0: "PENDING",
+            1: "ACTIVE",
+            2: "PREEMPTED",
+            3: "SUCCEEDED",
+            4: "ABORTED",
+            5: "REJECTED",
+            6: "PREEMPTING",
+            7: "RECALLING",
+            8: "RECALLED",
+            9: "LOST"
+        }
+        return gsd.get(self._ac.get_state())
+
+    def cancel_arm_task(self, method="all"):
+        if method is "all":
+            self._ac.cancel_all_goals()
+        else:
+            self._ac.cancel_goal()
