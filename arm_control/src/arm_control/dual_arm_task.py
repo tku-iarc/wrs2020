@@ -28,7 +28,7 @@ class DualArmTask:
         self.left_value = 0
         self.right_limit = False
         self.left_limit = False
-        
+                
         self.right_event = threading.Event()
         self.left_event = threading.Event()
         self.right_event.clear()
@@ -40,19 +40,30 @@ class DualArmTask:
         
 
     def __right_arm_process_thread(self):
+        rate = rospy.Rate(20)
         while True:
             self.right_event.wait()
-            self.right_arm.process()
+            if not self.right_arm.is_busy:
+                self.right_arm.process()
             if self.right_arm.cmd_queue_empty:
-                self.right_event.clear()
+                if self.right_arm.cmd_queue_2nd_empty:
+                    self.right_arm.clear()
+                elif self.right_arm.status == Status.idle:
+                    self.right_arm.cmd_2to1()
+            rate.sleep()
 
     def __left_arm_process_thread(self):
+        rate = rospy.Rate(20)
         while True:
             self.left_event.wait()
-            self.left_arm.process()
+            if not self.left_arm.is_busy:
+                self.left_arm.process()
             if self.left_arm.cmd_queue_empty:
-                self.left_event.clear()
-        
+                if self.left_arm.cmd_queue_2nd_empty:
+                    self.left_event.clear()
+                elif self.left_arm.status == Status.idle:
+                    self.left_arm.cmd_2to1()
+            rate.sleep()
 
     def __choose_and_check_side(self, side, command_queue):
         self.right_value = 0
@@ -63,17 +74,19 @@ class DualArmTask:
         if 'right' in side:
             while not command_queue.empty():
                 cmd = command_queue.get()
-                self.right_value = self.right_arm.check_range_limit(cmd['pos'], cmd['euler'], cmd['phi'])
-                if self.right_value < 0:
-                    return 'fail'
+                if cmd['cmd'] == 'ikMove':
+                    self.right_value = self.right_arm.check_range_limit(cmd['pos'], cmd['euler'], cmd['phi'])
+                    if self.right_value < 0:
+                        return 'fail'
             return 'right'
         
         elif 'left' in side:
             while not command_queue.empty():
                 cmd = command_queue.get()
-                self.left_value = self.left_arm.check_range_limit(cmd['pos'], cmd['euler'], cmd['phi'])
-                if self.left_value < 0:
-                    return 'fail'
+                if cmd['cmd'] == 'ikMove':
+                    self.left_value = self.left_arm.check_range_limit(cmd['pos'], cmd['euler'], cmd['phi'])
+                    if self.left_value < 0:
+                        return 'fail'
             return 'left'
 
         else:
@@ -83,32 +96,33 @@ class DualArmTask:
             left_close_limit = False
             while not command_queue.empty():
                 cmd = command_queue.get()
-                if not self.left_limit:
-                    self.left_value = self.left_arm.check_range_limit(cmd['pos'], cmd['euler'], cmd['phi'])
-                    if self.left_value > 0.85:
-                        left_close_limit = True
-                    if self.left_value < 0:
-                        self.left_limit = True
-                    else:
-                        left_sum += self.left_value
+                if cmd['cmd'] == 'ikMove':
+                    if not self.left_limit:
+                        self.left_value = self.left_arm.check_range_limit(cmd['pos'], cmd['euler'], cmd['phi'])
+                        if self.left_value > 0.85:
+                            left_close_limit = True
+                        if self.left_value < 0:
+                            self.left_limit = True
+                        else:
+                            left_sum += self.left_value
 
-                if not self.right_limit:
-                    self.right_value = self.right_arm.check_range_limit(cmd['pos'], cmd['euler'], cmd['phi'])
-                    if self.right_value > 0.85:
-                        right_close_limit = True
-                    if self.right_value < 0:
-                        self.right_limit = True
-                    else:
-                        right_sum += self.right_value
+                    if not self.right_limit:
+                        self.right_value = self.right_arm.check_range_limit(cmd['pos'], cmd['euler'], cmd['phi'])
+                        if self.right_value > 0.85:
+                            right_close_limit = True
+                        if self.right_value < 0:
+                            self.right_limit = True
+                        else:
+                            right_sum += self.right_value
                         
             if not (self.left_limit or self.right_limit):
-                if right_sum <= left_sum and self.right_arm.status is Status.idle:
+                if right_sum <= left_sum and self.right_arm.status == Status.idle:
                     return 'right'
-                elif left_sum <= right_sum and self.left_arm.status is Status.idle:
+                elif left_sum <= right_sum and self.left_arm.status == Status.idle:
                     return 'left'
-                elif self.right_arm.status is Status.idle and not right_close_limit:
+                elif self.right_arm.status == Status.idle and not right_close_limit:
                     return 'right'
-                elif self.left_arm.status is Status.idle and not left_close_limit:
+                elif self.left_arm.status == Status.idle and not left_close_limit:
                     return 'left'
                 elif right_sum <= left_sum:
                     return 'right'
@@ -123,15 +137,21 @@ class DualArmTask:
                 
             
 
-    def move_arm(self, side, command_queue):
+    def send_cmd(self, side, priority, command_queue):
         side = self.__choose_and_check_side(side, command_queue)
         print('Choosed side : '+side+' =================')
-        if side is 'right':
-            self.right_arm.cmd_queue_put(command_queue)
+        if side == 'right':
+            if priority:
+                self.right_arm.cmd_queue_put(command_queue)
+            else:
+                self.right_arm.cmd_queue_2nd_put(command_queue)
             if not self.right_event.is_set():
                 self.right_event.set()
-        elif side is 'left':
-            self.left_arm.cmd_queue_put(command_queue)
+        elif side == 'left':
+            if priority:
+                self.left_arm.cmd_queue_put(command_queue)
+            else:
+                self.left_arm.cmd_queue_2nd_put(command_queue)
             if not self.left_event.is_set():
                 self.left_event.set()
         return side

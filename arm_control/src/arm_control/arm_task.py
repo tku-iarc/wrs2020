@@ -32,15 +32,15 @@ class Status(IntEnum):
     busy            = 1
     emergency_stop  = 2
     ik_fail         = 3
-    disable         = 4
-    grasping        = 5
+    grasping        = 4
+    occupied        = 5
 
 
 class Command(dict):
 
     def __init__(self):
-        self['cmd']    : "ikMove"
-        self['mode']   : "p2p"
+        self['cmd']    : "ikMove" #'ikMove', 'jointMove', 'noaMove', 'fromtNoaTarget', 'relativeMove', 'relativePos', 'relativeEuler', 'grasping', 'occupied'
+        self['mode']   : "p2p"    #'p2p', 'line'
         self['pos']    : None
         self['euler']  : None
         self['phi']    : None
@@ -50,6 +50,8 @@ class Command(dict):
         self['suc_cmd']: None
         self['jpos']   : None
         self['speed']  : None
+        self['state']  : None
+        self['next_state'] : None
 
 class ArmTask:
     """Running arm task class."""
@@ -70,8 +72,12 @@ class ArmTask:
         self.__is_wait = False
         self.__speed = 50
         self.suction_angle = 0
-        self.status = Status.disable
+        self.status = Status.idle
         self.__cmd_queue = queue.Queue()
+        self.__cmd_queue_2nd = queue.Queue()
+        self.occupied = False
+        self.state = None
+        self.next_state = None
         if self.en_sim:
             self.suction = SuctionTask(self.name + '_gazebo')
         else:
@@ -138,7 +144,9 @@ class ArmTask:
 
         elif 'End Trajectory' in msg.status_msg:
             self.__is_busy = False
-            if self.__cmd_queue.empty():
+            if self.occupied is True:
+                self.status = Status.occupied
+            elif self.__cmd_queue.empty(), self.__2nd_cmd_queue.empty():
                 self.status = Status.idle
             print('Arm task receive End Trajectory')
 
@@ -161,6 +169,18 @@ class ArmTask:
     @property
     def cmd_queue_empty(self):
         return self.__cmd_queue.empty()
+
+    @property
+    def cmd_queue_2nd(self):
+        return self.__cmd_queue_2nd
+    
+    @cmd_queue_2nd.setter
+    def cmd_queue(self, cmd_q):
+        self.__cmd_queue_2nd = cmd_q
+
+    @property
+    def cmd_queue_2nd_empty(self):
+        return self.__cmd_queue_2nd.empty()
 
     @property
     def status(self):
@@ -196,7 +216,18 @@ class ArmTask:
 
     def cmd_queue_put(self, cmd_q):
         while not cmd_q.empty():
-            self.__cmd_queue(cmd_q.get())
+            self.__cmd_queue.put(cmd_q.get())
+
+    def cmd_queue_2nd_put(self, cmd_q):
+        while not cmd_q.empty():
+            self.__cmd_queue_2nd.put(cmd_q.get())
+
+    def cmd_2to1(self):
+        while not self.__cmd_queue_2nd.empty():
+            cmd = self.__cmd_queue_2nd.get()
+            self.__cmd_queue.put(cmd)
+            if cmd['cmd'] == 'occupied':
+                break
 
     def jointMove(self, slide_pos = 0,cmd=[0, 0, 0, 0, 0, 0, 0]):
         """Publish msg of joint cmd (rad) to manager node."""
@@ -492,14 +523,18 @@ class ArmTask:
         self.__clear_pub.publish(True)
 
     def process(self):
-        if self.status is Status.emergency_stop or self.status is Status.ik_fail:
+        if self.status == Status.emergency_stop or self.status == Status.ik_fail:
             return
-        if self.status is Status.grasping and self.suction.is_grip:
+        if self.status == Status.grasping and self.suction.is_grip:
             self.clear_cmd()
             rospy.sleep(0.1)
         
 
         cmd = self.__cmd_queue.get()
+        if cmd['state'] is not None:
+            self.state = cmd['state']
+        if cmd['next_state'] is not None:
+            self.next_state = cmd['next_state']
         if cmd['speed'] is not None:
             self.set_speed(cmd['speed'])
 
@@ -514,31 +549,36 @@ class ArmTask:
                 self.suction.gripper_suction_deg(cmd['suc_cmd'])
                 self.suction_angle = cmd['suc_cmd']
 
+        if cmd['cmd'] == 'occupied':
+            self.occupied = True
+        else:
+            self.occupied = False
 
-        if cmd['cmd'] is 'ikMove':
+        if cmd['cmd'] == 'ikMove':
             self.ikMove(cmd['mode'], cmd['pos'], cmd['euler'], cmd['phi'])
 
-        elif cmd['cmd'] is 'jointMove':
-            self.jointMove(cmd['jpos'][0] cmd['jpos'][1:7])
+        elif cmd['cmd'] == 'jointMove':
+            self.jointMove(cmd['jpos'][0], cmd['jpos'][1:7])
 
-        elif cmd['cmd'] is 'noaMove':
+        elif cmd['cmd'] == 'noaMove':
             self.noa_move_suction(cmd['mode'], n=cmd['n'], o=cmd['o'], a=cmd['a'])
 
-        elif cmd['cmd'] is 'fromtNoaTarget':
+        elif cmd['cmd'] == 'fromtNoaTarget':
             self.noa_relative_pos(cmd['mode'], cmd['pos'], cmd['euler'], cmd['phi'], n=cmd['n'], o=cmd['o'], a=cmd['a']):
         
-        elif cmd['cmd'] is 'relativeMove':
+        elif cmd['cmd'] == 'relativeMove':
             self.relative_move(cmd['mode'], cmd['pos'], cmd['euler'], cmd['phi'])
 
-        elif cmd['cmd'] is 'relativePos':
+        elif cmd['cmd'] == 'relativePos':
             self.relative_move_pose(cmd['mode'], cmd['pos'])
 
-        elif cmd['cmd'] is 'relativeEuler':
+        elif cmd['cmd'] == 'relativeEuler':
             self.move_euler(cmd['mode'], cmd['euler'])
 
-        elif cmd['cmd'] is 'grasping':
+        elif cmd['cmd'] == 'grasping':
             self.noa_move_suction(cmd['mode'], n=cmd['n'], o=cmd['o'], a=cmd['a'])
             self.status = Status.grasping
+
 
 # if __name__ == '__main__':
 #     rospy.init_node('test_arm_task')
