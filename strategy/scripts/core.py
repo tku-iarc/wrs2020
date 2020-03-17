@@ -42,14 +42,12 @@ class Strategy(object):
 
             if self.sm.is_idle:
                 if self.sm.start:
-                    # self.sm.toMove("TKU_ToROOMA")
-                    # self.sm.toMove("TKU_ToSHELF")
-                    self.sm.toArm()
+                    # self.sm.toMove("TKU_ToHOME")
+                    self.sm.toMove("TKU_ToSHELF")
+                    # self.sm.toArm()
 
             if self.sm.is_move:
-                # if s['mir_state'] == "Ready" and self.sm.arrived_position("SHELF"):
-                if self.sm.mir.status['mir_state'] == "Ready" \
-                   and self.sm.mir.arrived_position("SHELF"):
+                if self.sm.mir.mission_queue_is_empty:
                     print("Arrived")
                     self.sm.toArm()
 

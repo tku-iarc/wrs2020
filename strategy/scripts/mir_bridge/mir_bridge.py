@@ -114,6 +114,16 @@ class MIR(object):
         r = self.post_mission_queue(mission)
         self.check_response_status_code(r)
 
+    @property
+    def mission_queue_is_empty(self):
+        r = self.get_mission_queue()
+        rjson = json.loads(r.text)
+        for l in rjson:
+            if l.get("state").upper() == "PENDING" or \
+               l.get("state").upper() == "EXECUTING":
+               return False
+        return True
+
     @Request(method="delete", path="/mission_queue")
     def clear_mission_queue(self):
         pass
@@ -202,4 +212,3 @@ class MIR(object):
     # Use put /missions/{mission_id}/actions/{guid} to modify value of action
     # Use put /mission/{guid} to modify value of mission
     ##TODO: Clear ERROR Code
-    ## TODO: Check mission queue is empty?
