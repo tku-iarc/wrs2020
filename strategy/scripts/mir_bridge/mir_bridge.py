@@ -60,6 +60,14 @@ class MIR(object):
         else:
             raise Exception("Response ERROR")
 
+    def is_valid_guid(self, guid_to_test, version=1):
+        try:
+            guid_obj = UUID(guid_to_test, version=version)
+        except ValueError:
+            return False
+
+        return str(guid_obj) == guid_to_test
+
     @Request(method="get", path="/status")
     def get_status(self):
         pass
@@ -127,6 +135,48 @@ class MIR(object):
     @Request(method="delete", path="/mission_queue")
     def clear_mission_queue(self):
         pass
+
+    @Request(method="get", path="/mission_groups")
+    def get_groups(self):
+        pass
+
+    def get_group_guid(self, group):
+        r = self.get_groups()
+        rjson = json.loads(r.text)
+        for l in rjson:
+            if l.get("name") == group:
+                return l.get("guid")
+        print("No this group")
+        #print(r.text)
+        return None
+
+    @Request(method="get", path="/sessions")
+    def get_sessions(self):
+        pass
+
+    def get_session_guid(self, session):
+        r = self.get_sessions()
+        rjson = json.loads(r.text)
+        for l in rjson:
+            if l.get("name") == session:
+                return l.get("guid")
+        print("No this session")
+        #print(r.text)
+        return None
+
+    @Request(method="post", path="/missions")
+    def create_new_mission(self, name, group_id="TKU_IARC", session_id="TKU_IARC"):
+        if not self.is_valid_guid(group_id):
+            group_id = self.get_group_guid(group_id)
+        if not self.is_valid_guid(session_id):
+            session_id = self.get_session_guid(session_id)
+
+        body = {
+            "group_id": group_id,
+            "session_id": session_id,
+            "name": name
+        }
+        return body
 
     @Request(method="get", path="/positions")
     def get_positions(self):
@@ -212,3 +262,4 @@ class MIR(object):
     # Use put /missions/{mission_id}/actions/{guid} to modify value of action
     # Use put /mission/{guid} to modify value of mission
     ##TODO: Clear ERROR Code
+    ## TODO: map
