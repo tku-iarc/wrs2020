@@ -4,8 +4,11 @@ import json
 import requests
 import warnings
 import math
+from uuid import UUID
 
 MAP_NAME = "HOME_AREA"
+
+## TODO: Try to use function to reconstruct path for decorator's argument 'path'
 
 class Request(object):
     def __init__(self, method, path):
@@ -25,6 +28,10 @@ class Request(object):
             if payload is not None:
                 if payload.has_key("PATH"):
                     URL = "{}{}".format(URL, payload.get("PATH"))
+
+                if payload.has_key("BODY"):
+                    payload = payload.get("BODY")
+
                 try:
                     res = requests.request(self.method,
                                            url=URL,
@@ -60,6 +67,14 @@ class MIR(object):
         else:
             raise Exception("Response ERROR")
 
+    def is_valid_guid(self, guid_to_test, version=1):
+        try:
+            guid_obj = UUID(guid_to_test, version=version)
+        except ValueError:
+            return False
+
+        return str(guid_obj) == guid_to_test
+
     @Request(method="get", path="/status")
     def get_status(self):
         pass
@@ -89,14 +104,13 @@ class MIR(object):
     def get_missions(self):
         pass
 
-    def get_mission_guid(self, mission):
+    def get_mission_guid(self, mission, auto_create=True):
         r = self.get_missions()
         rjson = json.loads(r.text)
         for l in rjson:
             if l.get("name") == mission:
                 return l.get("guid")
-        print("No this mission")
-        #print(r.text)
+        warnings.warn("No this mission")
         return None
 
     @Request(method="get", path="/mission_queue")
@@ -111,12 +125,132 @@ class MIR(object):
         return body
 
     def add_mission_to_queue(self, mission):
-        r = self.post_mission_queue(mission)
+        if not self.is_valid_guid(mission):
+            mission_id = self.get_mission_guid(mission)
+        r = self.post_mission_queue(mission_id)
         self.check_response_status_code(r)
+
+    @property
+    def mission_queue_is_empty(self):
+        r = self.get_mission_queue()
+        rjson = json.loads(r.text)
+        for l in rjson:
+            if l.get("state").upper() == "PENDING" or \
+               l.get("state").upper() == "EXECUTING":
+               return False
+        return True
 
     @Request(method="delete", path="/mission_queue")
     def clear_mission_queue(self):
         pass
+
+    @Request(method="get", path="/mission_groups")
+    def get_groups(self):
+        pass
+
+    def get_group_guid(self, group):
+        r = self.get_groups()
+        rjson = json.loads(r.text)
+        for l in rjson:
+            if l.get("name") == group:
+                return l.get("guid")
+        print("No this group")
+        #print(r.text)
+        return None
+
+    @Request(method="get", path="/sessions")
+    def get_sessions(self):
+        pass
+
+    def get_session_guid(self, session):
+        r = self.get_sessions()
+        rjson = json.loads(r.text)
+        for l in rjson:
+            if l.get("name") == session:
+                return l.get("guid")
+        print("No this session")
+        #print(r.text)
+        return None
+
+    @Request(method="post", path="/missions")
+    def create_new_mission(self, name, group_id="TKU_IARC", session_id="TKU_IARC"):
+        print("Creating new mission name: {}, group_id: {}, session_id: {}" \
+                .format(name, group_id, session_id))
+        if not self.is_valid_guid(group_id):
+            group_id = self.get_group_guid(group_id)
+        if not self.is_valid_guid(session_id):
+            session_id = self.get_session_guid(session_id)
+
+        body = {
+            "group_id": group_id,
+            "session_id": session_id,
+            "name": name
+        }
+        return body
+
+    @Request(method="delete", path="/missions")
+    def delete_mission(self, mission):
+        if not self.is_valid_guid(mission):
+            mission_id = self.get_mission_guid(mission)
+            if mission_id is None:
+                warnings.warn("No this mission to DELETE")
+                return
+        return {"PATH": "/" + mission_id}
+
+    @Request(method="post", path="/missions")
+    def add_relative_move_action(self, dx=0.0, dy=0.0, dyaw=0.0, \
+                                 max_speed_v=0.5, max_speed_w=0.5, \
+                                 collision_detection=True):
+        '''
+        Add action 'relative move' to mission 'TKU_TMP'
+        '''
+        mission_guid = self.get_mission_guid("TKU_TMP")
+        if mission_guid is None:
+            print("[WARNING] No this mission. Creating mission {}".format("TKU_TMP"))
+            r = self.create_new_mission("TKU_TMP")
+            rjson = json.loads(r.text)
+            mission_guid = rjson.get("guid")
+
+        path = "/" + self.get_mission_guid("TKU_TMP") + "/actions"
+        body =  {
+            "action_type": "relative_move",
+            "mission_id": self.get_mission_guid("TKU_TMP"),
+            "parameters": [
+                {
+                    "id": "x",
+                    "value": dx
+                },
+                {
+                    "id": "y",
+                    "value": dy
+                },
+                {
+                    "id": "orientation",
+                    "value": dyaw
+                },
+                {
+                    "id": "max_linear_speed",
+                    "value": max_speed_v
+                },
+                {
+                    "id": "max_angular_speed",
+                    "value": max_speed_w
+                },
+                {
+                    "id": "collision_detection",
+                    "value": collision_detection
+                }
+            ],
+            "priority": 1
+        }
+        return {"PATH": path, "BODY": body}
+
+    def relative_move(self, dx=0.0, dy=0.0, dyaw=0.0, \
+                      max_speed_v=0.5, max_speed_w=0.5, collision_detection=True):
+        self.clear_mission_queue()
+        self.delete_mission("TKU_TMP")
+        self.add_relative_move_action(dx, dy, dyaw, max_speed_v, max_speed_w, collision_detection)
+        self.add_mission_to_queue("TKU_TMP")
 
     @Request(method="get", path="/positions")
     def get_positions(self):
@@ -177,6 +311,7 @@ class MIR(object):
         }
         return d
 
+    ## Maybe this function is useless
     def arrived_position(self, position_name):
         id = self.get_position_guid(position_name)
         r = self.get_position_by_id(id)
@@ -196,10 +331,5 @@ class MIR(object):
             else:
                 return False
 
-    ## TODO: Understand action to achieve related move?
-    # Use post /missions to add new mission
-    # Use post /missions/{mission_id}/actions to add new action
-    # Use put /missions/{mission_id}/actions/{guid} to modify value of action
-    # Use put /mission/{guid} to modify value of mission
-    ##TODO: Clear ERROR Code
-    ## TODO: Check mission queue is empty?
+    ## TODO: Clear ERROR Code
+    ## TODO: map
