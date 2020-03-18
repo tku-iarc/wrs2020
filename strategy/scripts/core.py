@@ -2,6 +2,7 @@
 import rospy
 import sys
 import math
+import time
 from std_msgs.msg import String
 from my_state_machine import MyStateMachine
 import dynamic_reconfigure.client
@@ -43,13 +44,15 @@ class Strategy(object):
             if self.sm.is_idle:
                 if self.sm.start:
                     # self.sm.toMove("TKU_ToHOME")
-                    self.sm.toMove("TKU_ToSHELF")
+                    # self.sm.toMove("TKU_ToSHELF")
                     # self.sm.toArm()
+                    self.sm.mir.relative_move(dx=0.03)
+                    time.sleep(1)
 
             if self.sm.is_move:
                 if self.sm.mir.mission_queue_is_empty:
                     print("Arrived")
-                    self.sm.toArm()
+                    # self.sm.toArm()
 
             if self.sm.is_arm:
                 if self.sm.arm_result is not None:
