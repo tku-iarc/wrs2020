@@ -4,6 +4,9 @@ import json
 import requests
 import warnings
 import math
+import time
+import base64
+import os
 from uuid import UUID
 
 MAP_NAME = "HOME_AREA"
@@ -113,6 +116,17 @@ class MIR(object):
         warnings.warn("No this mission")
         return None
 
+    @Request(method="get", path="/missions")
+    def get_mission_actions(self, mission):
+        mission_guid = self.get_mission_guid(mission)
+        if mission_guid is None:
+            print("[WARNING] No this mission. Creating mission {}".format(mission))
+            r = self.create_new_mission(mission)
+            rjson = json.loads(r.text)
+            mission_guid = rjson.get("guid")
+
+        return {"PATH": "/" + mission_guid + "/actions"}
+
     @Request(method="get", path="/mission_queue")
     def get_mission_queue(self):
         pass
@@ -154,7 +168,7 @@ class MIR(object):
         for l in rjson:
             if l.get("name") == group:
                 return l.get("guid")
-        print("No this group")
+        warnings.warn("No this group")
         #print(r.text)
         return None
 
@@ -168,7 +182,7 @@ class MIR(object):
         for l in rjson:
             if l.get("name") == session:
                 return l.get("guid")
-        print("No this session")
+        warnings.warn("No this session")
         #print(r.text)
         return None
 
@@ -198,58 +212,77 @@ class MIR(object):
         return {"PATH": "/" + mission_id}
 
     @Request(method="post", path="/missions")
-    def add_relative_move_action(self, dx=0.0, dy=0.0, dyaw=0.0, \
-                                 max_speed_v=0.5, max_speed_w=0.5, \
-                                 collision_detection=True):
-        '''
-        Add action 'relative move' to mission 'TKU_TMP'
-        '''
-        mission_guid = self.get_mission_guid("TKU_TMP")
+    def add_action_to_mission(self, mission, action_type, parameters, priority, scope_reference=None):
+        mission_guid = self.get_mission_guid(mission)
         if mission_guid is None:
-            print("[WARNING] No this mission. Creating mission {}".format("TKU_TMP"))
-            r = self.create_new_mission("TKU_TMP")
+            print("[WARNING] No this mission. Creating mission {}".format(mission))
+            r = self.create_new_mission(mission)
             rjson = json.loads(r.text)
             mission_guid = rjson.get("guid")
 
-        path = "/" + self.get_mission_guid("TKU_TMP") + "/actions"
-        body =  {
-            "action_type": "relative_move",
-            "mission_id": self.get_mission_guid("TKU_TMP"),
-            "parameters": [
-                {
-                    "id": "x",
-                    "value": dx
-                },
-                {
-                    "id": "y",
-                    "value": dy
-                },
-                {
-                    "id": "orientation",
-                    "value": dyaw
-                },
-                {
-                    "id": "max_linear_speed",
-                    "value": max_speed_v
-                },
-                {
-                    "id": "max_angular_speed",
-                    "value": max_speed_w
-                },
-                {
-                    "id": "collision_detection",
-                    "value": collision_detection
-                }
-            ],
-            "priority": 1
+        path = "/" + mission_guid + "/actions"
+        body = {
+            "action_type": action_type,
+            "mission_id": mission_guid,
+            "parameters": parameters,
+            "priority": priority,
+            "scope_reference": scope_reference
         }
         return {"PATH": path, "BODY": body}
+
+    def add_try_catch_action(self, priority):
+        param = [
+            { "id": "try",  "value": ""}, 
+            { "id": "catch",  "value": ""}
+        ]
+        self.add_action_to_mission("TKU_TMP", "try_catch", param, priority)
+
+    def get_scope_reference_guid(self, mission, id):
+        r = self.get_mission_actions(mission)
+        rjson = json.loads(r.text)
+        for l in rjson:
+            for i in l.get("parameters"):
+                if i.get("id") == id:
+                    return i.get("guid")
+
+        warnings.warn("No scope_reference")
+        return None
+
+    def add_relative_move_action(self, dx=0.0, dy=0.0, dyaw=0.0, \
+                                 max_speed_v=0.5, max_speed_w=0.5, \
+                                 collision_detection=True, priority=1, \
+                                 use_try_catch=True):
+        scope_reference = None
+        param = [
+            { "id": "x", "value": dx},
+            { "id": "y", "value": dy},
+            { "id": "orientation", "value": dyaw},
+            { "id": "max_linear_speed", "value": max_speed_v},
+            { "id": "max_angular_speed", "value": max_speed_w},
+            { "id": "collision_detection", "value": collision_detection}
+        ]
+        if use_try_catch:
+            self.add_try_catch_action(1)
+            sound_param = [
+                { "id": "sound",  "value": "mirconst-guid-0000-0001-sounds000000"}, 
+                { "id": "volume",  "value": 80.0}, 
+                { "id": "mode",  "value": "custom"}, 
+                { "id": "duration",  "value": "00:00:03.000000"}
+            ]
+            scope_ref_try = self.get_scope_reference_guid("TKU_TMP", "try")
+            scope_ref_catch = self.get_scope_reference_guid("TKU_TMP", "catch")
+            self.add_action_to_mission("TKU_TMP", "sound", sound_param, 3, scope_ref_catch)
+            self.add_action_to_mission("TKU_TMP", "relative_move", param, priority, scope_ref_catch)
+            self.add_action_to_mission("TKU_TMP", "relative_move", param, priority, scope_ref_try)
+        else:
+            self.add_action_to_mission("TKU_TMP", "relative_move", param, priority)
+
 
     def relative_move(self, dx=0.0, dy=0.0, dyaw=0.0, \
                       max_speed_v=0.5, max_speed_w=0.5, collision_detection=True):
         self.clear_mission_queue()
         self.delete_mission("TKU_TMP")
-        self.add_relative_move_action(dx, dy, dyaw, max_speed_v, max_speed_w, collision_detection)
+        self.add_relative_move_action(dx, dy, dyaw, max_speed_v, max_speed_w, collision_detection, 1)
         self.add_mission_to_queue("TKU_TMP")
 
     @Request(method="get", path="/positions")
@@ -282,19 +315,6 @@ class MIR(object):
             "type_id": position_type
         }
         return body
-
-    @Request(method="get", path="/maps")
-    def get_maps(self):
-        pass
-
-    def get_map_guid(self, map_name):
-        r = self.get_maps()
-        rjson = json.loads(r.text)
-        for l in rjson:
-            if l.get("name") == map_name:
-                return l.get("guid")
-        print("No this position")
-        return None
 
     @property
     def status(self):
@@ -331,5 +351,43 @@ class MIR(object):
             else:
                 return False
 
-    ## TODO: Clear ERROR Code
-    ## TODO: map
+    @Request(method="get", path="/maps")
+    def get_maps(self):
+        pass
+
+    @Request(method="get", path="/maps")
+    def get_map(self, map_name):
+        if not self.is_valid_guid(map_name):
+            map_guid = self.get_map_guid(map_name)
+            if map_guid is None:
+                warnings.warn("No this map: {}".format(map_name))
+                return
+        return {"PATH": "/" + map_guid}
+
+    def get_map_guid(self, map_name):
+        r = self.get_maps()
+        rjson = json.loads(r.text)
+        for l in rjson:
+            if l.get("name") == map_name:
+                return l.get("guid")
+        print("No this position")
+        return None
+
+    def save_map(self, map_name=MAP_NAME, saved_name=None, \
+                 saved_path=os.path.dirname(os.path.abspath(__file__))+"/maps/"):
+        if saved_name is None:
+            t = time.localtime()
+            timestamp = time.strftime('%b-%d-%Y_%H%M', t)
+            saved_name = (map_name + "-" + timestamp + ".png")
+        r = self.get_map(map_name)
+        rjson = json.loads(r.text)
+        bMap = rjson.get("map")
+        print(bMap)
+
+        if not os.path.exists(saved_path):
+            os.mkdir(saved_path)
+            print("Directory " , saved_path,  " Created ")
+
+        with open(saved_path + saved_name, "wb") as fh:
+            fh.write(base64.b64decode(bMap))
+        print("[INFO] Saved {} map in {}".format(map_name, saved_path))
