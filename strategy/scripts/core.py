@@ -44,10 +44,9 @@ class Strategy(object):
             if self.sm.is_idle:
                 if self.sm.start:
                     # self.sm.toMove("TKU_ToHOME")
-                    # self.sm.toMove("TKU_ToSHELF")
-                    # self.sm.toArm()
-                    self.sm.mir.relative_move(dx=0.03)
-                    time.sleep(1)
+                    self.sm.toMove("TKU_ToSHELF")
+                    # self.sm.mir.relative_move(dx=0.03)
+                    # time.sleep(1)
 
             if self.sm.is_move:
                 if self.sm.mir.mission_queue_is_empty:
