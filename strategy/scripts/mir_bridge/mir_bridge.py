@@ -5,6 +5,8 @@ import requests
 import warnings
 import math
 import time
+import base64
+import os
 from uuid import UUID
 
 MAP_NAME = "HOME_AREA"
@@ -314,19 +316,6 @@ class MIR(object):
         }
         return body
 
-    @Request(method="get", path="/maps")
-    def get_maps(self):
-        pass
-
-    def get_map_guid(self, map_name):
-        r = self.get_maps()
-        rjson = json.loads(r.text)
-        for l in rjson:
-            if l.get("name") == map_name:
-                return l.get("guid")
-        print("No this position")
-        return None
-
     @property
     def status(self):
         r = self.get_status()
@@ -362,5 +351,43 @@ class MIR(object):
             else:
                 return False
 
-    ## TODO: Add action with try-catch
-    ## TODO: map
+    @Request(method="get", path="/maps")
+    def get_maps(self):
+        pass
+
+    @Request(method="get", path="/maps")
+    def get_map(self, map_name):
+        if not self.is_valid_guid(map_name):
+            map_guid = self.get_map_guid(map_name)
+            if map_guid is None:
+                warnings.warn("No this map: {}".format(map_name))
+                return
+        return {"PATH": "/" + map_guid}
+
+    def get_map_guid(self, map_name):
+        r = self.get_maps()
+        rjson = json.loads(r.text)
+        for l in rjson:
+            if l.get("name") == map_name:
+                return l.get("guid")
+        print("No this position")
+        return None
+
+    def save_map(self, map_name=MAP_NAME, saved_name=None, \
+                 saved_path=os.path.dirname(os.path.abspath(__file__))+"/maps/"):
+        if saved_name is None:
+            t = time.localtime()
+            timestamp = time.strftime('%b-%d-%Y_%H%M', t)
+            saved_name = (map_name + "-" + timestamp + ".png")
+        r = self.get_map(map_name)
+        rjson = json.loads(r.text)
+        bMap = rjson.get("map")
+        print(bMap)
+
+        if not os.path.exists(saved_path):
+            os.mkdir(saved_path)
+            print("Directory " , saved_path,  " Created ")
+
+        with open(saved_path + saved_name, "wb") as fh:
+            fh.write(base64.b64decode(bMap))
+        print("[INFO] Saved {} map in {}".format(map_name, saved_path))
