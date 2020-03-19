@@ -198,52 +198,35 @@ class MIR(object):
         return {"PATH": "/" + mission_id}
 
     @Request(method="post", path="/missions")
-    def add_relative_move_action(self, dx=0.0, dy=0.0, dyaw=0.0, \
-                                 max_speed_v=0.5, max_speed_w=0.5, \
-                                 collision_detection=True):
-        '''
-        Add action 'relative move' to mission 'TKU_TMP'
-        '''
-        mission_guid = self.get_mission_guid("TKU_TMP")
+    def add_action_to_mission(self, mission, action_type, parameters, priority):
+        mission_guid = self.get_mission_guid(mission)
         if mission_guid is None:
-            print("[WARNING] No this mission. Creating mission {}".format("TKU_TMP"))
-            r = self.create_new_mission("TKU_TMP")
+            print("[WARNING] No this mission. Creating mission {}".format(mission))
+            r = self.create_new_mission(mission)
             rjson = json.loads(r.text)
             mission_guid = rjson.get("guid")
 
-        path = "/" + self.get_mission_guid("TKU_TMP") + "/actions"
-        body =  {
-            "action_type": "relative_move",
-            "mission_id": self.get_mission_guid("TKU_TMP"),
-            "parameters": [
-                {
-                    "id": "x",
-                    "value": dx
-                },
-                {
-                    "id": "y",
-                    "value": dy
-                },
-                {
-                    "id": "orientation",
-                    "value": dyaw
-                },
-                {
-                    "id": "max_linear_speed",
-                    "value": max_speed_v
-                },
-                {
-                    "id": "max_angular_speed",
-                    "value": max_speed_w
-                },
-                {
-                    "id": "collision_detection",
-                    "value": collision_detection
-                }
-            ],
-            "priority": 1
+        path = "/" + mission_guid + "/actions"
+        body = {
+            "action_type": action_type,
+            "mission_id": mission_guid,
+            "parameters": parameters,
+            "priority": priority
         }
         return {"PATH": path, "BODY": body}
+
+    def add_relative_move_action(self, dx=0.0, dy=0.0, dyaw=0.0, \
+                                 max_speed_v=0.5, max_speed_w=0.5, \
+                                 collision_detection=True):
+        param = [
+            { "id": "x", "value": dx},
+            { "id": "y", "value": dy},
+            { "id": "orientation", "value": dyaw},
+            { "id": "max_linear_speed", "value": max_speed_v},
+            { "id": "max_angular_speed", "value": max_speed_w},
+            { "id": "collision_detection", "value": collision_detection}
+        ]
+        self.add_action_to_mission("TKU_TMP", "relative_move", param, 1)
 
     def relative_move(self, dx=0.0, dy=0.0, dyaw=0.0, \
                       max_speed_v=0.5, max_speed_w=0.5, collision_detection=True):
@@ -331,5 +314,5 @@ class MIR(object):
             else:
                 return False
 
-    ## TODO: Clear ERROR Code
+    ## TODO: Add action with try-catch
     ## TODO: map
