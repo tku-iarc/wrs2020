@@ -48,7 +48,6 @@ class SuctionTask:
                     self.is_grip_callback,
                     queue_size=1
                 )
-                print 'nameeeee = ', self.name
             elif 'left' in self.name :
                 self.suction_pub = rospy.Publisher(
                     'mobile_dual_arm/l_suction_joint_position/command',
@@ -75,15 +74,12 @@ class SuctionTask:
 
     def robot_cmd_client(self, cmd):
         if 'gazebo' in self.name:
-            print "grasping 1"
             for i in range(1, 5):
                 if 'On' in cmd:
                     suction_service = 'robot/' + self.name + '/vacuum_gripper' + str(i) + '/on'
                 elif 'Off' in cmd:
                     suction_service = 'robot/' + self.name + '/vacuum_gripper' + str(i) + '/off'
-                print "grasping 2"    
                 rospy.wait_for_service(suction_service)
-                print "grasping 3"
                 try:
                     client = rospy.ServiceProxy(
                         suction_service,
@@ -92,10 +88,8 @@ class SuctionTask:
                     client()
                 except rospy.ServiceException, e:
                     print "Service call (Vacuum) failed: %s" % e
-                print "grasping 4"
         else:
             suction_service = self.name + '/suction_cmd'
-            print "grasping fuck"
             try:
                 rospy.wait_for_service(suction_service, timeout=1.)
             except rospy.ROSException as e:

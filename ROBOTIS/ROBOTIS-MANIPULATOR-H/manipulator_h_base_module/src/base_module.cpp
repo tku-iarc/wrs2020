@@ -282,19 +282,19 @@ bool BaseModule::checkRangeLimitCallback(manipulator_h_base_module_msgs::CheckRa
   Eigen::Vector3d positoin;
   Eigen::Matrix3d rotation;
 
-  positoin << robotis_->p2p_pose_msg_.pose.position.x, 
-              robotis_->p2p_pose_msg_.pose.position.y, 
-              robotis_->p2p_pose_msg_.pose.position.z;
+  positoin << req.pose.position.x, 
+              req.pose.position.y, 
+              req.pose.position.z;
 
-  Eigen::Quaterniond quaterniond(robotis_->p2p_pose_msg_.pose.orientation.w,
-                                 robotis_->p2p_pose_msg_.pose.orientation.x,
-                                 robotis_->p2p_pose_msg_.pose.orientation.y,
-                                 robotis_->p2p_pose_msg_.pose.orientation.z);
+  Eigen::Quaterniond quaterniond(req.pose.orientation.w,
+                                 req.pose.orientation.x,
+                                 req.pose.orientation.y,
+                                 req.pose.orientation.z);
 
   rotation = robotis_framework::convertQuaternionToRotation(quaterniond);
   
   res.limit_value = manipulator_->limit_check(positoin, rotation);
-  res.is_limit = (res.limit_value >= 0)? true : false;
+  res.is_limit = (res.limit_value > 1)? true : false;
   
   return true;
 }

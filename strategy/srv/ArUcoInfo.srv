@@ -1,0 +1,7 @@
+string    cmd
+
+---
+
+int64[]   ids
+float64[] tvecs
+float64[] rvecs

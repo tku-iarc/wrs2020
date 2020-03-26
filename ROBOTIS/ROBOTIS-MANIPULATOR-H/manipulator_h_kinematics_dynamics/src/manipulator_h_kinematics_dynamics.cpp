@@ -1013,7 +1013,7 @@ void ManipulatorKinematicsDynamics::getPhiAngle()
 
 double ManipulatorKinematicsDynamics::limit_check(Eigen::Vector3d &goal_position, Eigen::Matrix3d &rotation)
 {
-  double Lsw;
+  double Lsw, Low;
   Eigen::Vector3d Oc;
   Eigen::Vector3d test_pos;
  
@@ -1021,17 +1021,25 @@ double ManipulatorKinematicsDynamics::limit_check(Eigen::Vector3d &goal_position
   
   test_pos = Oc;
   test_pos(1) = test_pos(1) - (d1*RL_prm);
-  Lsw = test_pos.norm();
-
-  if(Lsw < (d2+d3) && Lsw > 0.148)
+  if(Oc(2) < -0.8)
   {
-    double middle = (d2+d3+0.148)/2;
-    double range = abs(Lsw - middle)/(d2+d3-middle);
+    test_pos(2) += 0.8;
+  }
+  else if (Oc(2) < 0.0)
+  {
+    test_pos(2) = 0;
+  }
+  Oc(2) = 0;
+  Lsw = test_pos.norm();
+  Low = Oc.norm();
+  if(Lsw < (d2+d3) && Low > 0.13)
+  {
+    double range = Lsw/(d2+d3);
     return range;
   }
   else
-    std::cout<<"Out of range !!!"<<std::endl;
-  return -1;
+    std::cout<<"Out of range !!!"<<Oc<<std::endl;
+  return 10;
   
 }
 
