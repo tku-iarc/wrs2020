@@ -9,9 +9,9 @@ from my_ros_bridge.my_ros_bridge import Robot
 from mir_bridge.mir_bridge import MIR
 
 ## SSID: ASUS_TKU_5G_2
-#HOST = "http://192.168.50.220:8080/v2.0.0"
+HOST = "http://192.168.50.220:8080/v2.0.0"
 ## Wired Connected
-HOST = "http://192.168.12.20:8080/v2.0.0"
+# HOST = "http://192.168.12.20:8080/v2.0.0"
 
 class MyStateMachine(Robot, StateMachine):
 
@@ -38,11 +38,14 @@ class MyStateMachine(Robot, StateMachine):
     home = State('Home')
     move = State('Move')
     arm = State('Arm')
+    ## rmove means Relative move
+    rmove = State('Rmove')
 
-    toIdle = move.to(idle) | home.to(idle) | arm.to(idle)
+    toIdle = move.to(idle) | home.to(idle) | arm.to(idle) | rmove.to(idle)
     toHome = idle.to(home) | move.to(home) | home.to.itself() | arm.to(home)
-    toMove = idle.to(move) | home.to(move) | move.to.itself() | arm.to(move)
+    toMove = idle.to(move) | home.to(move) | move.to.itself() | arm.to(move) | rmove.to(move)
     toArm = move.to(arm) | idle.to(arm)
+    toRove = idle.to(rmove) | move.to(rmove) | rmove.to.itself()
 
     def on_toIdle(self):
         print("To IDLE")
@@ -50,9 +53,12 @@ class MyStateMachine(Robot, StateMachine):
         # self.call_arm("stop")
         print("[IDLE] cancel arm task")
         self.cancel_arm_task()
+        print("[IDLE] clear MiR mission queue")
+        self.mir.clear_mission_queue()
         print("[IDLE] change MiR to 'Pause'")
         self.mir.set_status("Pause")
-        self.mir.clear_mission_queue()
+        print("[IDLE] Delete mission 'TKU_TMP'")
+        self.mir.delete_mission("TKU_TMP")
         print("[IDLE] reset configures")
         self.dclient.update_configuration({"start": False})
         self.dclient.update_configuration({"go_home": False})
@@ -69,6 +75,8 @@ class MyStateMachine(Robot, StateMachine):
             warnings.warn("[WARRING] No this position name!!!!!")
         else:
             self.mir.add_mission_to_queue(guid.encode('utf-8'))
+        # elif action.upper() == "RELATIVE MOVE":
+        #     self.mir.relative_move(dx=0.05)
 
     def on_toArm(self, mission=None):
         if mission is None:
