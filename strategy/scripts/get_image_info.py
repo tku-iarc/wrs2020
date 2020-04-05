@@ -3,6 +3,7 @@
 import rospy
 import numpy as np
 import cv2
+from math import sin, cos, radians
 from strategy.srv import ArUcoInfo, ArUcoInfoRequest
 
 class GetObjInfo():
@@ -16,7 +17,7 @@ class GetObjInfo():
                 'get_ar_marker',
                 ArUcoInfo
             )
-            res = req('side')
+            res = req(side)
             return res
         except rospy.ServiceException, e:
             print "Service call failed: %s" % e
@@ -34,6 +35,8 @@ class GetObjInfo():
             # print(type(cv2.Rodrigues(rvec)[0]))
             # print(cv2.Rodrigues(rvec).shape)
             rotations = np.append(rotations, cv2.Rodrigues(rvec)[0])
+	if rotations is None:
+		return None
         rotations = rotations.reshape(int(len(rotations)/9), 3, 3)
         obj_mat = []
         for rot, tvec in zip(rotations, tvecs):
@@ -43,13 +46,14 @@ class GetObjInfo():
 
     def visiontoArm(self, rot, tvec, arm_ori):
         dx = -0.06   # unit:meter
-        dy = 0      # unit:meter
-        dz = -0.14  # unit:meter   
+        dy = 0.032      # unit:meter
+        dz = -0.14  # unit:meter
+        rad = radians(10)   
 
-        TransMat_EndToImg = np.mat([[0, -1, 0, dx],
-                                    [1,  0, 0, dy],
-                                    [0,  0, 1, dz],
-                                    [0,  0, 0, 1]])
+        TransMat_EndToImg = np.mat([[0, cos(rad), -sin(rad), dx],
+                                    [-1,       0,         0, dy],
+                                    [0, sin(rad),  cos(rad), dz],
+                                    [0,        0,         0, 1]])
 
         T0_7 = np.identity(4)
         for i in range(0,4):

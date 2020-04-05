@@ -144,7 +144,7 @@ class ExpiredTask:
             cmd['cmd'] = 'jointMove'
             cmd['jpos'] = [0, 0, -1, 0, 1.57, 0, -0.57, 0]
             cmd['state'] = State.init
-            cmd['speed'] = 500
+            cmd['speed'] = 20
             cmd_queue.put(copy.deepcopy(cmd))
             self.dual_arm.send_cmd(side, False, cmd_queue)
             
@@ -172,7 +172,7 @@ class ExpiredTask:
         elif state == State.move2obj:
             obj = self.object_queue.get()
             pos, euler = copy.deepcopy(obj['pos']), obj['euler']
-            pos[2] += 0.03
+            pos[2] += 0.05
             cmd['cmd'], cmd['mode'], cmd['state'] = 'ikMove', 'p2p', State.move2obj
             cmd['pos'], cmd['euler'], cmd['phi'] = [0.5, pos[1], pos[2]], euler, 0
             cmd_queue.put(copy.deepcopy(cmd))
@@ -211,13 +211,17 @@ class ExpiredTask:
             cmd['suc_cmd'], cmd['noa'] = obj['sucang'], [0, 0, -0.05]
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['mode'] = 'ikMove', 'line'
-            cmd['pos'], cmd['euler'], cmd['phi'] = [0.5, obj['pos'][1], obj['pos'][2]], obj['euler'], 0
+            cmd['pos'], cmd['euler'], cmd['phi'] = [0.5, obj['pos'][1], obj['pos'][2]+0.065], obj['euler'], 0
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'] = 'jointMove'
             cmd['jpos'] = [0, 0, -1.5, 0, 2.07, 0, -0.57, 0]
             cmd_queue.put(copy.deepcopy(cmd))
             pose = self.place_pose_queue.get()
             pos, euler = pose[0], pose[1]
+            if side == 'left':
+                pos[1] += 0.12
+            else:
+                pos[1] -= 0.12
             cmd['cmd'], cmd['mode'] = 'fromtNoaTarget', 'line'
             cmd['pos'], cmd['euler'], cmd['phi'] = pos, euler, 0
             cmd['suc_cmd'], cmd['noa'] = 0, [0, 0, -0.2]
@@ -249,16 +253,16 @@ class ExpiredTask:
             if l_status == Status.idle or l_status == Status.occupied:
                 state = self.state_control(self.dual_arm.left_arm.state, 'left')
                 self.strategy(state, 'left')
-            r_status = self.dual_arm.right_arm.status
-            if r_status == Status.idle or r_status == Status.occupied:
-                state = self.state_control(self.dual_arm.right_arm.state, 'right')
-                self.strategy(state, 'right')
+#            r_status = self.dual_arm.right_arm.status
+#            if r_status == Status.idle or r_status == Status.occupied:
+#                state = self.state_control(self.dual_arm.right_arm.state, 'right')
+#                self.strategy(state, 'right')
             rate.sleep()
         
 if __name__ == '__main__':
     rospy.init_node('expired')
 
-    strategy = ExpiredTask('dual_arm', True)
+    strategy = ExpiredTask('dual_arm', False)
     
     strategy.process()
     del strategy.dual_arm

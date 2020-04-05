@@ -408,6 +408,7 @@ class ArmTask:
         rot = self.euler2rotation(euler) * suction_rot
         vec_n, vec_o, vec_a = self.rotation2vector(rot) #for suction
         move = [0, 0, 0]
+        a -= 0.065
 
         if n > 1e-10:
             move += multiply(vec_n, n)
@@ -434,6 +435,7 @@ class ArmTask:
         rot = self.euler2rotation(euler) * suction_rot
         vec_n, vec_o, vec_a = self.rotation2vector(rot) #for suction
         move = [0, 0, 0]
+        a -= 0.065
 
         if n > 1e-10:
             move += multiply(vec_n, n)
