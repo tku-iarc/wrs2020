@@ -89,12 +89,13 @@ class ExpiredTask:
 
     def get_obj_inf(self, side):
         fb = self.dual_arm.get_feedback(side)
-        ids, mats, names, exps = self.camara.get_obj_info(side, fb.orientation)
+        ids, mats, names, exps, side_ids = self.camara.get_obj_info(side, fb.orientation)
         obj = ObjInfo()
-        for _id, mat, name, exp in zip(ids, mats, names, exps):
+        for _id, mat, name, exp, side_id in zip(ids, mats, names, exps, side_ids):
             obj['id'] = _id
             obj['name'] = name
             obj['expired'] = exp
+            obj['side_id'] = side_id
             obj['pos'] = mat[0:3, 3]
             obj['sucang'], roll = self.dual_arm.suc2vector(mat[0:3, 2], [0, 1.57, 0])
             obj['euler']   = [roll, 90, 0]
@@ -110,7 +111,7 @@ class ExpiredTask:
 
     def check_pose(self, side):
         fb = self.dual_arm.get_feedback(side)
-        ids, mats, _, _ = self.camara.get_obj_info(side, fb.orientation)
+        ids, mats, _, _, _ = self.camara.get_obj_info(side, fb.orientation)
         for _id, mat in zip(ids, mats):
             if _id == self.target_obj[side]['id']:
                 self.target_obj[side]['pos'] = mat[0:3, 3]
