@@ -6,6 +6,7 @@ from enum import IntEnum
 import rospy
 import queue
 import copy
+import numpy as np
 from std_msgs.msg import Bool, Int32
 from arm_control import DualArmTask
 from arm_control import ArmTask, SuctionTask, Command, Status
@@ -13,12 +14,12 @@ from get_image_info import GetObjInfo
 from math import radians, degrees, sin, cos, pi
 
 
-c_pose = {'left' :[[[0.33,  0.25, -0.13],  [0.0, 90, 0.0]],
-                    [[0.33,  0.25, -0.48],  [0.0, 90, 0.0]],
-                    [[0.33,  0.25, -0.73],    [0.0, 90, 0.0]]],
-          'right':[[[0.33, -0.25, -0.13],  [0.0, 90, 0.0]],
-                    [[0.33, -0.25, -0.48],  [0.0, 90, 0.0]],
-                    [[0.33, -0.25, -0.73],    [0.0, 90, 0.0]]],
+c_pose = {'left' :[[[0.35,  0.25, -0.13],  [0.0, 90, 0.0]],
+                    [[0.35,  0.25, -0.48],  [0.0, 90, 0.0]],
+                    [[0.35,  0.25, -0.73],    [0.0, 90, 0.0]]],
+          'right':[[[0.35, -0.25, -0.13],  [0.0, 90, 0.0]],
+                    [[0.35, -0.25, -0.48],  [0.0, 90, 0.0]],
+                    [[0.35, -0.25, -0.73],    [0.0, 90, 0.0]]],
           'left_indx' : 0, 'right_indx' : 0}
 
 place_pose = [[[-0.38,  0, -0.796],[0.0, 0.0, 0.0]],
@@ -50,8 +51,8 @@ obj_pose = [[[[0.465, -0.1, -0.18], [0, 90, 0]],
 class ObjInfo(dict):
     def __init__(self):
         self['id']      = 0
-        self['side_id'] = 0
-        self['name']    = 'plum_riceball' # 'plum_riceball', 'salmon_riceball', 'sandwiche', 'burger', 'drink', 'lunch_box'
+        self['side_id'] = 'front'               # 'front', 'back', 'side'
+        self['name']    = 'plum_riceball' # 'plum_riceball', 'salmon_riceball', 'sandwich', 'burger', 'drink', 'lunch_box'
         self['state']   = 'new'           # 'new', 'old', 'expired'
         self['pos']     = None
         self['euler']   = None
@@ -77,7 +78,9 @@ class ExpiredTask:
         self.right_cpose_queue = queue.Queue()
         self.place_pose_queue = queue.Queue()
         self.object_queue = queue.Queue()
+        self.object_list = []
         self.target_obj = {'left' : ObjInfo(), 'right' : ObjInfo()}
+        self.obj_done = np.zeros((100), dtype=bool)
         self.init()
     
     def init(self):
@@ -86,20 +89,18 @@ class ExpiredTask:
 
     def get_obj_inf(self, side):
         fb = self.dual_arm.get_feedback(side)
-        print('2')
-        ids, mats = self.camara.get_obj_info(side, fb.orientation)
+        ids, mats, names, exps = self.camara.get_obj_info(side, fb.orientation)
         obj = ObjInfo()
-        print('3')
-        for _id, mat in zip(ids, mats):
+        for _id, mat, name, exp in zip(ids, mats, names, exps):
             obj['id'] = _id
+            obj['name'] = name
+            obj['expired'] = exp
             obj['pos'] = mat[0:3, 3]
             obj['sucang'], roll = self.dual_arm.suc2vector(mat[0:3, 2], [0, 1.57, 0])
             obj['euler']   = [roll, 90, 0]
             self.object_queue.put(obj)
-            print(obj['pos'], ' ',obj['euler'],' ', obj['sucang'])
-            print('4')
-            
-        
+            # self.object_list.append(obj)
+
     def arrange_obj(self, side):
         # obj = ObjInfo()
         # for pose in obj_pose[c_pose[side+'_indx']-1]:
@@ -108,6 +109,13 @@ class ExpiredTask:
         pass
 
     def check_pose(self, side):
+        fb = self.dual_arm.get_feedback(side)
+        ids, mats, _, _ = self.camara.get_obj_info(side, fb.orientation)
+        for _id, mat in zip(ids, mats):
+            if _id == self.target_obj[side]['id']:
+                self.target_obj[side]['pos'] = mat[0:3, 3]
+                self.target_obj[side]['sucang'], roll = self.dual_arm.suc2vector(mat[0:3, 2], [0, 1.57, 0])
+                self.target_obj[side]['euler']   = [roll, 90, 0]
         pass
 
     def state_control(self, state, side):
@@ -127,10 +135,8 @@ class ExpiredTask:
             state = State.pick_and_place
         elif state == State.pick_and_place:
             if self.object_queue.empty():
-                print("c_pose[side+'_indx']c_pose[side+'_indx']", side, c_pose[side+'_indx'])
                 if c_pose[side+'_indx'] >= 3:
                     state = State.finish
-                    print(side,'fuck go to finish')
                 else:
                     state = State.get_obj_inf
             else:
@@ -162,7 +168,6 @@ class ExpiredTask:
                 print('fuckfailfuckfailfuckfail')
                         
         elif state == State.select_obj:
-            print('1')
             self.get_obj_inf(side)
             self.arrange_obj(side)
             cmd['cmd'], cmd['state'] = None, State.select_obj
@@ -170,9 +175,18 @@ class ExpiredTask:
             self.dual_arm.send_cmd(side, True, cmd_queue)
             
         elif state == State.move2obj:
-            obj = self.object_queue.get()
+            obj = None
+            while True:
+                if self.object_queue.empty():
+                    cmd['cmd'], cmd['state'] = None, State.pick_and_place # in order to change to next level
+                    cmd_queue.put(copy.deepcopy(cmd))
+                    self.dual_arm.send_cmd(side, True, cmd_queue)
+                    return
+                obj = self.object_queue.get()
+                if self.obj_done[obj['id']] == False:
+                    break
             pos, euler = copy.deepcopy(obj['pos']), obj['euler']
-            pos[2] += 0.05
+            pos[2] += 0.065
             cmd['cmd'], cmd['mode'], cmd['state'] = 'ikMove', 'p2p', State.move2obj
             cmd['pos'], cmd['euler'], cmd['phi'] = [0.5, pos[1], pos[2]], euler, 0
             cmd_queue.put(copy.deepcopy(cmd))
@@ -182,11 +196,9 @@ class ExpiredTask:
             cmd['cmd'] = 'occupied'
             cmd_queue.put(copy.deepcopy(cmd))
             side = self.dual_arm.send_cmd('either', False, cmd_queue)
-            print('fffffffffffffffffffffffffff', side)
             if side != 'fail':
                 self.target_obj[side] = obj
             else:
-                print('fuckfailfuckfailfuckfail')
                 self.object_queue.put(obj)
             
         elif state == State.check_pose:
@@ -198,6 +210,7 @@ class ExpiredTask:
             
         elif state == State.pick_and_place:
             obj = self.target_obj[side]
+            self.obj_done[obj['id']] = True
             cmd['state'] = State.pick_and_place
             cmd['cmd'], cmd['mode'] = 'fromtNoaTarget', 'line'
             cmd['pos'], cmd['euler'], cmd['phi'] = obj['pos'], obj['euler'], 0
@@ -242,7 +255,6 @@ class ExpiredTask:
             cmd['state'] = State.finish, 
             cmd_queue.put(copy.deepcopy(cmd))
             self.dual_arm.send_cmd(side, False, cmd_queue)
-            print(side ,'fuckfuckfinishfinishfinish')
         return side
 
     def process(self):
