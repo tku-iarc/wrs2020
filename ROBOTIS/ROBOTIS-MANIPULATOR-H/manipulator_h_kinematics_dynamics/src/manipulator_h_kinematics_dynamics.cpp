@@ -1014,6 +1014,7 @@ void ManipulatorKinematicsDynamics::getPhiAngle()
 double ManipulatorKinematicsDynamics::limit_check(Eigen::Vector3d &goal_position, Eigen::Matrix3d &rotation)
 {
   double Lsw, Low;
+  double tar_slide_pos = 0;
   Eigen::Vector3d Oc;
   Eigen::Vector3d test_pos;
  
@@ -1024,16 +1025,24 @@ double ManipulatorKinematicsDynamics::limit_check(Eigen::Vector3d &goal_position
   if(Oc(2) < -0.8)
   {
     test_pos(2) += 0.8;
+    tar_slide_pos = -0.8;
   }
   else if (Oc(2) < 0.0)
   {
     test_pos(2) = 0;
+    tar_slide_pos = Oc(2);
   }
   Oc(2) = 0;
   Lsw = test_pos.norm();
   Low = Oc.norm();
   if(Lsw < (d2+d3) && Low > 0.13)
   {
+    Eigen::VectorXd Old_JointAngle(8);
+    Old_JointAngle << 0,0,0,0,0,0,0,0;
+  
+    bool ik_success = InverseKinematics_7(goal_position, rotation, 0, tar_slide_pos, Old_JointAngle, true);
+    if(!ik_success)
+      return 10;
     double range = Lsw/(d2+d3);
     return range;
   }
