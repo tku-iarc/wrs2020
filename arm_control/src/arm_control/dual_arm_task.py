@@ -54,7 +54,7 @@ class DualArmTask:
             self.right_event.wait()
             if self.stop_event.is_set():
                 break
-            if not self.right_arm.is_busy:
+            if not self.right_arm.is_busy or self.right_arm.status == Status.grasping:
                 self.right_arm.process()
             if self.right_arm.cmd_queue_empty:
                 if self.right_arm.cmd_queue_2nd_empty:
@@ -69,7 +69,7 @@ class DualArmTask:
             self.left_event.wait()
             if self.stop_event.is_set():
                 break
-            if not self.left_arm.is_busy:
+            if not self.left_arm.is_busy or self.left_arm.status == Status.grasping:
                 self.left_arm.process()
             if self.left_arm.cmd_queue_empty:
                 if self.left_arm.cmd_queue_2nd_empty:

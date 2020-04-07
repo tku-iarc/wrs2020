@@ -14,12 +14,12 @@ from get_image_info import GetObjInfo
 from math import radians, degrees, sin, cos, pi
 
 
-c_pose = {'left' :[[[0.35,  0.25, -0.03],  [0.0, 90, 0.0]],
-                    [[0.35,  0.25, -0.38],  [0.0, 90, 0.0]],
-                    [[0.35,  0.25, -0.73],    [0.0, 90, 0.0]]],
-          'right':[[[0.35, -0.25, -0.03],  [0.0, 90, 0.0]],
-                    [[0.35, -0.25, -0.38],  [0.0, 90, 0.0]],
-                    [[0.35, -0.25, -0.73],    [0.0, 90, 0.0]]],
+c_pose = {'left' :[[[0.38,  0.25, -0.03],  [0.0, 90, 0.0]],
+                    [[0.38,  0.25, -0.38],  [0.0, 90, 0.0]],
+                    [[0.38,  0.25, -0.73],    [0.0, 90, 0.0]]],
+          'right':[[[0.38, -0.25, -0.03],  [0.0, 90, 0.0]],
+                    [[0.38, -0.25, -0.38],  [0.0, 90, 0.0]],
+                    [[0.38, -0.25, -0.73],    [0.0, 90, 0.0]]],
           'left_indx' : 0, 'right_indx' : 0}
 
 place_pose = [[[-0.38,  0, -0.796],[0.0, 0.0, 0.0]],
@@ -193,7 +193,7 @@ class ExpiredTask:
             pos, euler = copy.deepcopy(obj['pos']), obj['euler']
             pos[2] += 0.065
             cmd['cmd'], cmd['mode'], cmd['state'] = 'ikMove', 'p2p', State.move2obj
-            cmd['pos'], cmd['euler'], cmd['phi'] = [0.5, pos[1], pos[2]], euler, 0
+            cmd['pos'], cmd['euler'], cmd['phi'] = [0.4, pos[1], pos[2]], euler, 0
             cmd_queue.put(copy.deepcopy(cmd))
             # cmd['cmd'], cmd['mode'], cmd['state'] = 'ikMove', 'line', State.move2obj
             # cmd['pos'], cmd['euler'], cmd['phi'] = pos, euler, 0

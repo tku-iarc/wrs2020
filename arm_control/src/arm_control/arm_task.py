@@ -408,7 +408,7 @@ class ArmTask:
         rot = self.euler2rotation(euler) * suction_rot
         vec_n, vec_o, vec_a = self.rotation2vector(rot) #for suction
         move = [0, 0, 0]
-        a -= 0.065
+        # a -= 0.065
 
         if n > 1e-10:
             move += multiply(vec_n, n)
@@ -536,9 +536,11 @@ class ArmTask:
     def process(self):
         if self.status == Status.emergency_stop or self.status == Status.ik_fail:
             return
-        if self.status == Status.grasping and self.suction.is_grip:
-            self.clear_cmd()
-            rospy.sleep(0.1)
+        if self.status == Status.grasping:
+            if self.suction.is_grip:
+                self.clear_cmd()
+                rospy.sleep(0.1)
+            return
         
         if self.__cmd_queue.empty():
             return
