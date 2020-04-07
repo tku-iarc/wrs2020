@@ -173,7 +173,7 @@ class SuctionTask:
         else:
             self.fail_cnt = 0
             self.gripped = True
-	    print("FUCK grippedgrippedgrippedgrippedgrippedgripped")
+#             print("FUCK grippedgrippedgrippedgrippedgrippedgripped")
 
     @property
     def is_grip(self):

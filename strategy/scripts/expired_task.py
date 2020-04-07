@@ -14,11 +14,11 @@ from get_image_info import GetObjInfo
 from math import radians, degrees, sin, cos, pi
 
 
-c_pose = {'left' :[[[0.35,  0.25, -0.13],  [0.0, 90, 0.0]],
-                    [[0.35,  0.25, -0.48],  [0.0, 90, 0.0]],
+c_pose = {'left' :[[[0.35,  0.25, -0.03],  [0.0, 90, 0.0]],
+                    [[0.35,  0.25, -0.38],  [0.0, 90, 0.0]],
                     [[0.35,  0.25, -0.73],    [0.0, 90, 0.0]]],
-          'right':[[[0.35, -0.25, -0.13],  [0.0, 90, 0.0]],
-                    [[0.35, -0.25, -0.48],  [0.0, 90, 0.0]],
+          'right':[[[0.35, -0.25, -0.03],  [0.0, 90, 0.0]],
+                    [[0.35, -0.25, -0.38],  [0.0, 90, 0.0]],
                     [[0.35, -0.25, -0.73],    [0.0, 90, 0.0]]],
           'left_indx' : 0, 'right_indx' : 0}
 
@@ -91,6 +91,8 @@ class ExpiredTask:
         fb = self.dual_arm.get_feedback(side)
         ids, mats, names, exps, side_ids = self.camara.get_obj_info(side, fb.orientation)
         obj = ObjInfo()
+        if ids is None:
+            return
         for _id, mat, name, exp, side_id in zip(ids, mats, names, exps, side_ids):
             obj['id'] = _id
             obj['name'] = name
@@ -112,6 +114,8 @@ class ExpiredTask:
     def check_pose(self, side):
         fb = self.dual_arm.get_feedback(side)
         ids, mats, _, _, _ = self.camara.get_obj_info(side, fb.orientation)
+        if ids is None:
+            return
         for _id, mat in zip(ids, mats):
             if _id == self.target_obj[side]['id']:
                 self.target_obj[side]['pos'] = mat[0:3, 3]
@@ -199,8 +203,10 @@ class ExpiredTask:
             side = self.dual_arm.send_cmd('either', False, cmd_queue)
             if side != 'fail':
                 self.target_obj[side] = obj
+                print('side = ', side, 'id = ',obj['id'])
             else:
                 self.object_queue.put(obj)
+                print('fffffffffffuuuuuuuuuuccccccccccckkkkkkkkkkk')
             
         elif state == State.check_pose:
             # self.get_obj_inf(side)
@@ -266,10 +272,10 @@ class ExpiredTask:
             if l_status == Status.idle or l_status == Status.occupied:
                 state = self.state_control(self.dual_arm.left_arm.state, 'left')
                 self.strategy(state, 'left')
-#            r_status = self.dual_arm.right_arm.status
-#            if r_status == Status.idle or r_status == Status.occupied:
-#                state = self.state_control(self.dual_arm.right_arm.state, 'right')
-#                self.strategy(state, 'right')
+            r_status = self.dual_arm.right_arm.status
+            if r_status == Status.idle or r_status == Status.occupied:
+                state = self.state_control(self.dual_arm.right_arm.state, 'right')
+                self.strategy(state, 'right')
             rate.sleep()
         
 if __name__ == '__main__':
