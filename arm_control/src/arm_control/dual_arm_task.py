@@ -56,6 +56,10 @@ class DualArmTask:
                 break
             if not self.right_arm.is_busy or self.right_arm.status == Status.grasping:
                 self.right_arm.process()
+            if self.right_arm.status == Status.grasping and self.right_arm.suction.is_grip:
+                self.right_arm.clear_cmd()
+                print('is_gripppppppppppp_clear_cmd')
+                rospy.sleep(0.1)
             if self.right_arm.cmd_queue_empty:
                 if self.right_arm.cmd_queue_2nd_empty:
                     self.right_event.clear()
@@ -69,8 +73,12 @@ class DualArmTask:
             self.left_event.wait()
             if self.stop_event.is_set():
                 break
-            if not self.left_arm.is_busy or self.left_arm.status == Status.grasping:
+            if not self.left_arm.is_busy:
                 self.left_arm.process()
+            if self.left_arm.status == Status.grasping and self.left_arm.suction.is_grip:
+                self.left_arm.clear_cmd()
+                print('is_gripppppppppppp_clear_cmd')
+                rospy.sleep(0.1)
             if self.left_arm.cmd_queue_empty:
                 if self.left_arm.cmd_queue_2nd_empty:
                     self.left_event.clear()
