@@ -190,6 +190,7 @@ class ExpiredTask:
                     return
                 obj = self.object_queue.get()
                 if self.obj_done[obj['id']] == False:
+                    self.obj_done[obj['id']] = True
                     break
             pos, euler = copy.deepcopy(obj['pos']), obj['euler']
             pos[2] += 0.065
@@ -207,6 +208,7 @@ class ExpiredTask:
                 print('side = ', side, 'id = ',obj['id'])
             else:
                 self.object_queue.put(obj)
+                self.obj_done[obj['id']] = False
                 print('fffffffffffuuuuuuuuuuccccccccccckkkkkkkkkkk')
             
         elif state == State.check_pose:
@@ -218,7 +220,6 @@ class ExpiredTask:
             
         elif state == State.pick_and_place:
             obj = self.target_obj[side]
-            self.obj_done[obj['id']] = True
             cmd['state'] = State.pick_and_place
             cmd['cmd'], cmd['mode'] = 'fromtNoaTarget', 'line'
             cmd['pos'], cmd['euler'], cmd['phi'] = obj['pos'], obj['euler'], 0
