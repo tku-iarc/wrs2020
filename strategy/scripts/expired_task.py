@@ -14,12 +14,12 @@ from get_image_info import GetObjInfo
 from math import radians, degrees, sin, cos, pi
 
 
-c_pose = {'left' :[[[0.38,  0.25, -0.03],  [0.0, 90, 0.0]],
-                    [[0.38,  0.25, -0.38],  [0.0, 90, 0.0]],
-                    [[0.38,  0.25, -0.73],    [0.0, 90, 0.0]]],
-          'right':[[[0.38, -0.25, -0.03],  [0.0, 90, 0.0]],
-                    [[0.38, -0.25, -0.38],  [0.0, 90, 0.0]],
-                    [[0.38, -0.25, -0.73],    [0.0, 90, 0.0]]],
+c_pose = {'left' :[[[0.38,  0.2, 0.1],  [0.0, 80, 0.0]],
+                    [[0.38,  0.2, -0.3],  [0.0, 80, 0.0]],
+                    [[0.38,  0.2, -0.7],    [0.0, 80, 0.0]]],
+          'right':[[[0.38, -0.2, 0.1],  [0.0, 80, 0.0]],
+                    [[0.38, -0.2, -0.3],  [0.0, 80, 0.0]],
+                    [[0.38, -0.2, -0.7],    [0.0, 80, 0.0]]],
           'left_indx' : 0, 'right_indx' : 0}
 
 place_pose = [[[-0.38,  0, -0.796],[0.0, 0.0, 0.0]],
@@ -99,6 +99,7 @@ class ExpiredTask:
             obj['expired'] = exp
             obj['side_id'] = side_id
             obj['pos'] = mat[0:3, 3]
+#            obj['pos'][2] += 0.03
             obj['sucang'], roll = self.dual_arm.suc2vector(mat[0:3, 2], [0, 1.57, 0])
             obj['euler']   = [roll, 90, 0]
             self.object_queue.put(obj)
@@ -224,9 +225,10 @@ class ExpiredTask:
             cmd['suc_cmd'], cmd['noa'] = obj['sucang'], [0, 0, -0.05]
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['mode'], cmd['noa'] = 'grasping', 'line', [0, 0, 0.08]
-            cmd['suc_cmd'] = 'On'
+            cmd['suc_cmd'], cmd['speed'] = 'On', 5
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['mode'],  = 'fromtNoaTarget', 'line'
+            cmd['speed'] = 20
             cmd['pos'], cmd['euler'], cmd['phi'] = obj['pos'], obj['euler'], 0
             cmd['suc_cmd'], cmd['noa'] = obj['sucang'], [0, 0, -0.05]
             cmd_queue.put(copy.deepcopy(cmd))
@@ -272,10 +274,10 @@ class ExpiredTask:
             if l_status == Status.idle or l_status == Status.occupied:
                 state = self.state_control(self.dual_arm.left_arm.state, 'left')
                 self.strategy(state, 'left')
-#            r_status = self.dual_arm.right_arm.status
-#            if r_status == Status.idle or r_status == Status.occupied:
-#                state = self.state_control(self.dual_arm.right_arm.state, 'right')
-#                self.strategy(state, 'right')
+            r_status = self.dual_arm.right_arm.status
+            if r_status == Status.idle or r_status == Status.occupied:
+                state = self.state_control(self.dual_arm.right_arm.state, 'right')
+                self.strategy(state, 'right')
             rate.sleep()
         
 if __name__ == '__main__':

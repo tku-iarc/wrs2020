@@ -97,7 +97,7 @@ class GetObjInfo():
             return 'fuck', exp, id
 
     def visiontoArm(self, rot, tvec, arm_ori):
-        dx = -0.06   # unit:meter
+        dx = -0.04   # unit:meter
         dy = 0.032      # unit:meter
         dz = -0.14  # unit:meter
         rad = radians(10)   
