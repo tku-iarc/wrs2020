@@ -79,8 +79,8 @@ class DualArmTask:
             rate.sleep()
 
     def __choose_and_check_side(self, side, command_queue):
-        self.right_value = 0
-        self.left_value = 0
+        self.right_value = 0.0
+        self.left_value = 0.0
         self.right_limit = False
         self.left_limit = False
         cmd_q = queue.Queue()
@@ -117,6 +117,7 @@ class DualArmTask:
                         self.left_value, self.left_limit = self.left_arm.check_range_limit(cmd['pos'], cmd['euler'], cmd['phi'])
                         if self.left_value > 0.2:
                             left_close_limit = True
+                            print('left_close_limit = True')
                         else:
                             left_sum += self.left_value
 
@@ -124,6 +125,7 @@ class DualArmTask:
                         self.right_value, self.right_limit = self.right_arm.check_range_limit(cmd['pos'], cmd['euler'], cmd['phi'])
                         if self.right_value > 0.2:
                             right_close_limit = True
+                            print('right_close_limit = True')
                         else:
                             right_sum += self.right_value
                         
@@ -134,8 +136,10 @@ class DualArmTask:
                     side = 'left'
                 elif self.right_arm.status == Status.idle and not right_close_limit:
                     side = 'right'
+                    print('self.right_arm.status == Status.idle and not right_close_limit')
                 elif self.left_arm.status == Status.idle and not left_close_limit:
                     side = 'left'
+                    print('self.left_arm.status == Status.idle and not left_close_limit')
                 elif right_sum <= left_sum:
                     side = 'right'
                 elif left_sum <= right_sum:
