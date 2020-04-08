@@ -132,24 +132,31 @@ class DualArmTask:
             if not (self.left_limit or self.right_limit):
                 if right_sum <= left_sum and self.right_arm.status == Status.idle:
                     side = 'right'
+                    print('fuckkkkkkkk1111111111111111111111111111111111111')
                 elif left_sum <= right_sum and self.left_arm.status == Status.idle:
                     side = 'left'
+                    print('fuckkkkkkkk2222222222222222222222222222222222222222')
                 elif self.right_arm.status == Status.idle and not right_close_limit:
                     side = 'right'
-                    print('self.right_arm.status == Status.idle and not right_close_limit')
+                    print('fuckkkkkkkk33333333333333333333333333333333333333333')
                 elif self.left_arm.status == Status.idle and not left_close_limit:
                     side = 'left'
-                    print('self.left_arm.status == Status.idle and not left_close_limit')
+                    print('fuckkkkkkkk444444444444444444444444444444444444444444444')
                 elif right_sum <= left_sum:
                     side = 'right'
+                    print('fuckkkkkkkk5555555555555555555555555555555555555555555555')
                 elif left_sum <= right_sum:
                     side = 'left'
+                    print('fuckkkkkkkk666666666666666666666666666666666666666666666')
             elif self.right_limit and self.left_limit:
                 side = 'fail'
+                print('fuckkkkkkkk7777777777777777777777777777777777777777777777777')
             elif self.right_limit:
                 side = 'left'
+                print('fuckkkkkkkk888888888888888888888888888888888888888888888')
             elif self.left_limit:
                 side = 'right'
+                print('fuckkkkkkkk99999999999999999999999999999999999999999999')
             return side, cmd_q
             
 
