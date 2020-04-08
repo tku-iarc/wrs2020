@@ -443,6 +443,7 @@ bool ManipulatorKinematicsDynamics::inverseKinematics_test(Eigen::MatrixXd tar_p
   ik_success = InverseKinematics_7(tar_position, tar_orientation, tar_phi, tar_slide_pos, Old_JointAngle, true, false);
 
   int joint_num;
+  std::vector<int> idx = findRoute(8);
 
   for (int id = 0; id < idx.size(); id++)
   {
