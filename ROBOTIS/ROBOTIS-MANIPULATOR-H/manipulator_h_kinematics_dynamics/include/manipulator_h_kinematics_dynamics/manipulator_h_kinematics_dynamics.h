@@ -75,12 +75,12 @@ public:
 
   bool inverseKinematics(int to, Eigen::MatrixXd tar_position, Eigen::MatrixXd tar_orientation,
                          double tar_phi, double tar_slide_pos, bool is_p2p);
-  bool inverseKinematics(int from, int to, Eigen::MatrixXd tar_position, Eigen::MatrixXd tar_orientation,
-                         int max_iter, double ik_err);
+  bool inverseKinematics_test(Eigen::MatrixXd tar_position,
+                              Eigen::MatrixXd tar_orientation, double tar_phi, double tar_slide_pos);
   Eigen::MatrixXd Trans( double &Theta, Eigen::VectorXd &DH );
   Eigen::Vector3d forwardKinematics_7(int joint_ID, Eigen::VectorXd angle);
   bool InverseKinematics_7( Eigen::VectorXd position, Eigen::Matrix3d rotation, double phi, 
-                            double slide_position, Eigen::VectorXd Old_JointAngle, bool is_p2p);
+                            double slide_position, Eigen::VectorXd Old_JointAngle, bool is_p2p, bool is_run);
   bool slideInverseKinematics(Eigen::Vector3d goal_position, Eigen::Matrix3d rotation, 
                                                             double slide_pos, double& goal_slide_pos);
   double limit_check(Eigen::Vector3d &goal_position, Eigen::Matrix3d &rotation);

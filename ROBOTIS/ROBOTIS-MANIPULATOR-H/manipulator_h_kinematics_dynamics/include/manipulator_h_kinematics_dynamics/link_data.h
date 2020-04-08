@@ -46,6 +46,7 @@ public:
   double joint_limit_min_;
 
   double joint_angle_;
+  double joint_angle_test;
   double joint_velocity_;
   double joint_acceleration_;
   double slide_position_;  //new
