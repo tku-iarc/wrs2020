@@ -272,10 +272,10 @@ class ExpiredTask:
             if l_status == Status.idle or l_status == Status.occupied:
                 state = self.state_control(self.dual_arm.left_arm.state, 'left')
                 self.strategy(state, 'left')
-            r_status = self.dual_arm.right_arm.status
-            if r_status == Status.idle or r_status == Status.occupied:
-                state = self.state_control(self.dual_arm.right_arm.state, 'right')
-                self.strategy(state, 'right')
+#            r_status = self.dual_arm.right_arm.status
+#            if r_status == Status.idle or r_status == Status.occupied:
+#                state = self.state_control(self.dual_arm.right_arm.state, 'right')
+#                self.strategy(state, 'right')
             rate.sleep()
         
 if __name__ == '__main__':

@@ -118,17 +118,16 @@ class DualArmTask:
                         if self.left_value > 0.2:
                             left_close_limit = True
                             print('left_close_limit = True')
-                        else:
-                            left_sum += self.left_value
+                        left_sum += self.left_value
 
                     if not self.right_limit:
                         self.right_value, self.right_limit = self.right_arm.check_range_limit(cmd['pos'], cmd['euler'], cmd['phi'])
                         if self.right_value > 0.2:
                             right_close_limit = True
                             print('right_close_limit = True')
-                        else:
-                            right_sum += self.right_value
-                        
+                        right_sum += self.right_value
+            print('right_sum = ', right_sum)
+            print('left_sum = ', left_sum)
             if not (self.left_limit or self.right_limit):
                 if right_sum <= left_sum and self.right_arm.status == Status.idle:
                     side = 'right'

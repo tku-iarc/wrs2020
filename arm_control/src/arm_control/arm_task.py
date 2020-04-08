@@ -537,8 +537,10 @@ class ArmTask:
         if self.status == Status.emergency_stop or self.status == Status.ik_fail:
             return
         if self.status == Status.grasping:
+            print('graspinininingggggggggg')
             if self.suction.is_grip:
                 self.clear_cmd()
+                print('is_gripppppppppppp_clear_cmd')
                 rospy.sleep(0.1)
             return
         
