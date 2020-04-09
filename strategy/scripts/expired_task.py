@@ -79,7 +79,9 @@ class ExpiredTask:
         self.place_pose_queue = queue.Queue()
         self.object_queue = queue.Queue()
         self.object_list = []
-        self.target_obj = {'left' : ObjInfo(), 'right' : ObjInfo()}
+        self.left_tar_obj = queue.Queue()
+        self.right_tar_obj = queue.Queue()
+        self.target_obj = {'left' : self.left_tar_obj, 'right' : self.right_tar_obj}
         self.obj_done = np.zeros((100), dtype=bool)
         self.init()
     
@@ -115,6 +117,10 @@ class ExpiredTask:
         fb = self.dual_arm.get_feedback(side)
         ids, mats, _, _, _ = self.camara.get_obj_info(side, fb.orientation)
         if ids is None:
+            if side == 'left':
+                self.target_obj[side] = self.left_tar_obj.get()
+            elif side == 'right':
+                self.target_obj[side] = self.right_tar_obj.get()
             return
         for _id, mat in zip(ids, mats):
             if _id == self.target_obj[side]['id']:
@@ -197,10 +203,11 @@ class ExpiredTask:
                 if self.obj_done[obj['id']] == False:
                     self.obj_done[obj['id']] = True
                     break
-            pos, euler = copy.deepcopy(obj['pos']), obj['euler']
+            pos = copy.deepcopy(obj['pos'])
+            pos[1] += 0.032
             pos[2] += 0.065
             cmd['cmd'], cmd['mode'], cmd['state'] = 'ikMove', 'p2p', State.move2obj
-            cmd['pos'], cmd['euler'], cmd['phi'] = [0.4, pos[1], pos[2]], euler, 0
+            cmd['pos'], cmd['euler'], cmd['phi'] = [0.4, pos[1], pos[2]], [0, 90, 0], 0
             cmd_queue.put(copy.deepcopy(cmd))
             # cmd['cmd'], cmd['mode'], cmd['state'] = 'ikMove', 'line', State.move2obj
             # cmd['pos'], cmd['euler'], cmd['phi'] = pos, euler, 0
@@ -209,8 +216,11 @@ class ExpiredTask:
             cmd_queue.put(copy.deepcopy(cmd))
             print('sideeeeeeeeeeee = ', side)
             side = self.dual_arm.send_cmd('either', False, cmd_queue)
-            if side != 'fail':
-                self.target_obj[side] = obj
+            if side == 'left':
+                self.left_tar_obj.put(obj)
+                print('side = ', side, 'id = ',obj['id'])
+            elif side == 'right':
+                self.right_tar_obj.put(obj)
                 print('side = ', side, 'id = ',obj['id'])
             else:
                 self.object_queue.put(obj)
