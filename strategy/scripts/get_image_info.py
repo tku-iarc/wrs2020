@@ -31,9 +31,6 @@ class GetObjInfo():
         tvecs = tvecs.reshape(int(len(tvecs)/3), 3)
         rotations = []
         for rvec in rvecs:
-            # print(cv2.Rodrigues(rvec))
-            # print(type(cv2.Rodrigues(rvec)[0]))
-            # print(cv2.Rodrigues(rvec).shape)
             rotations = np.append(rotations, cv2.Rodrigues(rvec)[0])
 	if rotations == []:
 	    return None, None, None, None, None
@@ -111,13 +108,10 @@ class GetObjInfo():
         for i in range(0,4):
             for j in range(0,4):
                 T0_7[i][j] = arm_ori[i*4+j]
-        print(tvec[2])
-        print(rot)
         Mat_nVec_Pos = np.mat([ [rot[0, 0], rot[0, 1], rot[0, 2],tvec[0]],
                                 [rot[1, 0], rot[1, 1], rot[1, 2],tvec[1]],
                                 [rot[2, 0], rot[2, 1], rot[2, 2],tvec[2]],
                                 [   0,         0,         0,        1   ] ])
     
         Mat_VecPos_ImgToBase = T0_7 * TransMat_EndToImg * Mat_nVec_Pos
-        print(Mat_VecPos_ImgToBase)
         return Mat_VecPos_ImgToBase

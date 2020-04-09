@@ -53,43 +53,36 @@ class DualArmTask:
         while not rospy.is_shutdown():
             if self.stop_event.is_set():
                 break
-            # if not self.right_arm.is_busy:
             self.right_arm.process()
             if self.right_arm.status == Status.grasping and self.right_arm.suction.is_grip:
                 self.right_arm.clear_cmd()
-                print('is_gripppppppppppp_clear_cmd')
                 rospy.sleep(0.1)
             if self.right_arm.cmd_queue_empty:
-                if self.right_arm.cmd_queue_2nd_empty:
-                    # print('event__clearrrrrrrright', self.right_arm.status, self.right_arm.state)
-                    # self.right_event.clear()
+                if self.right_arm.cmd_queue_2nd_empty and self.right_arm.status == Status.idle:
+                    self.right_event.clear()
                     pass
                 elif not self.right_arm.is_busy and not self.right_arm.status == Status.occupied:
                     self.right_arm.cmd_2to1()
-                    print('move_cmd_2to1______________________')
             rate.sleep()
-            # self.right_event.wait()
+            self.right_event.wait()
 
     def __left_arm_process_thread(self):
         rate = rospy.Rate(20)
         while not rospy.is_shutdown():
             if self.stop_event.is_set():
                 break
-            # if not self.left_arm.is_busy:
             self.left_arm.process()
             if self.left_arm.status == Status.grasping and self.left_arm.suction.is_grip:
                 self.left_arm.clear_cmd()
-                print('is_gripppppppppppp_clear_cmd')
                 rospy.sleep(0.1)
             if self.left_arm.cmd_queue_empty:
-                if self.left_arm.cmd_queue_2nd_empty:
-                    # self.left_event.clear()
-                    # print('event__clearllllllleft', self.left_arm.status, self.left_arm.state)
+                if self.left_arm.cmd_queue_2nd_empty and self.left_arm.status == Status.idle:
+                    self.left_event.clear()
                     pass
                 elif not self.left_arm.is_busy and not self.left_arm.status == Status.occupied:
                     self.left_arm.cmd_2to1()
             rate.sleep()
-            # self.left_event.wait()
+            self.left_event.wait()
 
     def __choose_and_check_side(self, side, command_queue):
         self.right_value = 0.0
