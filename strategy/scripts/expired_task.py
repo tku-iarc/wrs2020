@@ -185,6 +185,7 @@ class ExpiredTask:
             self.dual_arm.send_cmd(side, False, cmd_queue)
             
         elif state == State.get_obj_inf:
+            cmd['suc_cmd'] = 'Off'
             cmd['cmd'], cmd['mode'] = 'ikMove', 'p2p'
             cmd['pos'], cmd['euler'], cmd['phi'] = c_pose[side][c_pose[side+'_indx']][0], c_pose[side][c_pose[side+'_indx']][1], 0
             cmd_queue.put(copy.deepcopy(cmd))
@@ -216,6 +217,7 @@ class ExpiredTask:
             pos = copy.deepcopy(obj['pos'])
             pos[1] += 0.032
             pos[2] += 0.065
+            cmd['suc_cmd'] = 'Off'
             cmd['cmd'], cmd['mode'], cmd['state'] = 'ikMove', 'p2p', State.move2obj
             cmd['pos'], cmd['euler'], cmd['phi'] = [0.4, pos[1], pos[2]], [0, 90, 0], 0
             cmd_queue.put(copy.deepcopy(cmd))
@@ -287,6 +289,7 @@ class ExpiredTask:
             self.dual_arm.send_cmd(side, True, cmd_queue)
 
         elif state == State.finish:
+            cmd['suc_cmd'] = 'Off'
             cmd['cmd'] = 'jointMove'
             cmd['jpos'] = [0, 0, -1, 0, 1.57, 0, -0.57, 0]
             cmd['state'] = State.finish, 
