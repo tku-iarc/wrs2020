@@ -148,10 +148,10 @@ class ArmTask:
         elif 'End Trajectory' in msg.status_msg:
             self.__is_busy = False
             rospy.sleep(0.3)
-            if self.occupied is True:
-                self.status = Status.occupied
-            elif self.__cmd_queue.empty() and self.__cmd_queue_2nd.empty():
-                self.status = Status.idle
+            # if self.occupied is True and self.__cmd_queue.empty():
+            #     self.status = Status.occupied
+            # elif self.__cmd_queue.empty() and self.__cmd_queue_2nd.empty():
+            #     self.status = Status.idle
             print('Arm task receive End Trajectory')
 
     def __stop_callback(self, msg):
@@ -544,7 +544,7 @@ class ArmTask:
         #         rospy.sleep(0.1)
         #     return
         
-        if not self.__cmd_queue.empty():
+        if not self.__cmd_queue.empty() and not self.is_busy:
             
             cmd = self.__cmd_queue.get()
             self.status = Status.busy        
@@ -597,13 +597,15 @@ class ArmTask:
             elif cmd['cmd'] == 'grasping':
                 self.noa_move_suction(cmd['mode'], n=cmd['noa'][0], o=cmd['noa'][1], a=cmd['noa'][2])
                 self.status = Status.grasping
-                
+
         if not self.is_busy and not self.occupied:
             if self.__cmd_queue.empty() and self.__cmd_queue_2nd.empty():
                 self.status = Status.idle
         elif not self.is_busy and self.occupied:
             if self.__cmd_queue.empty():
                 self.status = Status.occupied
+        else:
+            self.status = Status.busy
 
 # if __name__ == '__main__':
 #     rospy.init_node('test_arm_task')

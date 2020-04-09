@@ -51,42 +51,45 @@ class DualArmTask:
     def __right_arm_process_thread(self):
         rate = rospy.Rate(20)
         while not rospy.is_shutdown():
-            self.right_event.wait()
             if self.stop_event.is_set():
                 break
-            if not self.right_arm.is_busy:
-                self.right_arm.process()
+            # if not self.right_arm.is_busy:
+            self.right_arm.process()
             if self.right_arm.status == Status.grasping and self.right_arm.suction.is_grip:
                 self.right_arm.clear_cmd()
                 print('is_gripppppppppppp_clear_cmd')
                 rospy.sleep(0.1)
             if self.right_arm.cmd_queue_empty:
                 if self.right_arm.cmd_queue_2nd_empty:
-                    print('event__clearrrrrrrright')
-                    self.right_event.clear()
+                    # print('event__clearrrrrrrright', self.right_arm.status, self.right_arm.state)
+                    # self.right_event.clear()
+                    pass
                 elif not self.right_arm.is_busy and not self.right_arm.status == Status.occupied:
                     self.right_arm.cmd_2to1()
                     print('move_cmd_2to1______________________')
             rate.sleep()
+            # self.right_event.wait()
 
     def __left_arm_process_thread(self):
         rate = rospy.Rate(20)
         while not rospy.is_shutdown():
-            self.left_event.wait()
             if self.stop_event.is_set():
                 break
-            if not self.left_arm.is_busy:
-                self.left_arm.process()
+            # if not self.left_arm.is_busy:
+            self.left_arm.process()
             if self.left_arm.status == Status.grasping and self.left_arm.suction.is_grip:
                 self.left_arm.clear_cmd()
                 print('is_gripppppppppppp_clear_cmd')
                 rospy.sleep(0.1)
             if self.left_arm.cmd_queue_empty:
                 if self.left_arm.cmd_queue_2nd_empty:
-                    self.left_event.clear()
+                    # self.left_event.clear()
+                    # print('event__clearllllllleft', self.left_arm.status, self.left_arm.state)
+                    pass
                 elif not self.left_arm.is_busy and not self.left_arm.status == Status.occupied:
                     self.left_arm.cmd_2to1()
             rate.sleep()
+            # self.left_event.wait()
 
     def __choose_and_check_side(self, side, command_queue):
         self.right_value = 0.0
@@ -127,52 +130,37 @@ class DualArmTask:
                         self.left_value, self.left_limit = self.left_arm.check_range_limit(cmd['pos'], cmd['euler'], cmd['phi'])
                         if self.left_value > 0.2:
                             left_close_limit = True
-                            print('left_close_limit = True')
                         left_sum += self.left_value
 
                     if not self.right_limit:
                         self.right_value, self.right_limit = self.right_arm.check_range_limit(cmd['pos'], cmd['euler'], cmd['phi'])
                         if self.right_value > 0.2:
                             right_close_limit = True
-                            print('right_close_limit = True')
                         right_sum += self.right_value
-            print('right_sum = ', right_sum)
-            print('left_sum = ', left_sum)
             if not (self.left_limit or self.right_limit):
                 if right_sum <= left_sum and self.right_arm.status == Status.idle:
                     side = 'right'
-                    print('fuckkkkkkkk1111111111111111111111111111111111111')
                 elif left_sum <= right_sum and self.left_arm.status == Status.idle:
                     side = 'left'
-                    print('fuckkkkkkkk2222222222222222222222222222222222222222')
                 elif self.right_arm.status == Status.idle and not right_close_limit:
                     side = 'right'
-                    print('fuckkkkkkkk33333333333333333333333333333333333333333')
                 elif self.left_arm.status == Status.idle and not left_close_limit:
                     side = 'left'
-                    print('fuckkkkkkkk444444444444444444444444444444444444444444444')
                 elif right_sum <= left_sum:
                     side = 'right'
-                    print('fuckkkkkkkk5555555555555555555555555555555555555555555555')
                 elif left_sum <= right_sum:
                     side = 'left'
-                    print('fuckkkkkkkk666666666666666666666666666666666666666666666')
             elif self.right_limit and self.left_limit:
                 side = 'fail'
-                print('fuckkkkkkkk7777777777777777777777777777777777777777777777777')
             elif self.right_limit:
                 side = 'left'
-                print('fuckkkkkkkk888888888888888888888888888888888888888888888')
             elif self.left_limit:
                 side = 'right'
-                print('fuckkkkkkkk99999999999999999999999999999999999999999999')
             return side, cmd_q
             
 
     def send_cmd(self, side, priority, command_queue):
-        # cq = copy.copy(command_queue)
         side, command_queue = self.__choose_and_check_side(side, command_queue)
-        # print('Choosed side : '+side+' =================')
         if side == 'right':
             if priority:
                 self.right_arm.cmd_queue_put(command_queue)
@@ -180,6 +168,7 @@ class DualArmTask:
                 self.right_arm.cmd_queue_2nd_put(command_queue)
             if not self.right_event.is_set():
                 self.right_event.set()
+            self.right_arm.status = Status.busy
         elif side == 'left':
             if priority:
                 self.left_arm.cmd_queue_put(command_queue)
@@ -187,6 +176,7 @@ class DualArmTask:
                 self.left_arm.cmd_queue_2nd_put(command_queue)
             if not self.left_event.is_set():
                 self.left_event.set()
+            self.left_arm.status = Status.busy
         return side
 
     def get_feedback(self, side):
