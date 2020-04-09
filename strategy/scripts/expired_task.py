@@ -64,8 +64,9 @@ class State(IntEnum):
     select_obj      = 2
     move2obj        = 3
     check_pose      = 4
-    pick_and_place  = 5
-    finish          = 6
+    pick  = 5
+    place           = 6
+    finish          = 7
 
 class ExpiredTask:
     def __init__(self, _name, en_sim):
@@ -102,9 +103,11 @@ class ExpiredTask:
             obj['expired'] = exp
             obj['side_id'] = side_id
             obj['pos'] = mat[0:3, 3]
+            obj['vecter'] = mat[0:3, 2]
             obj['sucang'], roll = self.dual_arm.suc2vector(mat[0:3, 2], [0, 1.57, 0])
             obj['euler']   = [roll, 90, 0]
-            self.object_queue.put(obj)
+            if obj['vecter'][2] > -0.1:
+                self.object_queue.put(obj)
 
     def arrange_obj(self, side):
         pass
@@ -121,8 +124,9 @@ class ExpiredTask:
         for _id, mat in zip(ids, mats):
             if _id == self.target_obj[side]['id']:
                 self.target_obj[side]['pos'] = mat[0:3, 3]
-                self.target_obj[side]['sucang'], roll = self.dual_arm.suc2vector(mat[0:3, 2], [0, 1.57, 0])
-                self.target_obj[side]['euler']   = [roll, 90, 0]
+                if mat[2, 2] > -0.1:
+                    self.target_obj[side]['sucang'], roll = self.dual_arm.suc2vector(mat[0:3, 2], [0, 1.57, 0])
+                    self.target_obj[side]['euler']   = [roll, 90, 0]
         pass
 
     def state_control(self, state, side):
@@ -143,8 +147,23 @@ class ExpiredTask:
         elif state == State.move2obj:
             state = State.check_pose
         elif state == State.check_pose:
-            state = State.pick_and_place
-        elif state == State.pick_and_place:
+            state = State.pick
+        elif state == State.pick:
+            if side == 'left':
+                is_grip = self.dual_arm.left_arm.suction.is_grip
+            else:
+                is_grip = self.dual_arm.right_arm.suction.is_grip
+            if is_grip:
+                state = State.place
+            elif self.object_queue.empty():
+                if c_pose[side+'_indx'] >= 3:
+                    state = State.finish
+                else:
+                    state = State.get_obj_inf
+            else:
+                state = State.move2obj
+                    
+        elif state == State.place:
             if self.object_queue.empty():
                 if c_pose[side+'_indx'] >= 3:
                     state = State.finish
@@ -221,15 +240,17 @@ class ExpiredTask:
             cmd_queue.put(copy.deepcopy(cmd))
             self.dual_arm.send_cmd(side, True, cmd_queue)
             
-        elif state == State.pick_and_place:
+        elif state == State.pick:
             obj = self.target_obj[side]
-            cmd['state'] = State.pick_and_place
+            cmd['state'] = State.pick
             cmd['cmd'], cmd['mode'] = 'fromtNoaTarget', 'line'
             cmd['pos'], cmd['euler'], cmd['phi'] = obj['pos'], obj['euler'], 0
             cmd['suc_cmd'], cmd['noa'] = obj['sucang'], [0, 0, -0.05]
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['mode'], cmd['noa'] = 'grasping', 'line', [0, 0, 0.08]
             cmd['suc_cmd'], cmd['speed'] = 'On', 5
+            if obj['vecter'][2] < 0.2:
+                cmd['speed'] = 30
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['mode'],  = 'relativePos', 'line'
             cmd['speed'] = 20
@@ -238,6 +259,10 @@ class ExpiredTask:
             cmd['cmd'], cmd['mode'] = 'ikMove', 'line'
             cmd['pos'], cmd['euler'], cmd['phi'] = [0.45, obj['pos'][1], obj['pos'][2]+0.065], obj['euler'], 0
             cmd_queue.put(copy.deepcopy(cmd))
+            self.dual_arm.send_cmd(side, True, cmd_queue)
+
+        elif state == State.place:
+            cmd['state'] = State.place
             cmd['cmd'] = 'jointMove'
             cmd['jpos'] = [0, 0, -1.5, 0, 2.07, 0, -0.57, 0]
             cmd_queue.put(copy.deepcopy(cmd))
