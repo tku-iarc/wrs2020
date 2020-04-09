@@ -548,7 +548,7 @@ class ArmTask:
             return
         else:
             cmd = self.__cmd_queue.get()
-        
+        self.status = Status.busy        
         if cmd['state'] is not None:
             self.state = cmd['state']
         if cmd['next_state'] is not None:
@@ -571,8 +571,8 @@ class ArmTask:
             self.occupied = True
         else:
             self.occupied = False
-            if self.status == Status.occupied:
-                self.status = Status.idle
+           # if self.status == Status.occupied:
+            #    self.status = Status.busy
 
         if cmd['cmd'] == 'ikMove':
             self.ikMove(cmd['mode'], cmd['pos'], cmd['euler'], cmd['phi'])
@@ -598,6 +598,9 @@ class ArmTask:
         elif cmd['cmd'] == 'grasping':
             self.noa_move_suction(cmd['mode'], n=cmd['noa'][0], o=cmd['noa'][1], a=cmd['noa'][2])
             self.status = Status.grasping
+        if not self.is_busy and not self.occupied:
+            if self.__cmd_queue.empty() and self.__cmd_queue_2nd.empty():
+                self.status = Status.idle
 
 
 # if __name__ == '__main__':

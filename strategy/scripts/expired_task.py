@@ -134,7 +134,13 @@ class ExpiredTask:
         elif state == State.get_obj_inf:
             state = State.select_obj
         elif state == State.select_obj:
-            state = State.move2obj
+            if self.object_queue.empty():
+                if c_pose[side+'_indx'] >= 3:
+                    state = State.finish
+                else:
+                    state = State.get_obj_inf
+            else:
+                state = State.move2obj
         elif state == State.move2obj:
             state = State.check_pose
         elif state == State.check_pose:
@@ -184,9 +190,9 @@ class ExpiredTask:
             obj = None
             while True:
                 if self.object_queue.empty():
-                    cmd['cmd'], cmd['state'] = None, State.pick_and_place # in order to change to next level
-                    cmd_queue.put(copy.deepcopy(cmd))
-                    self.dual_arm.send_cmd(side, True, cmd_queue)
+                   # cmd['cmd'], cmd['state'] = None, State.pick_and_place # in order to change to next level
+                   # cmd_queue.put(copy.deepcopy(cmd))
+                   # self.dual_arm.send_cmd(side, True, cmd_queue)
                     return
                 obj = self.object_queue.get()
                 if self.obj_done[obj['id']] == False:
@@ -202,6 +208,7 @@ class ExpiredTask:
             # cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'] = 'occupied'
             cmd_queue.put(copy.deepcopy(cmd))
+            print('sideeeeeeeeeeee = ', side)
             side = self.dual_arm.send_cmd('either', False, cmd_queue)
             if side != 'fail':
                 self.target_obj[side] = obj
