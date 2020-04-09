@@ -604,7 +604,7 @@ class ArmTask:
         elif not self.is_busy and self.occupied:
             if self.__cmd_queue.empty():
                 self.status = Status.occupied
-        else:
+        elif not self.status == Status.grasping:
             self.status = Status.busy
 
 # if __name__ == '__main__':

@@ -51,16 +51,16 @@ class GetObjInfo():
             if names[i] == names[i+1] and exps[i] == exps[i+1]:
                 if np.linalg.norm(np.subtract(obj_mat[i, 0:3, 3], obj_mat[i+1, 0:3, 3])) < 0.05:
                     if side_ids[i] == 0:
-                        ids[i+1] = None
+                        ids[i+1] = -1
                     elif side_ids[i+1] == 0:
-                        ids[i] = None
+                        ids[i] = -1
                     elif side_ids[i] == 1:
-                        ids[i] = None
+                        ids[i] = -1
                     elif side_ids[i+1] == 1:
-                        ids[i+1] = None
+                        ids[i+1] = -1
                     else:
-                        ids[i] = None
-                    if ids[i+1] is None:
+                        ids[i] = -1
+                    if ids[i+1] == -1:
                         ids[i], ids[i+1] = ids[i+1], ids[i]
                         names[i], names[i+1] = names[i+1], names[i]
                         exps[i], exps[i+1] = exps[i+1], exps[i]

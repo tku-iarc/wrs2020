@@ -161,7 +161,7 @@ class ExpiredTask:
             cmd['cmd'] = 'jointMove'
             cmd['jpos'] = [0, 0, -1, 0, 1.57, 0, -0.57, 0]
             cmd['state'] = State.init
-            cmd['speed'] = 200
+            cmd['speed'] = 20
             cmd_queue.put(copy.deepcopy(cmd))
             self.dual_arm.send_cmd(side, False, cmd_queue)
             
@@ -232,7 +232,7 @@ class ExpiredTask:
             cmd['suc_cmd'], cmd['speed'] = 'On', 5
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['mode'],  = 'relativePos', 'line'
-            cmd['speed'] = 200
+            cmd['speed'] = 20
             cmd['pos'] = [0, 0, 0.03]
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['mode'] = 'ikMove', 'line'
@@ -289,7 +289,7 @@ class ExpiredTask:
 if __name__ == '__main__':
     rospy.init_node('expired')
 
-    strategy = ExpiredTask('dual_arm', True)
+    strategy = ExpiredTask('dual_arm', False)
     rospy.on_shutdown(strategy.dual_arm.shutdown)
     strategy.process()
     strategy.dual_arm.shutdown()
