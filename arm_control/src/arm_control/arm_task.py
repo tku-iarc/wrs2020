@@ -544,64 +544,66 @@ class ArmTask:
         #         rospy.sleep(0.1)
         #     return
         
-        if self.__cmd_queue.empty():
-            return
-        else:
+        if not self.__cmd_queue.empty():
+            
             cmd = self.__cmd_queue.get()
-        self.status = Status.busy        
-        if cmd['state'] is not None:
-            self.state = cmd['state']
-        if cmd['next_state'] is not None:
-            self.next_state = cmd['next_state']
-        if cmd['speed'] is not None:
-            self.set_speed(cmd['speed'])
+            self.status = Status.busy        
+            if cmd['state'] is not None:
+                self.state = cmd['state']
+            if cmd['next_state'] is not None:
+                self.next_state = cmd['next_state']
+            if cmd['speed'] is not None:
+                self.set_speed(cmd['speed'])
 
-        if cmd['suc_cmd'] is not None:
-            if type(cmd['suc_cmd']) is not str:
-                self.suction.gripper_suction_deg(cmd['suc_cmd'])
-                self.suction_angle = cmd['suc_cmd']
-            elif 'On' in cmd['suc_cmd']:
-                self.suction.gripper_vacuum_on()
-            elif 'calibration' in cmd['suc_cmd']:
-                self.suction.gripper_calibration()
-            elif 'Off' in cmd['suc_cmd']:
-                self.suction.gripper_vacuum_off()
+            if cmd['suc_cmd'] is not None:
+                if type(cmd['suc_cmd']) is not str:
+                    self.suction.gripper_suction_deg(cmd['suc_cmd'])
+                    self.suction_angle = cmd['suc_cmd']
+                elif 'On' in cmd['suc_cmd']:
+                    self.suction.gripper_vacuum_on()
+                elif 'calibration' in cmd['suc_cmd']:
+                    self.suction.gripper_calibration()
+                elif 'Off' in cmd['suc_cmd']:
+                    self.suction.gripper_vacuum_off()
 
-        if cmd['cmd'] == 'occupied':
-            self.occupied = True
-        else:
-            self.occupied = False
-           # if self.status == Status.occupied:
-            #    self.status = Status.busy
+            if cmd['cmd'] == 'occupied':
+                self.occupied = True
+            else:
+                self.occupied = False
+            # if self.status == Status.occupied:
+                #    self.status = Status.busy
 
-        if cmd['cmd'] == 'ikMove':
-            self.ikMove(cmd['mode'], cmd['pos'], cmd['euler'], cmd['phi'])
+            if cmd['cmd'] == 'ikMove':
+                self.ikMove(cmd['mode'], cmd['pos'], cmd['euler'], cmd['phi'])
 
-        elif cmd['cmd'] == 'jointMove':
-            self.jointMove(cmd['jpos'][0], cmd['jpos'][1:8])
+            elif cmd['cmd'] == 'jointMove':
+                self.jointMove(cmd['jpos'][0], cmd['jpos'][1:8])
 
-        elif cmd['cmd'] == 'noaMove':
-            self.noa_move_suction(cmd['mode'], n=cmd['noa'][0], o=cmd['noa'][1], a=cmd['noa'][2])
+            elif cmd['cmd'] == 'noaMove':
+                self.noa_move_suction(cmd['mode'], n=cmd['noa'][0], o=cmd['noa'][1], a=cmd['noa'][2])
 
-        elif cmd['cmd'] == 'fromtNoaTarget':
-            self.noa_relative_pos(cmd['mode'], cmd['pos'], cmd['euler'], cmd['phi'], n=cmd['noa'][0], o=cmd['noa'][1], a=cmd['noa'][2])
+            elif cmd['cmd'] == 'fromtNoaTarget':
+                self.noa_relative_pos(cmd['mode'], cmd['pos'], cmd['euler'], cmd['phi'], n=cmd['noa'][0], o=cmd['noa'][1], a=cmd['noa'][2])
 
-        elif cmd['cmd'] == 'relativeMove':
-            self.relative_move(cmd['mode'], cmd['pos'], cmd['euler'], cmd['phi'])
+            elif cmd['cmd'] == 'relativeMove':
+                self.relative_move(cmd['mode'], cmd['pos'], cmd['euler'], cmd['phi'])
 
-        elif cmd['cmd'] == 'relativePos':
-            self.relative_move_pose(cmd['mode'], cmd['pos'])
+            elif cmd['cmd'] == 'relativePos':
+                self.relative_move_pose(cmd['mode'], cmd['pos'])
 
-        elif cmd['cmd'] == 'relativeEuler':
-            self.move_euler(cmd['mode'], cmd['euler'])
+            elif cmd['cmd'] == 'relativeEuler':
+                self.move_euler(cmd['mode'], cmd['euler'])
 
-        elif cmd['cmd'] == 'grasping':
-            self.noa_move_suction(cmd['mode'], n=cmd['noa'][0], o=cmd['noa'][1], a=cmd['noa'][2])
-            self.status = Status.grasping
+            elif cmd['cmd'] == 'grasping':
+                self.noa_move_suction(cmd['mode'], n=cmd['noa'][0], o=cmd['noa'][1], a=cmd['noa'][2])
+                self.status = Status.grasping
+                
         if not self.is_busy and not self.occupied:
             if self.__cmd_queue.empty() and self.__cmd_queue_2nd.empty():
                 self.status = Status.idle
-
+        elif not self.is_busy and self.occupied:
+            if self.__cmd_queue.empty():
+                self.status = Status.occupied
 
 # if __name__ == '__main__':
 #     rospy.init_node('test_arm_task')

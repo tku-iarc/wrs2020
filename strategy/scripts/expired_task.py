@@ -99,7 +99,6 @@ class ExpiredTask:
             obj['expired'] = exp
             obj['side_id'] = side_id
             obj['pos'] = mat[0:3, 3]
-#            obj['pos'][2] += 0.03
             obj['sucang'], roll = self.dual_arm.suc2vector(mat[0:3, 2], [0, 1.57, 0])
             obj['euler']   = [roll, 90, 0]
             self.object_queue.put(obj)
