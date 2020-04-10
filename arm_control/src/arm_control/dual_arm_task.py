@@ -40,6 +40,7 @@ class DualArmTask:
         self.left_thread = threading.Thread(target=self.__left_arm_process_thread)
         self.right_thread.start()
         self.left_thread.start()
+        rospy.on_shutdown(self.shutdown)
 
     def shutdown(self):
         self.right_arm.clear_cmd()
@@ -47,12 +48,14 @@ class DualArmTask:
         self.stop_event.set()
         self.right_event.set()
         self.left_event.set()
+        # del self.right_thread
+        # del self.left_thread
 
     def __right_arm_process_thread(self):
         rate = rospy.Rate(20)
         while not rospy.is_shutdown():
             if self.stop_event.is_set():
-                break
+                return
             self.right_arm.process()
             if self.right_arm.status == Status.grasping and self.right_arm.suction.is_grip:
                 self.right_arm.clear_cmd()
@@ -70,7 +73,7 @@ class DualArmTask:
         rate = rospy.Rate(20)
         while not rospy.is_shutdown():
             if self.stop_event.is_set():
-                break
+                return
             self.left_arm.process()
             if self.left_arm.status == Status.grasping and self.left_arm.suction.is_grip:
                 self.left_arm.clear_cmd()

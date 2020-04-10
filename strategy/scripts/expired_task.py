@@ -223,7 +223,7 @@ class ExpiredTask:
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'] = 'occupied'
             cmd_queue.put(copy.deepcopy(cmd))
-            side = self.dual_arm.send_cmd('either', False, cmd_queue)
+            side = self.dual_arm.send_cmd(side, False, cmd_queue)
             if side == 'left':
                 self.left_tar_obj.put(obj)
                 print('side = ', side, 'id = ',obj['id'])
@@ -236,7 +236,6 @@ class ExpiredTask:
                 print('fffffffffffuuuuuuuuuuccccccccccckkkkkkkkkkk')
             
         elif state == State.check_pose:
-            # self.get_obj_inf(side)
             self.check_pose(side)
             cmd['cmd'], cmd['state'] = 'occupied', State.check_pose
             cmd_queue.put(copy.deepcopy(cmd))
@@ -292,7 +291,7 @@ class ExpiredTask:
             cmd['suc_cmd'] = 'Off'
             cmd['cmd'] = 'jointMove'
             cmd['jpos'] = [0, 0, -1, 0, 1.57, 0, -0.57, 0]
-            cmd['state'] = State.finish, 
+            cmd['state'] = State.finish
             cmd_queue.put(copy.deepcopy(cmd))
             self.dual_arm.send_cmd(side, False, cmd_queue)
         return side
@@ -312,7 +311,7 @@ class ExpiredTask:
                 self.strategy(r_state, 'right')
             rate.sleep()
             if l_state == State.finish and r_state == State.finish:
-                break
+                return
         
 if __name__ == '__main__':
     rospy.init_node('expired')
