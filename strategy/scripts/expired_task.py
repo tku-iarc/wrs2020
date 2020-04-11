@@ -64,7 +64,7 @@ class State(IntEnum):
     select_obj      = 2
     move2obj        = 3
     check_pose      = 4
-    pick  = 5
+    pick            = 5
     place           = 6
     finish          = 7
 
@@ -82,8 +82,14 @@ class ExpiredTask:
         self.object_list = []
         self.left_tar_obj = queue.Queue()
         self.right_tar_obj = queue.Queue()
-        self.target_obj = {'left' : self.left_tar_obj, 'right' : self.right_tar_obj}
+        self.retry_obj_queue_left = queue.Queue()
+        self.retry_obj_queue_right = queue.Queue()
+        self.target_obj_queue = {'left' : self.left_tar_obj, 'right' : self.right_tar_obj}
+        self.target_obj = {'left': None, 'right': None}
+        self.retry_obj_queue = {'left': self.retry_obj_queue_left, 'right': self.retry_obj_queue_right}
         self.obj_done = np.zeros((100), dtype=bool)
+        self.obj_retry = np.zeros((100), dtype=bool)
+        self.next_level = {'left': False, 'right': False}
         self.init()
     
     def init(self):
@@ -113,10 +119,7 @@ class ExpiredTask:
         pass
 
     def check_pose(self, side):
-        if side == 'left':
-            self.target_obj[side] = self.left_tar_obj.get()
-        elif side == 'right':
-            self.target_obj[side] = self.right_tar_obj.get()
+        self.target_obj[side] = self.target_obj_queue[side].get()
         fb = self.dual_arm.get_feedback(side)
         ids, mats, _, _, _ = self.camara.get_obj_info(side, fb.orientation)
         if ids is None:
@@ -155,16 +158,18 @@ class ExpiredTask:
                 is_grip = self.dual_arm.right_arm.suction.is_grip
             if is_grip:
                 state = State.place
-            elif self.object_queue.empty():
+            elif self.next_level[side] == True:
+                self.next_level[side] = False
                 if c_pose[side+'_indx'] >= 3:
                     state = State.finish
                 else:
                     state = State.get_obj_inf
             else:
+                self.retry_obj_queue[side].put(self.target_obj[side])
                 state = State.move2obj
-                    
         elif state == State.place:
-            if self.object_queue.empty():
+            if self.next_level[side] == True:
+                self.next_level[side] = False
                 if c_pose[side+'_indx'] >= 3:
                     state = State.finish
                 else:
@@ -207,21 +212,36 @@ class ExpiredTask:
             
         elif state == State.move2obj:
             obj = None
-            while True:
+            if self.retry_obj_queue[side].empty() and self.target_obj_queue[side].empty():
                 if self.object_queue.empty():
+                    self.next_level[side] = True
                     return
-                obj = self.object_queue.get()
+                for _ in range(self.object_queue.qsize()):
+                    obj = self.object_queue.get()
+                    if self.obj_done[obj['id']] == False:
+                        if side == 'left' and obj['pos'][1] < -0.02:
+                            self.object_queue.put(obj)
+                            self.obj_done[obj['id']] = False
+                            return
+                        if side == 'right' and obj['pos'][1] > 0.02:
+                            self.object_queue.put(obj)
+                            self.obj_done[obj['id']] = False
+                            return
+                        self.obj_done[obj['id']] = True
+                        break
+            elif self.target_obj_queue[side].empty():
+                obj = self.retry_obj_queue[side].get()
+                if self.obj_retry[obj['id']] == False:
+                    self.obj_retry[obj['id']] = True
+                else:
+                    return
+            else:
+                obj = self.target_obj_queue[side].get()
                 if self.obj_done[obj['id']] == False:
-                    self.obj_done[obj['id']] = True
-                    break
-            if side == 'left' and obj['pos'][1] < -0.02:
-                self.object_queue.put(obj)
-                self.obj_done[obj['id']] = False
-                return
-            if side == 'right' and obj['pos'][1] > 0.02:
-                self.object_queue.put(obj)
-                self.obj_done[obj['id']] = False
-                return
+                    self.obj_retry[obj['id']] = True
+                else:
+                    return
+
             pos = copy.deepcopy(obj['pos'])
             pos[1] += 0.032
             pos[2] += 0.065
@@ -232,17 +252,14 @@ class ExpiredTask:
             cmd['cmd'] = 'occupied'
             cmd_queue.put(copy.deepcopy(cmd))
             side = self.dual_arm.send_cmd(side, False, cmd_queue)
-            if side == 'left' and obj['pos'][1] > -0.02:
-                self.left_tar_obj.put(obj)
-                print('side = ', side, 'id = ',obj['id'])
-            elif side == 'right' and obj['pos'][1] < 0.02:
-                self.right_tar_obj.put(obj)
-                print('side = ', side, 'id = ',obj['id'])
-            else:
+            if side == 'fail':
                 self.object_queue.put(obj)
                 self.obj_done[obj['id']] = False
                 print('fffffffffffuuuuuuuuuuccccccccccckkkkkkkkkkk')
-            
+            else:
+                self.target_obj_queue[side].put(obj)
+                print('side = ', side, 'id = ',obj['id'])
+
         elif state == State.check_pose:
             self.check_pose(side)
             cmd['cmd'], cmd['state'] = 'occupied', State.check_pose
@@ -257,12 +274,12 @@ class ExpiredTask:
             cmd['suc_cmd'], cmd['noa'] = obj['sucang'], [0, 0, -0.05]
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['mode'], cmd['noa'] = 'grasping', 'line', [0, 0, 0.08]
-            cmd['suc_cmd'], cmd['speed'] = 'On', 5
+            cmd['suc_cmd'], cmd['speed'] = 'On', 10
             if obj['vecter'][2] < 0.2:
                 cmd['speed'] = 20
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['mode'],  = 'relativePos', 'line'
-            cmd['speed'] = 20
+            cmd['speed'], cmd['suc_cmd'] = 20, 'calibration'
             cmd['pos'] = [0, 0, 0.03]
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['mode'] = 'ikMove', 'line'
