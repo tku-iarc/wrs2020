@@ -23,21 +23,21 @@ c_pose = {'left' :[[[0.38,  0.2, 0.1],  [0.0, 80, 0.0]],
           'left_indx' : 0, 'right_indx' : 0}
 
 place_pose = [[[-0.38,  0, -0.796],[0.0, 0.0, 0.0]],
-              [[-0.42,  0, -0.796],[0.0, 0.0, 0.0]],
+              [[-0.45,  0, -0.796],[0.0, 0.0, 0.0]],
               [[-0.38,  0, -0.796],[0.0, 0.0, 0.0]],                             
-              [[-0.42,  0, -0.796],[0.0, 0.0, 0.0]],
-              [[-0.38,  0, -0.796],[0.0, 0.0, 0.0]],
-              [[-0.42,  0, -0.796],[0.0, 0.0, 0.0]],
-              [[-0.38,  0, -0.796],[0.0, 0.0, 0.0]],                             
-              [[-0.42,  0, -0.796],[0.0, 0.0, 0.0]],
-              [[-0.38,  0, -0.796],[0.0, 0.0, 0.0]],
-              [[-0.42,  0, -0.796],[0.0, 0.0, 0.0]],
-              [[-0.38,  0, -0.796],[0.0, 0.0, 0.0]],                             
-              [[-0.42,  0, -0.796],[0.0, 0.0, 0.0]],
-              [[-0.38,  0, -0.796],[0.0, 0.0, 0.0]],
-              [[-0.42,  0, -0.796],[0.0, 0.0, 0.0]],
-              [[-0.38,  0, -0.796],[0.0, 0.0, 0.0]],                             
-              [[-0.42,  0, -0.796],[0.0, 0.0, 0.0]]]
+              [[-0.45,  0, -0.796],[0.0, 0.0, 0.0]],
+              [[-0.38,  0.02, -0.75],[0.0, 0.0, 0.0]],
+              [[-0.45,  -0.02, -0.75],[0.0, 0.0, 0.0]],
+              [[-0.38,  -0.02, -0.75],[0.0, 0.0, 0.0]],                             
+              [[-0.45,  0.02, -0.75],[0.0, 0.0, 0.0]],
+              [[-0.38,  0, -0.7],[0.0, 0.0, 0.0]],
+              [[-0.45,  0, -0.7],[0.0, 0.0, 0.0]],
+              [[-0.38,  0, -0.7],[0.0, 0.0, 0.0]],                             
+              [[-0.45,  0, -0.7],[0.0, 0.0, 0.0]],
+              [[-0.38,  0, -0.7],[0.0, 0.0, 0.0]],
+              [[-0.45,  0, -0.7],[0.0, 0.0, 0.0]],
+              [[-0.38,  0, -0.7],[0.0, 0.0, 0.0]],                             
+              [[-0.42,  0, -0.7],[0.0, 0.0, 0.0]]]
 
 obj_pose = [[[[0.465, -0.1, -0.18], [0, 90, 0]],
             [[0.465,  0.1, -0.18], [0, 90, 0]]],
@@ -214,6 +214,14 @@ class ExpiredTask:
                 if self.obj_done[obj['id']] == False:
                     self.obj_done[obj['id']] = True
                     break
+            if side == 'left' and obj['pos'][1] < -0.02:
+                self.object_queue.put(obj)
+                self.obj_done[obj['id']] = False
+                return
+            if side == 'right' and obj['pos'][1] > 0.02:
+                self.object_queue.put(obj)
+                self.obj_done[obj['id']] = False
+                return
             pos = copy.deepcopy(obj['pos'])
             pos[1] += 0.032
             pos[2] += 0.065
@@ -224,10 +232,10 @@ class ExpiredTask:
             cmd['cmd'] = 'occupied'
             cmd_queue.put(copy.deepcopy(cmd))
             side = self.dual_arm.send_cmd(side, False, cmd_queue)
-            if side == 'left':
+            if side == 'left' and obj['pos'][1] > -0.02:
                 self.left_tar_obj.put(obj)
                 print('side = ', side, 'id = ',obj['id'])
-            elif side == 'right':
+            elif side == 'right' and obj['pos'][1] < 0.02:
                 self.right_tar_obj.put(obj)
                 print('side = ', side, 'id = ',obj['id'])
             else:
@@ -251,7 +259,7 @@ class ExpiredTask:
             cmd['cmd'], cmd['mode'], cmd['noa'] = 'grasping', 'line', [0, 0, 0.08]
             cmd['suc_cmd'], cmd['speed'] = 'On', 5
             if obj['vecter'][2] < 0.2:
-                cmd['speed'] = 30
+                cmd['speed'] = 20
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['mode'],  = 'relativePos', 'line'
             cmd['speed'] = 20
