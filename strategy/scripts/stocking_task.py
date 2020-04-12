@@ -13,36 +13,56 @@ from arm_control import ArmTask, SuctionTask, Command, Status
 from get_image_info import GetObjInfo
 from math import radians, degrees, sin, cos, pi
 
-pick_pose_left = [#[[-0.25, 0.15, -0.67], [0, 0, 0]],
-                  #[[-0.25, 0.15, -0.67], [0, 0, 0]],
-                  #[[-0.25, 0.15, -0.57], [0, 0, 0]],
-                  #[[-0.25, 0.15, -0.57], [0, 0, 0]],
-                  [[-0.25, 0.15, -0.72], [-135, 0, 0]],
-                  [[-0.25, 0.15, -0.77], [-135, 0, 0]]]
+#pick_pose_left = [[[-0.2, 0.09, -0.705], [0, 0, 0]],
+#                  #[[-0.25, 0.15, -0.67], [0, 0, 0]],
+#                  [[-0.2, 0.23, -0.72], [0, 0, 0]],
+#                  #[[-0.25, 0.15, -0.57], [0, 0, 0]],
+#                  [[-0.2, 0.09, -0.745], [-135, 0, 0]],
+#                  [[-0.25, 0.15, -0.79], [-135, 0, 0]]]
+#
+#pick_pose_right = [[[-0.2, -0.095, -0.71], [0, 0, 0]],
+#                  # [[-0.25, -0.15, -0.67], [0, 0, 0]],
+#                   [[-0.2, -0.225, -0.72], [0, 0, 0]],
+#                  # [[-0.25, -0.15, -0.57], [0, 0, 0]],
+#                   [[-0.2, -0.095, -0.745], [135, 0, 0]],
+#                   [[-0.2, -0.095, -0.79], [135, 0, 0]]]
+#
+#place_pose_left = [[[0.57,  0.15, -0.178], [0, 90, 0]],
+#                   #[[0.58,  0.15, -0.18], [0, 90, 0]],
+#                   [[0.65,  0.15, -0.45], [0, 90, 0]],
+#                   #[[0.58,  0.15, -0.48], [0, 90, 0]],
+#                   [[0.67,  0.15, -0.91],  [0, 90, -45]],
+#                   [[0.67,  0.15, -0.865],  [0, 90, -45]]]
+#
+#place_pose_right = [[[0.57, -0.15, -0.178], [0, 90, 0]],
+#                    #[[0.58, -0.15, -0.18], [0, 90, 0]],
+#                    [[0.65, -0.15, -0.45], [0, 90, 0]],
+#                    #[[0.58, -0.15, -0.48], [0, 90, 0]],
+#                    [[0.67, -0.15, -0.91],  [0, 90, 45]],
+#                    [[0.67, -0.15, -0.865],  [0, 90, 45]]]
+pick_pose_left = [[[-0.2, 0.09, -0.705], [0, 0, 0]],
+                  [[-0.2, 0.23, -0.72], [0, 0, 0]],
+                  [[-0.2, 0.09, -0.745], [-135, 0, 0]],
+                  [[-0.25, 0.15, -0.79], [-135, 0, 0]]]
 
-pick_pose_right = [#[[-0.25, -0.15, -0.67], [0, 0, 0]],
-                   #[[-0.25, -0.15, -0.67], [0, 0, 0]],
-                   #[[-0.25, -0.15, -0.57], [0, 0, 0]],
-                   #[[-0.25, -0.15, -0.57], [0, 0, 0]],
-                   [[-0.25, -0.15, -0.72], [135, 0, 0]],
-                   [[-0.25, -0.15, -0.77], [135, 0, 0]]]
+pick_pose_right = [[[-0.2, -0.095, -0.71], [0, 0, 0]],
+                   [[-0.2, -0.225, -0.72], [0, 0, 0]],
+                   [[-0.2, -0.095, -0.745], [135, 0, 0]],
+                   [[-0.2, -0.095, -0.79], [135, 0, 0]]]
 
-place_pose_left = [#[[0.65,  0.15, -0.18], [0, 90, 0]],
-                   #[[0.58,  0.15, -0.18], [0, 90, 0]],
-                   #[[0.65,  0.15, -0.48], [0, 90, 0]],
-                   #[[0.58,  0.15, -0.48], [0, 90, 0]],
-                   [[0.65,  0.2, -0.88],  [0, 90, -45]],
-                   [[0.65,  0.2, -0.88],  [0, 90, -45]]]
+place_pose_left = [[[0.57,  0.15, -0.178], [0, 90, 0]],
+                   [[0.65,  0.15, -0.45], [0, 90, 0]],
+                   [[0.67,  0.15, -0.91],  [0, 90, -45]],
+                   [[0.67,  0.15, -0.865],  [0, 90, -45]]]
 
-place_pose_right = [#[[0.65, -0.15, -0.18], [0, 90, 0]],
-                    #[[0.58, -0.15, -0.18], [0, 90, 0]],
-                    #[[0.65, -0.15, -0.48], [0, 90, 0]],
-                    #[[0.58, -0.15, -0.48], [0, 90, 0]],
-                    [[0.65, -0.2, -0.883],  [0, 90, 45]],
-                    [[0.65, -0.2, -0.883],  [0, 90, 45]]]
+place_pose_right = [[[0.57, -0.15, -0.178], [0, 90, 0]],
+                    [[0.65, -0.15, -0.45], [0, 90, 0]],
+                    [[0.67, -0.15, -0.91],  [0, 90, 45]],
+                    [[0.67, -0.15, -0.865],  [0, 90, 45]]]
 
-place_sucang_left = [0,0,0,0,0,0]
-place_sucang_right = [0,0,0,0,0,0]
+
+place_sucang_left = [0,-90,-90,-90,0,0]
+place_sucang_right = [0,-90,-90,-90,0,0]
 
 class State(IntEnum):
     init            = 0
@@ -101,7 +121,7 @@ class StockingTask:
             cmd['cmd'] = 'jointMove'
             cmd['jpos'] = [0, 0, -1.8, 0, 2.57, 0, -0.87, 0]
             cmd['state'] = State.init
-            cmd['speed'] = 200
+            cmd['speed'] = 20
             cmd_queue.put(copy.deepcopy(cmd))
             self.dual_arm.send_cmd(side, False, cmd_queue)
 
@@ -114,29 +134,32 @@ class StockingTask:
             cmd['pos'], cmd['euler'], cmd['phi'] = pick_pose[0], pick_pose[1], 0
             cmd['suc_cmd'], cmd['noa'] = 0, [0, 0, -0.25]
             cmd_queue.put(copy.deepcopy(cmd))
-            cmd['cmd'], cmd['mode'] = 'fromtNoaTarget', 'p2p'
+            cmd['cmd'], cmd['mode'] = 'fromtNoaTarget', 'line'
             cmd['pos'], cmd['euler'], cmd['phi'] = pick_pose[0], pick_pose[1], 0
-            cmd['suc_cmd'], cmd['noa'] = 0, [0, 0, -0.03]
+            cmd['suc_cmd'], cmd['noa'] = 0, [0, 0, 0.045]
             cmd_queue.put(copy.deepcopy(cmd))
-            cmd['cmd'], cmd['mode'], cmd['noa'] = 'grasping', 'line', [0, 0, 0.08]
-            cmd['suc_cmd'], cmd['speed'] = 'On', 50
+            cmd['cmd'], cmd['mode'], cmd['noa'] = 'grasping', 'line', [0, 0, 0.03]
+            cmd['suc_cmd'], cmd['speed'] = 'On', 5
             cmd_queue.put(copy.deepcopy(cmd))
-            cmd['cmd'], cmd['mode'],  = 'relativePos', 'p2p'
-            cmd['speed'], cmd['pos'] = 200, [0, 0, 0.25]
+            cmd['cmd'], cmd['mode'],  = 'relativePos', 'line'
+            cmd['speed'], cmd['pos'] = 20, [0, 0, 0.33]
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['suc_cmd'] = 'jointMove', 'calibration'
             cmd['jpos'] = [0, 0, -1.8, 0, 2.57, 0, -0.87, 0]
             cmd_queue.put(copy.deepcopy(cmd))
-            cmd['cmd'], cmd['mode'] = 'ikMove', 'p2p'
+            cmd['cmd'], cmd['mode'] = 'ikMove', 'line'
             cmd['pos'] = [0.45, place_pose[0][1], place_pose[0][2]+0.05]
             cmd['euler'], cmd['phi'] = place_pose[1], 0
+            if place_pose[0][2] > -0.25:
+                cmd['mode'] = 'p2p'
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['mode'] = 'ikMove', 'line'
             cmd['pos'], cmd['euler'], cmd['phi'] = place_pose[0], place_pose[1], 0
             cmd['suc_cmd'] = suc_angle
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['mode'],  = 'noaMove', 'line'
-            cmd['suc_cmd'], cmd['noa'] = 'Off', [0, 0, 0.02]
+            cmd['noa'] = [0, 0, -0.02]
+            cmd['suc_cmd'] = 'Off'
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['mode'] = 'ikMove', 'line'
             cmd['pos'] = [0.45, place_pose[0][1], place_pose[0][2]+0.03]
@@ -174,7 +197,7 @@ class StockingTask:
 
 if __name__ == '__main__':
     rospy.init_node('expired')
-    strategy = StockingTask('dual_arm', True)
+    strategy = StockingTask('dual_arm', False)
     rospy.on_shutdown(strategy.dual_arm.shutdown)
     strategy.process()
     strategy.dual_arm.shutdown()

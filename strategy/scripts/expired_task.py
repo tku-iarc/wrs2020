@@ -26,13 +26,13 @@ place_pose = [[[-0.38,  0, -0.796],[0.0, 0.0, 0.0]],
               [[-0.45,  0, -0.796],[0.0, 0.0, 0.0]],
               [[-0.38,  0, -0.796],[0.0, 0.0, 0.0]],                             
               [[-0.45,  0, -0.796],[0.0, 0.0, 0.0]],
-              [[-0.38,  0.02, -0.75],[0.0, 0.0, 0.0]],
-              [[-0.45,  -0.02, -0.75],[0.0, 0.0, 0.0]],
-              [[-0.38,  -0.02, -0.75],[0.0, 0.0, 0.0]],                             
-              [[-0.45,  0.02, -0.75],[0.0, 0.0, 0.0]],
-              [[-0.38,  0, -0.7],[0.0, 0.0, 0.0]],
-              [[-0.45,  0, -0.7],[0.0, 0.0, 0.0]],
-              [[-0.38,  0, -0.7],[0.0, 0.0, 0.0]],                             
+              [[-0.38,  0.02, -0.73],[0.0, 0.0, 0.0]],
+              [[-0.45,  -0.02, -0.73],[0.0, 0.0, 0.0]],
+              [[-0.38,  -0.02, -0.73],[0.0, 0.0, 0.0]],                             
+              [[-0.45,  0.02, -0.73],[0.0, 0.0, 0.0]],
+              [[-0.38,  0, -0.68],[0.0, 0.0, 0.0]],
+              [[-0.45,  0, -0.68],[0.0, 0.0, 0.0]],
+              [[-0.38,  0, -0.68],[0.0, 0.0, 0.0]],                             
               [[-0.45,  0, -0.7],[0.0, 0.0, 0.0]],
               [[-0.38,  0, -0.7],[0.0, 0.0, 0.0]],
               [[-0.45,  0, -0.7],[0.0, 0.0, 0.0]],
@@ -112,8 +112,10 @@ class ExpiredTask:
             obj['vecter'] = mat[0:3, 2]
             obj['sucang'], roll = self.dual_arm.suc2vector(mat[0:3, 2], [0, 1.57, 0])
             obj['euler']   = [roll, 90, 0]
-            if obj['vecter'][2] > -0.1:
+            if obj['vecter'][2] > -0.2:
                 self.object_queue.put(obj)
+            if obj['id'] == 37:
+                print('fuckkkkkkkkkkkkkkkkkkkkkkk3737373737373737373737')
 
     def arrange_obj(self, side):
         pass
@@ -165,7 +167,8 @@ class ExpiredTask:
                 else:
                     state = State.get_obj_inf
             else:
-                self.retry_obj_queue[side].put(self.target_obj[side])
+                if self.obj_retry[self.target_obj[side]['id']] == False:
+                    self.retry_obj_queue[side].put(self.target_obj[side])
                 state = State.move2obj
         elif state == State.place:
             if self.next_level[side] == True:
@@ -194,6 +197,7 @@ class ExpiredTask:
             cmd['cmd'], cmd['mode'] = 'ikMove', 'p2p'
             cmd['pos'], cmd['euler'], cmd['phi'] = c_pose[side][c_pose[side+'_indx']][0], c_pose[side][c_pose[side+'_indx']][1], 0
             cmd_queue.put(copy.deepcopy(cmd))
+            cmd['suc_cmd'] = 0
             cmd['cmd'] = 'occupied'
             cmd['state'] = State.get_obj_inf
             cmd_queue.put(copy.deepcopy(cmd))
@@ -212,6 +216,7 @@ class ExpiredTask:
             
         elif state == State.move2obj:
             obj = None
+            chosed = False
             if self.retry_obj_queue[side].empty() and self.target_obj_queue[side].empty():
                 if self.object_queue.empty():
                     self.next_level[side] = True
@@ -221,25 +226,33 @@ class ExpiredTask:
                     if self.obj_done[obj['id']] == False:
                         if side == 'left' and obj['pos'][1] < -0.02:
                             self.object_queue.put(obj)
-                            self.obj_done[obj['id']] = False
-                            return
+                            continue
                         if side == 'right' and obj['pos'][1] > 0.02:
                             self.object_queue.put(obj)
-                            self.obj_done[obj['id']] = False
-                            return
+                            continue
                         self.obj_done[obj['id']] = True
+                        chosed = True
+                        print('fuck1')
                         break
+                if chosed is False:
+                    self.next_level[side] = True
+                    print('fuck2')
+                    return
             elif self.target_obj_queue[side].empty():
                 obj = self.retry_obj_queue[side].get()
                 if self.obj_retry[obj['id']] == False:
                     self.obj_retry[obj['id']] = True
+                    print('fuck3')
                 else:
+                    print('fuck4')
                     return
             else:
                 obj = self.target_obj_queue[side].get()
                 if self.obj_done[obj['id']] == False:
                     self.obj_retry[obj['id']] = True
+                    print('fuck5')
                 else:
+                    print('fuck6')
                     return
 
             pos = copy.deepcopy(obj['pos'])
@@ -268,12 +281,14 @@ class ExpiredTask:
             
         elif state == State.pick:
             obj = self.target_obj[side]
+            if obj['vecter'][2] > 0.7:
+                obj['pos'][0] -= 0.02
             cmd['state'] = State.pick
             cmd['cmd'], cmd['mode'] = 'fromtNoaTarget', 'line'
             cmd['pos'], cmd['euler'], cmd['phi'] = obj['pos'], obj['euler'], 0
-            cmd['suc_cmd'], cmd['noa'] = obj['sucang'], [0, 0, -0.05]
+            cmd['suc_cmd'], cmd['noa'] = obj['sucang'], [0, 0, -0.03]
             cmd_queue.put(copy.deepcopy(cmd))
-            cmd['cmd'], cmd['mode'], cmd['noa'] = 'grasping', 'line', [0, 0, 0.08]
+            cmd['cmd'], cmd['mode'], cmd['noa'] = 'grasping', 'line', [0, 0, 0.05]
             cmd['suc_cmd'], cmd['speed'] = 'On', 10
             if obj['vecter'][2] < 0.2:
                 cmd['speed'] = 20
@@ -308,7 +323,7 @@ class ExpiredTask:
             cmd['suc_cmd'] = 'Off'
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'] = 'jointMove'
-            cmd['jpos'] = [0, 0, -1.5, 0, 2.07, 0, -0.57, 0]
+            cmd['jpos'] = [0, 0, -1.8, 0, 2.57, 0, -0.87, 0]
             cmd_queue.put(copy.deepcopy(cmd))
             self.dual_arm.send_cmd(side, True, cmd_queue)
 
