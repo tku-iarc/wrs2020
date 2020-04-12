@@ -97,6 +97,7 @@ class DualArmTask:
             while not command_queue.empty():
                 cmd = command_queue.get()
                 if cmd['cmd'] == 'ikMove':
+                    print(cmd['pos'], cmd['euler'], cmd['phi'])
                     self.right_value, self.right_limit = self.right_arm.check_range_limit(cmd['pos'], cmd['euler'], cmd['phi'])
                     if self.right_limit:
                         return 'fail', cmd_q
@@ -107,6 +108,7 @@ class DualArmTask:
             while not command_queue.empty():
                 cmd = command_queue.get()
                 if cmd['cmd'] == 'ikMove':
+                    print(cmd['pos'], cmd['euler'], cmd['phi'])
                     self.left_value, self.left_limit = self.left_arm.check_range_limit(cmd['pos'], cmd['euler'], cmd['phi'])
                     if self.left_limit:
                         return 'fail', cmd_q

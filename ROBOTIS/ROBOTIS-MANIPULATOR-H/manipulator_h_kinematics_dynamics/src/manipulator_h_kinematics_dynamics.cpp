@@ -1007,17 +1007,17 @@ double ManipulatorKinematicsDynamics::limit_check(Eigen::Vector3d &goal_position
     test_pos(2) += 0.8;
     tar_slide_pos = -0.8;
   }
-  else if (Oc(2) < 0.0)
+  else if (Oc(2) < -0.01)
   {
-    test_pos(2) = 0;
-    tar_slide_pos = Oc(2);
+    test_pos(2) = 0.01;
+    tar_slide_pos = Oc(2)+0.01;
   }
   Oc(2) = 0;
   Lsw = test_pos.norm();
   Low = Oc.norm();
   if(Lsw < (d2+d3) && Low > 0.13)
   {
-  
+    std::cout<<"fuckkkkk"<<goal_position<<std::endl<<rotation<<std::endl<<tar_slide_pos<<std::endl;
     bool ik_success = inverseKinematics_test(goal_position, rotation, 0, tar_slide_pos);
     if(!ik_success)
       return 10;
