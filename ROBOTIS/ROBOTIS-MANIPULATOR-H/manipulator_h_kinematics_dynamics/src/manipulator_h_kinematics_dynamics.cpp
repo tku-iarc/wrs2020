@@ -192,16 +192,7 @@ void ManipulatorKinematicsDynamics::load_LinkParam()
     a2 = DHTABLE(4,0);
     Lse = sqrt(pow(a1,2)+pow(d2,2));
     Lew = sqrt(pow(a2,2)+pow(d3,2));
-    RL_prm = cos(DHTABLE(0, 3));
-
-    JointAngle     = Eigen::MatrixXd::Zero(8, 1);
-    tmp_JointAngle = Eigen::MatrixXd::Zero(8, 1);
-
-    R03 = Eigen::MatrixXd::Zero(4, 4);
-    R04 = Eigen::MatrixXd::Zero(4, 4);
-    R07 = Eigen::MatrixXd::Zero(4, 4);
-    R47 = Eigen::MatrixXd::Zero(4, 4);
-    
+    RL_prm = cos(DHTABLE(0, 3));    
 }
 
 std::vector<int> ManipulatorKinematicsDynamics::findRoute(int to)
@@ -525,6 +516,13 @@ bool ManipulatorKinematicsDynamics::InverseKinematics_7( Eigen::VectorXd goal_po
   Eigen::MatrixXd DH(5, 4);
   Eigen::VectorXd DH_row(4);
   Eigen::Matrix3d Modify_euler;
+
+    Eigen::VectorXd JointAngle     = Eigen::MatrixXd::Zero(8, 1);
+      Eigen::VectorXd tmp_JointAngle = Eigen::MatrixXd::Zero(8, 1);
+      Eigen::MatrixXd R03 = Eigen::MatrixXd::Zero(4, 4);
+      Eigen::MatrixXd R04 = Eigen::MatrixXd::Zero(4, 4);
+      Eigen::MatrixXd R07 = Eigen::MatrixXd::Zero(4, 4);
+      Eigen::MatrixXd R47 = Eigen::MatrixXd::Zero(4, 4);
 
   modify_euler_theta = (-pi/2)*RL_prm;
   Modify_euler << cos(modify_euler_theta), -sin(modify_euler_theta), 0,

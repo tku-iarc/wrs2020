@@ -44,14 +44,6 @@ private:
   double Lse, Lew;
   double RL_prm;
 
-  Eigen::VectorXd JointAngle;
-  Eigen::VectorXd tmp_JointAngle;
-
-  Eigen::MatrixXd R03;
-  Eigen::MatrixXd R04;
-  Eigen::MatrixXd R07;
-  Eigen::MatrixXd R47;
-
 public:
   ManipulatorKinematicsDynamics();
   ManipulatorKinematicsDynamics(TreeSelect tree);
