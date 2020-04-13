@@ -70,7 +70,7 @@ public:
   bool inverseKinematics_test(Eigen::MatrixXd tar_position,
                               Eigen::MatrixXd tar_orientation, double tar_phi, double tar_slide_pos);
   Eigen::MatrixXd Trans( double &Theta, Eigen::VectorXd &DH );
-  Eigen::Vector3d forwardKinematics_7(int joint_ID, Eigen::VectorXd angle);
+  Eigen::Vector3d forwardKinematics_7(int joint_ID, Eigen::VectorXd angle, Eigen::MatrixXd &DHTABLE_IK);
   bool InverseKinematics_7( Eigen::VectorXd position, Eigen::Matrix3d rotation, double phi, 
                             double slide_position, Eigen::VectorXd Old_JointAngle, bool is_p2p, bool is_run);
   bool slideInverseKinematics(Eigen::Vector3d goal_position, Eigen::Matrix3d rotation, 

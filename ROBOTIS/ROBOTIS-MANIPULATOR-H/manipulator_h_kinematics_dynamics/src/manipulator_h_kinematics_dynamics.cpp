@@ -478,7 +478,7 @@ Eigen::MatrixXd ManipulatorKinematicsDynamics::Trans( double &Theta, Eigen::Vect
        0,     0,           0,           1;  
   return A;
 }
-Eigen::Vector3d ManipulatorKinematicsDynamics::forwardKinematics_7(int joint_ID, Eigen::VectorXd angle)
+Eigen::Vector3d ManipulatorKinematicsDynamics::forwardKinematics_7(int joint_ID, Eigen::VectorXd angle, Eigen::MatrixXd &DHTABLE_IK)
 {
   Eigen::MatrixXd T = Eigen::MatrixXd::Identity(4,4);
   Eigen::MatrixXd A(4,4);
@@ -486,7 +486,7 @@ Eigen::Vector3d ManipulatorKinematicsDynamics::forwardKinematics_7(int joint_ID,
 
   for ( int i=0; i<=joint_ID; i++ )
   {
-    DH_row = DHTABLE.row(i);
+    DH_row = DHTABLE_IK.row(i);
     A = Trans(angle(i), DH_row);
     T = T*A;
   }
@@ -618,7 +618,7 @@ bool ManipulatorKinematicsDynamics::InverseKinematics_7( Eigen::VectorXd goal_po
 
     JointAngle(4) = theta_4;
 
-    Eigen::VectorXd testPos = forwardKinematics_7(5,JointAngle);
+    Eigen::VectorXd testPos = forwardKinematics_7(5, JointAngle, DHTABLE_IK);
 
     double tmp_joint1;
     tmp_joint1 = JointAngle(1);
@@ -702,7 +702,7 @@ bool ManipulatorKinematicsDynamics::InverseKinematics_7( Eigen::VectorXd goal_po
         JointAngle(7) = pi + theta_7;
     double dof2 = 8;
 
-    Eigen::VectorXd testPos = forwardKinematics_7(7,JointAngle);
+    Eigen::VectorXd testPos = forwardKinematics_7(7, JointAngle, DHTABLE_IK);
   
     testPos = testPos - goal_position;
 
