@@ -14,12 +14,12 @@ from get_image_info import GetObjInfo
 from math import radians, degrees, sin, cos, pi
 
 
-c_pose = {'left' :[[[0.38,  0.2, 0.1],  [0.0, 70, 0.0]],
-                    [[0.38,  0.2, -0.3],  [0.0, 70, 0.0]],
-                    [[0.38,  0.2, -0.7],    [0.0, 70, 0.0]]],
-          'right':[[[0.38, -0.2, 0.1],  [0.0, 70, 0.0]],
-                    [[0.38, -0.2, -0.3],  [0.0, 70, 0.0]],
-                    [[0.38, -0.2, -0.7],    [0.0, 70, 0.0]]],
+c_pose = {'left' :[[[0.38,  0.2, 0.15],  [0.0, 65, 0.0]],
+                    [[0.38,  0.2, -0.25],  [0.0, 65, 0.0]],
+                    [[0.38,  0.2, -0.65],    [0.0, 65, 0.0]]],
+          'right':[[[0.38, -0.2, 0.15],  [0.0, 65, 0.0]],
+                    [[0.38, -0.2, -0.25],  [0.0, 65, 0.0]],
+                    [[0.38, -0.2, -0.65],    [0.0, 65, 0.0]]],
           'left_indx' : 0, 'right_indx' : 0}
 
 place_pose = [[[-0.38,  0, -0.796],[0.0, 0.0, 0.0]],
@@ -114,6 +114,7 @@ class ExpiredTask:
             obj['euler']   = [roll, 90, 0]
             if obj['vector'][2] > -0.2:
                 self.object_queue.put(obj)
+                print('fuck+++++============--------------', obj['pos'])
             else:
                 print('fuck < -0.2 ', obj['vector'])
             print('fuckkkkkkkkkkkkkkkkkkkkkkk', obj['id'])
@@ -189,7 +190,7 @@ class ExpiredTask:
         cmd_queue = queue.Queue()
         if state == State.init:
             cmd['cmd'] = 'jointMove'
-            cmd['jpos'] = [0, 0, -1, 0, 1.57, 0, -0.57, 0]
+            cmd['jpos'] = [0, 0, -1.2, 0, 1.87, 0, -0.87, 0]
             cmd['state'] = State.init
             cmd['speed'] = 40
             cmd_queue.put(copy.deepcopy(cmd))
@@ -289,12 +290,11 @@ class ExpiredTask:
             obj = copy.deepcopy(self.target_obj[side])
             if obj['vector'][2] > 0.7:
                 obj['pos'][0] -= 0.02
-                obj['pos'][2] += 0.05
+               # obj['pos'][2] += 0.05
             cmd['state'] = State.pick
             cmd['cmd'], cmd['mode'] = 'fromtNoaTarget', 'line'
             cmd['pos'], cmd['euler'], cmd['phi'] = obj['pos'], obj['euler'], 0
             cmd['suc_cmd'], cmd['noa'] = obj['sucang'], [0, 0, -0.03]
-
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['mode'], cmd['noa'] = 'grasping', 'line', [0, 0, 0.05]
             cmd['suc_cmd'], cmd['speed'] = 'On', 15
@@ -306,7 +306,7 @@ class ExpiredTask:
             cmd['pos'] = [0, 0, 0.03]
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['mode'] = 'ikMove', 'line'
-            cmd['pos'], cmd['euler'], cmd['phi'] = [0.45, obj['pos'][1], obj['pos'][2]+0.065], obj['euler'], 0
+            cmd['pos'], cmd['euler'], cmd['phi'] = [0.45, obj['pos'][1], obj['pos'][2]+0.08], obj['euler'], 0
             cmd_queue.put(copy.deepcopy(cmd))
             self.dual_arm.send_cmd(side, True, cmd_queue)
 

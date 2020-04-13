@@ -543,7 +543,7 @@ class ArmTask:
         #         print('is_gripppppppppppp_clear_cmd')
         #         rospy.sleep(0.1)
         #     return
-        
+
         if not self.__cmd_queue.empty() and not self.is_busy:
             
             cmd = self.__cmd_queue.get()
@@ -561,6 +561,8 @@ class ArmTask:
                 self.occupied = False
             # if self.status == Status.occupied:
                 #    self.status = Status.busy
+            if cmd['suc_cmd'] is not None and type(cmd['suc_cmd']) is not str:
+                    self.suction_angle = cmd['suc_cmd']
 
             if cmd['cmd'] == 'ikMove':
                 self.ikMove(cmd['mode'], cmd['pos'], cmd['euler'], cmd['phi'])
