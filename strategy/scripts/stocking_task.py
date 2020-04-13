@@ -43,7 +43,7 @@ from math import radians, degrees, sin, cos, pi
 pick_pose_left = [[[-0.2, 0.09, -0.705], [0, 0, 0]],
                   [[-0.2, 0.23, -0.72], [0, 0, 0]],
                   [[-0.2, 0.09, -0.745], [-135, 0, 0]],
-                  [[-0.25, 0.15, -0.79], [-135, 0, 0]]]
+                  [[-0.2, 0.09, -0.79], [-135, 0, 0]]]
 
 pick_pose_right = [[[-0.2, -0.095, -0.71], [0, 0, 0]],
                    [[-0.2, -0.225, -0.72], [0, 0, 0]],
@@ -121,7 +121,7 @@ class StockingTask:
             cmd['cmd'] = 'jointMove'
             cmd['jpos'] = [0, 0, -1.8, 0, 2.57, 0, -0.87, 0]
             cmd['state'] = State.init
-            cmd['speed'] = 20
+            cmd['speed'] = 40
             cmd_queue.put(copy.deepcopy(cmd))
             self.dual_arm.send_cmd(side, False, cmd_queue)
 
@@ -129,6 +129,12 @@ class StockingTask:
             pick_pose = self.pick_pose[side].get()
             place_pose = self.place_pose[side].get()
             suc_angle = self.place_sucang[side].get()
+            print('=============================================')
+            print(side, pick_pose)
+            print('++++++++++++++++++++++++++++++++++++++++++++')
+            print(side, place_pose)
+            print('============================================')
+            
             cmd['state'] = State.pick_and_place
             cmd['cmd'], cmd['mode'] = 'fromtNoaTarget', 'line'
             cmd['pos'], cmd['euler'], cmd['phi'] = pick_pose[0], pick_pose[1], 0
@@ -142,7 +148,7 @@ class StockingTask:
             cmd['suc_cmd'], cmd['speed'] = 'On', 5
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['mode'],  = 'relativePos', 'line'
-            cmd['speed'], cmd['pos'] = 20, [0, 0, 0.33]
+            cmd['speed'], cmd['pos'] = 40, [0, 0, 0.33]
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['suc_cmd'] = 'jointMove', 'calibration'
             cmd['jpos'] = [0, 0, -1.8, 0, 2.57, 0, -0.87, 0]
