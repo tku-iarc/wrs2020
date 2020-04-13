@@ -516,13 +516,14 @@ bool ManipulatorKinematicsDynamics::InverseKinematics_7( Eigen::VectorXd goal_po
   Eigen::MatrixXd DH(5, 4);
   Eigen::VectorXd DH_row(4);
   Eigen::Matrix3d Modify_euler;
+  Eigen::MatrixXd DHTABLE_IK = DHTABLE;
 
-    Eigen::VectorXd JointAngle     = Eigen::MatrixXd::Zero(8, 1);
-      Eigen::VectorXd tmp_JointAngle = Eigen::MatrixXd::Zero(8, 1);
-      Eigen::MatrixXd R03 = Eigen::MatrixXd::Zero(4, 4);
-      Eigen::MatrixXd R04 = Eigen::MatrixXd::Zero(4, 4);
-      Eigen::MatrixXd R07 = Eigen::MatrixXd::Zero(4, 4);
-      Eigen::MatrixXd R47 = Eigen::MatrixXd::Zero(4, 4);
+  Eigen::VectorXd JointAngle     = Eigen::MatrixXd::Zero(8, 1);
+  Eigen::VectorXd tmp_JointAngle = Eigen::MatrixXd::Zero(8, 1);
+  Eigen::MatrixXd R03 = Eigen::MatrixXd::Zero(4, 4);
+  Eigen::MatrixXd R04 = Eigen::MatrixXd::Zero(4, 4);
+  Eigen::MatrixXd R07 = Eigen::MatrixXd::Zero(4, 4);
+  Eigen::MatrixXd R47 = Eigen::MatrixXd::Zero(4, 4);
 
   modify_euler_theta = (-pi/2)*RL_prm;
   Modify_euler << cos(modify_euler_theta), -sin(modify_euler_theta), 0,
@@ -534,11 +535,11 @@ bool ManipulatorKinematicsDynamics::InverseKinematics_7( Eigen::VectorXd goal_po
  
   Oc << goal_position(0)-d4*R07(0,2), goal_position(1)-d4*R07(1,2), goal_position(2)-d4*R07(2,2);
 
-  DHTABLE(0,2) = slide_position;       
+  DHTABLE_IK(0,2) = slide_position;       
           
   ////////////////////////////////////////////////////////////////////////////////////////////////
 
-  Ps << 0, d1*cos(DHTABLE(0,3)), slide_position;   
+  Ps << 0, d1*cos(DHTABLE_IK(0,3)), slide_position;   
   Vsw = Oc - Ps;     
   Lsw = Vsw.norm();  
   theta_e = acos((Lse*Lse + Lsw*Lsw - Lew*Lew) / (2*Lse*Lsw));  
@@ -547,7 +548,7 @@ bool ManipulatorKinematicsDynamics::InverseKinematics_7( Eigen::VectorXd goal_po
   Lsc = Lse * cos(theta_e); 
   Lec = Lse * sin(theta_e); 
 
-  DH << 0,   -pi/2, slide_position, DHTABLE(0,3),    
+  DH << 0,   -pi/2, slide_position, DHTABLE_IK(0,3),    
         0,   -pi/2, d1,             pi/2,
         0,   -pi/2, 0,             -pi/2, 
         Lec,  pi/2, Lsc,            0,    
@@ -572,7 +573,7 @@ bool ManipulatorKinematicsDynamics::InverseKinematics_7( Eigen::VectorXd goal_po
  
   theta_4 = M_PI - acos((Lse*Lse + Lew*Lew - Lsw*Lsw) / (2*Lse*Lew)) + atan(a1/d2) + atan(a2/d3);
   
-  DH_row = DHTABLE.row(4);
+  DH_row = DHTABLE_IK.row(4);
   A = Trans(theta_4, DH_row);   
   R04 = R03 * A;
 
