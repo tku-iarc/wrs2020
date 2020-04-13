@@ -555,17 +555,6 @@ class ArmTask:
             if cmd['speed'] is not None:
                 self.set_speed(cmd['speed'])
 
-            if cmd['suc_cmd'] is not None:
-                if type(cmd['suc_cmd']) is not str:
-                    self.suction.gripper_suction_deg(cmd['suc_cmd'])
-                    self.suction_angle = cmd['suc_cmd']
-                elif 'On' in cmd['suc_cmd']:
-                    self.suction.gripper_vacuum_on()
-                elif 'calibration' in cmd['suc_cmd']:
-                    self.suction.gripper_calibration()
-                elif 'Off' in cmd['suc_cmd']:
-                    self.suction.gripper_vacuum_off()
-
             if cmd['cmd'] == 'occupied':
                 self.occupied = True
             else:
@@ -597,6 +586,17 @@ class ArmTask:
             elif cmd['cmd'] == 'grasping':
                 self.noa_move_suction(cmd['mode'], n=cmd['noa'][0], o=cmd['noa'][1], a=cmd['noa'][2])
                 self.status = Status.grasping
+
+            if cmd['suc_cmd'] is not None:
+                if type(cmd['suc_cmd']) is not str:
+                    self.suction.gripper_suction_deg(cmd['suc_cmd'])
+                    self.suction_angle = cmd['suc_cmd']
+                elif 'On' in cmd['suc_cmd']:
+                    self.suction.gripper_vacuum_on()
+                elif 'calibration' in cmd['suc_cmd']:
+                    self.suction.gripper_calibration()
+                elif 'Off' in cmd['suc_cmd']:
+                    self.suction.gripper_vacuum_off()
 
         if not self.is_busy and not self.occupied:
             if self.__cmd_queue.empty() and self.__cmd_queue_2nd.empty():
