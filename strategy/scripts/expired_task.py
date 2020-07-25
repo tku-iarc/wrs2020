@@ -14,30 +14,30 @@ from get_image_info import GetObjInfo
 from math import radians, degrees, sin, cos, pi
 
 
-c_pose = {'left' :[[[0.38,  0.2, 0.1],  [0.0, 80, 0.0]],
-                    [[0.38,  0.2, -0.3],  [0.0, 80, 0.0]],
-                    [[0.38,  0.2, -0.7],    [0.0, 80, 0.0]]],
-          'right':[[[0.38, -0.2, 0.1],  [0.0, 80, 0.0]],
-                    [[0.38, -0.2, -0.3],  [0.0, 80, 0.0]],
-                    [[0.38, -0.2, -0.7],    [0.0, 80, 0.0]]],
+c_pose = {'left' :[[[0.38,  0.2, 0.15],  [0.0, 65, 0.0]],
+                    [[0.38,  0.2, -0.25],  [0.0, 65, 0.0]],
+                    [[0.38,  0.2, -0.65],    [0.0, 65, 0.0]]],
+          'right':[[[0.38, -0.2, 0.15],  [0.0, 65, 0.0]],
+                    [[0.38, -0.2, -0.25],  [0.0, 65, 0.0]],
+                    [[0.38, -0.2, -0.65],    [0.0, 65, 0.0]]],
           'left_indx' : 0, 'right_indx' : 0}
 
 place_pose = [[[-0.38,  0, -0.796],[0.0, 0.0, 0.0]],
-              [[-0.45,  0, -0.796],[0.0, 0.0, 0.0]],
-              [[-0.38,  0, -0.796],[0.0, 0.0, 0.0]],                             
-              [[-0.45,  0, -0.796],[0.0, 0.0, 0.0]],
+              [[-0.38,  0, -0.796],[0.0, 0.0, 0.0]],
+              [[-0.43,  0, -0.796],[0.0, 0.0, 0.0]],                             
+              [[-0.43,  0, -0.796],[0.0, 0.0, 0.0]],
               [[-0.38,  0.02, -0.73],[0.0, 0.0, 0.0]],
-              [[-0.45,  -0.02, -0.73],[0.0, 0.0, 0.0]],
-              [[-0.38,  -0.02, -0.73],[0.0, 0.0, 0.0]],                             
-              [[-0.45,  0.02, -0.73],[0.0, 0.0, 0.0]],
+              [[-0.38,  -0.02, -0.73],[0.0, 0.0, 0.0]],
+              [[-0.43,  -0.02, -0.73],[0.0, 0.0, 0.0]],                             
+              [[-0.43,  0.02, -0.73],[0.0, 0.0, 0.0]],
               [[-0.38,  0, -0.68],[0.0, 0.0, 0.0]],
-              [[-0.45,  0, -0.68],[0.0, 0.0, 0.0]],
-              [[-0.38,  0, -0.68],[0.0, 0.0, 0.0]],                             
-              [[-0.45,  0, -0.7],[0.0, 0.0, 0.0]],
+              [[-0.38,  0, -0.68],[0.0, 0.0, 0.0]],
+              [[-0.43,  0, -0.68],[0.0, 0.0, 0.0]],                             
+              [[-0.43,  0, -0.7],[0.0, 0.0, 0.0]],
               [[-0.38,  0, -0.7],[0.0, 0.0, 0.0]],
-              [[-0.45,  0, -0.7],[0.0, 0.0, 0.0]],
-              [[-0.38,  0, -0.7],[0.0, 0.0, 0.0]],                             
-              [[-0.42,  0, -0.7],[0.0, 0.0, 0.0]]]
+              [[-0.38,  0, -0.7],[0.0, 0.0, 0.0]],
+              [[-0.43,  0, -0.7],[0.0, 0.0, 0.0]],                             
+              [[-0.43,  0, -0.7],[0.0, 0.0, 0.0]]]
 
 obj_pose = [[[[0.465, -0.1, -0.18], [0, 90, 0]],
             [[0.465,  0.1, -0.18], [0, 90, 0]]],
@@ -109,13 +109,15 @@ class ExpiredTask:
             obj['expired'] = exp
             obj['side_id'] = side_id
             obj['pos'] = mat[0:3, 3]
-            obj['vecter'] = mat[0:3, 2]
+            obj['vector'] = mat[0:3, 2]
             obj['sucang'], roll = self.dual_arm.suc2vector(mat[0:3, 2], [0, 1.57, 0])
             obj['euler']   = [roll, 90, 0]
-            if obj['vecter'][2] > -0.2:
+            if obj['vector'][2] > -0.2:
                 self.object_queue.put(obj)
-            if obj['id'] == 37:
-                print('fuckkkkkkkkkkkkkkkkkkkkkkk3737373737373737373737')
+                print('fuck+++++============--------------', obj['pos'])
+            else:
+                print('fuck < -0.2 ', obj['vector'])
+            print('fuckkkkkkkkkkkkkkkkkkkkkkk', obj['id'])
 
     def arrange_obj(self, side):
         pass
@@ -179,6 +181,8 @@ class ExpiredTask:
                     state = State.get_obj_inf
             else:
                 state = State.move2obj
+        elif state == State.finish:
+            state = None
         return state
             
     def strategy(self, state, side):
@@ -186,9 +190,9 @@ class ExpiredTask:
         cmd_queue = queue.Queue()
         if state == State.init:
             cmd['cmd'] = 'jointMove'
-            cmd['jpos'] = [0, 0, -1, 0, 1.57, 0, -0.57, 0]
+            cmd['jpos'] = [0, 0, -1.2, 0, 1.87, 0, -0.87, 0]
             cmd['state'] = State.init
-            cmd['speed'] = 20
+            cmd['speed'] = 40
             cmd_queue.put(copy.deepcopy(cmd))
             self.dual_arm.send_cmd(side, False, cmd_queue)
             
@@ -215,11 +219,13 @@ class ExpiredTask:
             self.dual_arm.send_cmd(side, True, cmd_queue)
             
         elif state == State.move2obj:
+            print('fuckmove2obj ++++++++++ ', side)
             obj = None
             chosed = False
             if self.retry_obj_queue[side].empty() and self.target_obj_queue[side].empty():
                 if self.object_queue.empty():
                     self.next_level[side] = True
+                    print('fuck10')
                     return
                 for _ in range(self.object_queue.qsize()):
                     obj = self.object_queue.get()
@@ -238,6 +244,7 @@ class ExpiredTask:
                     self.next_level[side] = True
                     print('fuck2')
                     return
+                print('fuck11')
             elif self.target_obj_queue[side].empty():
                 obj = self.retry_obj_queue[side].get()
                 if self.obj_retry[obj['id']] == False:
@@ -280,25 +287,26 @@ class ExpiredTask:
             self.dual_arm.send_cmd(side, True, cmd_queue)
             
         elif state == State.pick:
-            obj = self.target_obj[side]
-            if obj['vecter'][2] > 0.7:
+            obj = copy.deepcopy(self.target_obj[side])
+            if obj['vector'][2] > 0.7:
                 obj['pos'][0] -= 0.02
+               # obj['pos'][2] += 0.05
             cmd['state'] = State.pick
             cmd['cmd'], cmd['mode'] = 'fromtNoaTarget', 'line'
             cmd['pos'], cmd['euler'], cmd['phi'] = obj['pos'], obj['euler'], 0
             cmd['suc_cmd'], cmd['noa'] = obj['sucang'], [0, 0, -0.03]
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['mode'], cmd['noa'] = 'grasping', 'line', [0, 0, 0.05]
-            cmd['suc_cmd'], cmd['speed'] = 'On', 10
-            if obj['vecter'][2] < 0.2:
-                cmd['speed'] = 20
+            cmd['suc_cmd'], cmd['speed'] = 'On', 15
+            if obj['vector'][2] < 0.2:
+                cmd['speed'] = 30
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['mode'],  = 'relativePos', 'line'
-            cmd['speed'], cmd['suc_cmd'] = 20, 'calibration'
+            cmd['speed'], cmd['suc_cmd'] = 40, 'calibration'
             cmd['pos'] = [0, 0, 0.03]
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['mode'] = 'ikMove', 'line'
-            cmd['pos'], cmd['euler'], cmd['phi'] = [0.45, obj['pos'][1], obj['pos'][2]+0.065], obj['euler'], 0
+            cmd['pos'], cmd['euler'], cmd['phi'] = [0.45, obj['pos'][1], obj['pos'][2]+0.08], obj['euler'], 0
             cmd_queue.put(copy.deepcopy(cmd))
             self.dual_arm.send_cmd(side, True, cmd_queue)
 
@@ -350,8 +358,9 @@ class ExpiredTask:
                 r_state = self.state_control(self.dual_arm.right_arm.state, 'right')
                 self.strategy(r_state, 'right')
             rate.sleep()
-            if l_state == State.finish and r_state == State.finish:
-                return
+            if l_state is None and r_state is None:
+                if l_status == Status.idle and r_status == Status.idle:
+                    return
         
 if __name__ == '__main__':
     rospy.init_node('expired')

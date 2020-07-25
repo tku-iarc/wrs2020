@@ -199,11 +199,12 @@ class StockingTask:
                 self.strategy(r_state, 'right')
             rate.sleep()
             if l_state == State.finish and r_state == State.finish:
-                return
+                if l_status == Status.idle and r_status == Status.idle:
+                    return
 
 if __name__ == '__main__':
     rospy.init_node('expired')
-    strategy = StockingTask('dual_arm', False)
+    strategy = StockingTask('dual_arm', False) 
     rospy.on_shutdown(strategy.dual_arm.shutdown)
     strategy.process()
     strategy.dual_arm.shutdown()
