@@ -32,8 +32,8 @@ class GetObjInfo():
         rotations = []
         for rvec in rvecs:
             rotations = np.append(rotations, cv2.Rodrigues(rvec)[0])
-	if rotations == []:
-	    return None, None, None, None, None
+        if rotations == []:
+            return None, None, None, None, None
         rotations = rotations.reshape(int(len(rotations)/9), 3, 3)
         obj_mat, names, exps, side_ids = [], [], [], []
         for rot, tvec, id in zip(rotations, tvecs, ids):
