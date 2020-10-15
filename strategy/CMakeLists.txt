@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   message_generation
   dynamic_reconfigure
+  arm_control
 )
 
 ## System dependencies are found with CMake's conventions
@@ -111,7 +112,7 @@ generate_dynamic_reconfigure_options(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES strategy
-  CATKIN_DEPENDS actionlib_msgs geometry_msgs roscpp rospy std_msgs message_runtime dynamic_reconfigure #message_generation
+  CATKIN_DEPENDS actionlib_msgs geometry_msgs roscpp rospy std_msgs message_runtime dynamic_reconfigure #message_generation arm_control
   DEPENDS system_lib
 )
 

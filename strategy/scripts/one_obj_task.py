@@ -13,56 +13,11 @@ from arm_control import DualArmTask
 from get_image_info import GetObjInfo
 from math import radians, degrees, sin, cos, pi
 
-#pick_pose_left = [[[-0.2, 0.09, -0.705], [0, 0, 0]],
-#                  #[[-0.25, 0.15, -0.67], [0, 0, 0]],
-#                  [[-0.2, 0.23, -0.72], [0, 0, 0]],
-#                  #[[-0.25, 0.15, -0.57], [0, 0, 0]],
-#                  [[-0.2, 0.09, -0.745], [-135, 0, 0]],
-#                  [[-0.25, 0.15, -0.79], [-135, 0, 0]]]
-#
-#pick_pose_right = [[[-0.2, -0.095, -0.71], [0, 0, 0]],
-#                  # [[-0.25, -0.15, -0.67], [0, 0, 0]],
-#                   [[-0.2, -0.225, -0.72], [0, 0, 0]],
-#                  # [[-0.25, -0.15, -0.57], [0, 0, 0]],
-#                   [[-0.2, -0.095, -0.745], [135, 0, 0]],
-#                   [[-0.2, -0.095, -0.79], [135, 0, 0]]]
-#
-#place_pose_left = [[[0.57,  0.15, -0.178], [0, 90, 0]],
-#                   #[[0.58,  0.15, -0.18], [0, 90, 0]],
-#                   [[0.65,  0.15, -0.45], [0, 90, 0]],
-#                   #[[0.58,  0.15, -0.48], [0, 90, 0]],
-#                   [[0.67,  0.15, -0.91],  [0, 90, -45]],
-#                   [[0.67,  0.15, -0.865],  [0, 90, -45]]]
-#
-#place_pose_right = [[[0.57, -0.15, -0.178], [0, 90, 0]],
-#                    #[[0.58, -0.15, -0.18], [0, 90, 0]],
-#                    [[0.65, -0.15, -0.45], [0, 90, 0]],
-#                    #[[0.58, -0.15, -0.48], [0, 90, 0]],
-#                    [[0.67, -0.15, -0.91],  [0, 90, 45]],
-#                    [[0.67, -0.15, -0.865],  [0, 90, 45]]]
-pick_pose_left = [[[-0.2, 0.09, -0.705], [0, 0, 0]],
-                  [[-0.2, 0.23, -0.72], [0, 0, 0]],
-                  [[-0.2, 0.09, -0.745], [-135, 0, 0]],
-                  [[-0.2, 0.09, -0.79], [-135, 0, 0]]]
+pick_pose_left = [[[-0.2, 0.09, -0.705], [0, 0, 0]]]
 
-pick_pose_right = [[[-0.2, -0.095, -0.71], [0, 0, 0]],
-                   [[-0.2, -0.225, -0.72], [0, 0, 0]],
-                   [[-0.2, -0.095, -0.745], [135, 0, 0]],
-                   [[-0.2, -0.095, -0.79], [135, 0, 0]]]
-
-place_pose_left = [[[0.57,  0.15, -0.178], [0, 90, 0]],
-                   [[0.65,  0.15, -0.45], [0, 90, 0]],
-                   [[0.67,  0.15, -0.91],  [0, 90, -45]],
-                   [[0.67,  0.15, -0.865],  [0, 90, -45]]]
-
-place_pose_right = [[[0.57, -0.15, -0.178], [0, 90, 0]],
-                    [[0.65, -0.15, -0.45], [0, 90, 0]],
-                    [[0.67, -0.15, -0.91],  [0, 90, 45]],
-                    [[0.67, -0.15, -0.865],  [0, 90, 45]]]
-
+place_pose_left = [[[0.57,  0.15, -0.178], [0, 90, 0]]]
 
 place_sucang_left = [0,-90,-90,-90,0,0]
-place_sucang_right = [0,-90,-90,-90,0,0]
 
 class State(IntEnum):
     init            = 0
@@ -89,26 +44,23 @@ class StockingTask:
     def init(self):
         for pose in pick_pose_left:
             self.pick_left_queue.put(pose)
-        for pose in pick_pose_right:
-            self.pick_right_queue.put(pose)
         for pose in place_pose_left:
             self.place_left_queue.put(pose)
-        for pose in place_pose_right:
-            self.place_right_queue.put(pose)
         for angle in place_sucang_left:
             self.sucang_left_queue.put(angle)
-        for angle in place_sucang_right:
-            self.sucang_right_queue.put(angle)
 
     def state_control(self, state, side):
+        print(state, state == State.pick_and_place)
         if state is None:
             state = State.init
         elif state == State.init:
             state = State.pick_and_place
         elif state == State.pick_and_place:
             if self.pick_pose[side].empty():
+                print('as1111111111111')
                 state = State.finish
             else:
+                print('222222222222')
                 state = State.pick_and_place
         elif state == State.finish:
             state = None
@@ -119,7 +71,7 @@ class StockingTask:
         cmd_queue = queue.Queue()
         if state == State.init:
             cmd['cmd'] = 'jointMove'
-            cmd['jpos'] = [0, 0, -1.8, 0, 2.57, 0, -0.87, 0]
+            cmd['jpos'] = [0, 0, -1.4, 0, 1.57, 0, -0.4, 0]
             cmd['state'] = State.init
             cmd['speed'] = 40
             cmd_queue.put(copy.deepcopy(cmd))
@@ -136,22 +88,22 @@ class StockingTask:
             print('============================================')
             
             cmd['state'] = State.pick_and_place
-            cmd['cmd'], cmd['mode'] = 'fromtNoaTarget', 'line'
-            cmd['pos'], cmd['euler'], cmd['phi'] = pick_pose[0], pick_pose[1], 0
-            cmd['suc_cmd'], cmd['noa'] = 0, [0, 0, -0.25]
-            cmd_queue.put(copy.deepcopy(cmd))
-            cmd['cmd'], cmd['mode'] = 'fromtNoaTarget', 'line'
-            cmd['pos'], cmd['euler'], cmd['phi'] = pick_pose[0], pick_pose[1], 0
-            cmd['suc_cmd'], cmd['noa'] = 0, [0, 0, 0.045]
-            cmd_queue.put(copy.deepcopy(cmd))
-            cmd['cmd'], cmd['mode'], cmd['noa'] = 'grasping', 'line', [0, 0, 0.03]
-            cmd['suc_cmd'], cmd['speed'] = 'On', 5
-            cmd_queue.put(copy.deepcopy(cmd))
-            cmd['cmd'], cmd['mode'],  = 'relativePos', 'line'
-            cmd['speed'], cmd['pos'] = 40, [0, 0, 0.33]
-            cmd_queue.put(copy.deepcopy(cmd))
+            # cmd['cmd'], cmd['mode'] = 'fromtNoaTarget', 'line'
+            # cmd['pos'], cmd['euler'], cmd['phi'] = pick_pose[0], pick_pose[1], 0
+            # cmd['suc_cmd'], cmd['noa'] = 0, [0, 0, -0.25]
+            # cmd_queue.put(copy.deepcopy(cmd))
+            # cmd['cmd'], cmd['mode'] = 'fromtNoaTarget', 'line'
+            # cmd['pos'], cmd['euler'], cmd['phi'] = pick_pose[0], pick_pose[1], 0
+            # cmd['suc_cmd'], cmd['noa'] = 0, [0, 0, 0.045]
+            # cmd_queue.put(copy.deepcopy(cmd))
+            # cmd['cmd'], cmd['mode'], cmd['noa'] = 'grasping', 'line', [0, 0, 0.03]
+            # cmd['suc_cmd'], cmd['speed'] = 'On', 5
+            # cmd_queue.put(copy.deepcopy(cmd))
+            # cmd['cmd'], cmd['mode'],  = 'relativePos', 'line'
+            # cmd['speed'], cmd['pos'] = 40, [0, 0, 0.33]
+            # cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['suc_cmd'] = 'jointMove', 'calibration'
-            cmd['jpos'] = [0, 0, -1.8, 0, 2.57, 0, -0.87, 0]
+            cmd['jpos'] = [0, 0, -1.4, 0, 1.57, 0, -0.4, 0]
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['mode'] = 'ikMove', 'line'
             cmd['pos'] = [0.45, place_pose[0][1], place_pose[0][2]+0.05]
@@ -172,34 +124,39 @@ class StockingTask:
             cmd['euler'], cmd['phi'] = place_pose[1], 0
             cmd_queue.put(copy.deepcopy(cmd))
             cmd['cmd'], cmd['suc_cmd'] = 'jointMove', 'calibration'
-            cmd['jpos'] = [0, 0, -1.8, 0, 2.57, 0, -0.87, 0]
+            cmd['jpos'] = [0, 0, -1.4, 0, 1.57, 0, -0.4, 0]
             cmd_queue.put(copy.deepcopy(cmd))
             self.dual_arm.send_cmd(side, False, cmd_queue)
 
         elif state == State.finish:
+            print('asdfasdfasdf')
             cmd['suc_cmd'] = 'Off'
             cmd['cmd'] = 'jointMove'
             cmd['jpos'] = [0, 0, -1, 0, 1.57, 0, -0.57, 0]
             cmd['state'] = State.finish
             cmd_queue.put(copy.deepcopy(cmd))
             self.dual_arm.send_cmd(side, False, cmd_queue)
+            print('dddddddddddddddd')
 
     def process(self):
-        rate = rospy.Rate(10)
+        rate = rospy.Rate(100)
         rospy.on_shutdown(self.dual_arm.shutdown)
         while True:
             l_status = self.dual_arm.left_arm.status
+            print(self.dual_arm.left_arm.state)
             if l_status == Status.idle or l_status == Status.occupied:
+                print('333333333333333333')
                 l_state = self.state_control(self.dual_arm.left_arm.state, 'left')
+                print(l_state)
                 self.strategy(l_state, 'left')
             rate.sleep()
-            r_status = self.dual_arm.right_arm.status
-            if r_status == Status.idle or r_status == Status.occupied:
-                r_state = self.state_control(self.dual_arm.right_arm.state, 'right')
-                self.strategy(r_state, 'right')
-            rate.sleep()
-            if l_state == State.finish and r_state == State.finish:
-                if l_status == Status.idle and r_status == Status.idle:
+            # r_status = self.dual_arm.right_arm.status
+            # if r_status == Status.idle or r_status == Status.occupied:
+            #     r_state = self.state_control(self.dual_arm.right_arm.state, 'right')
+            #     self.strategy(r_state, 'right')
+            # rate.sleep()
+            if l_state == State.finish: # and r_state == State.finish:
+                if self.dual_arm.left_arm.status == Status.idle: # and r_status == Status.idle:
                     return
 
 if __name__ == '__main__':
@@ -207,6 +164,7 @@ if __name__ == '__main__':
     strategy = StockingTask('dual_arm', True) 
     rospy.on_shutdown(strategy.dual_arm.shutdown)
     strategy.process()
+    print('qqqqqqqqqqqqqqqqqqqqqqqqqqqq')
     strategy.dual_arm.shutdown()
     del strategy.dual_arm
         

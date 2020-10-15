@@ -9,7 +9,7 @@ import queue
 import copy
 # import object_distribtion
 
-from math import radians, degrees, sin, cos, pi
+from math import radians, degrees, sin, cos, pi, acos, asin
 from numpy import multiply
 from enum import IntEnum
 # from Queue import Queue
@@ -38,6 +38,7 @@ class Status(IntEnum):
     ik_fail         = 3
     grasping        = 4
     occupied        = 5
+    gripping        = 6
 
 
 class Command(dict):
@@ -87,7 +88,7 @@ class ArmTask:
             self.suction = SuctionTask(self.suc_name)
 
     def __set_pubSub(self):
-        print "[Arm] name space : " + str(self.name) 
+        print ("[Arm] name space : " + str(self.name)) 
         self.__set_mode_pub = rospy.Publisher(
             str(self.name) + '/set_mode_msg',
             String,
@@ -179,7 +180,7 @@ class ArmTask:
         return self.__cmd_queue_2nd
     
     @cmd_queue_2nd.setter
-    def cmd_queue(self, cmd_q):
+    def cmd_queue_2nd(self, cmd_q):
         self.__cmd_queue_2nd = cmd_q
 
     @property
@@ -343,8 +344,8 @@ class ArmTask:
             )
             res = get_endpos('arm')
             return res
-        except rospy.ServiceException, e:
-            print "Service call failed: %s" % e
+        except rospy.ServiceException as e:
+            print ("Service call failed: %s" % e)
     
     def get_joint(self):
         rospy.wait_for_service(self.name + '/get_joint_pose')
@@ -359,8 +360,8 @@ class ArmTask:
                 
             res = joint(name)
             return res
-        except rospy.ServiceException, e:
-            print "Service call failed: %s" % e
+        except rospy.ServiceException as e:
+            print ("Service call failed: %s" % e)
 
     def check_range_limit(self, pos=_POS, euler=_ORI, phi=_PHI):
         roll, pitch, yaw = copy.deepcopy(euler)
@@ -388,8 +389,8 @@ class ArmTask:
             )
             res = range_limit(req)
             return res.limit_value, res.is_limit
-        except rospy.ServiceException, e:
-            print "Service call failed: %s" % e
+        except rospy.ServiceException as e:
+            print ("Service call failed: %s" % e)
 
     def noa_move_suction(self, mode='p2p', suction_angle=None, n=0, o=0, a=0):
         if suction_angle is None:
@@ -493,9 +494,9 @@ class ArmTask:
             degrees(phi)
         )
 
-    def move_to_vector_point(sef, mode='p2p', pos=_POS, vector=[1,0,0], phi=0): # This funthion will move arm and return suction angle 
+    def move_to_vector_point(self, mode='p2p', pos=_POS, vector=[1,0,0], phi=0): # This funthion will move arm and return suction angle 
     # Only for left arm Euler (0 0 30)
-        goal_vec = -vector
+        goal_vec = [-1*i for i in vector]
         a = 0.866
         b = 0.5
         x, y, z = goal_vec[0], goal_vec[1], goal_vec[2]
@@ -507,7 +508,7 @@ class ArmTask:
             roll_angle = roll_angle_c
         else:
             roll_angle = -roll_angle_c
-
+        euler = [0., 0., 0.]
         pos[0] += vector[0]*0.065
         pos[1] += vector[1]*0.065
         pos[2] += vector[2]*0.065
@@ -589,6 +590,9 @@ class ArmTask:
                 self.noa_move_suction(cmd['mode'], n=cmd['noa'][0], o=cmd['noa'][1], a=cmd['noa'][2])
                 self.status = Status.grasping
 
+            elif cmd['cmd'] == 'gripping':
+                self.status = Status.gripping
+
             if cmd['suc_cmd'] is not None:
                 if type(cmd['suc_cmd']) is not str:
                     self.suction.gripper_suction_deg(cmd['suc_cmd'])
@@ -599,6 +603,10 @@ class ArmTask:
                     self.suction.gripper_calibration()
                 elif 'Off' in cmd['suc_cmd']:
                     self.suction.gripper_vacuum_off()
+            
+            if cmd['gripper_cmd'] is not None:
+                if 'open' in cmd['gripper_cmd']:
+                    self.
 
         if not self.is_busy and not self.occupied:
             if self.__cmd_queue.empty() and self.__cmd_queue_2nd.empty():
@@ -608,38 +616,3 @@ class ArmTask:
                 self.status = Status.occupied
         elif not self.status == Status.grasping:
             self.status = Status.busy
-
-# if __name__ == '__main__':
-#     rospy.init_node('test_arm_task')
-#     print("Test arm task script")
-    
-#     a = ArmTask('right_arm')
-#     rospy.sleep(0.3)
-
-#     a.set_speed(100)
-#     a.jointMove(0, (0, -1, 0, 1, 0, 0, 0))
-#     a.set_speed(20)
-#     a.wait_busy()
-    
-#     a.ikMove('p2p', (0, -0.3, -0.9), (0, 0, 0), 30) 
-#     a.set_speed(100)
-#     a.wait_busy()
-    
-#     a.noa_move_suction('p2p', -45, n=0, s=0, a=-0.1)
-#     a.wait_busy()
-        
-#     a.singleJointMove(0,-0.2)
-#     a.wait_busy()
-        
-#     a.jointMove(0, (0, -1, 0, 1, 0, 0, 0))
-#     a.wait_busy()
-        
-#     a.singleJointMove(2,0.5)
-#     a.wait_busy()
-        
-#     a.relative_move_pose('p2p', (0, 0.1, 0) )
-#     a.wait_busy()
-    
-#     a.back_home()
-#     a.wait_busy()
- 
