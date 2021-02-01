@@ -21,6 +21,9 @@ $ sudo apt-get install ros-<distro>-map-server
 $ sudo apt-get install ros-<distro>-sbpl-lattice-planner
 $ sudo apt-get install ros-<distro>-nav-core-adapter
 $ sudo apt-get install ros-<distro>-dwb-plugins
+$ sudo apt-get install ros-melodic-aruco*
+$ sudo apt-get install ros-melodic-socketcan*
+$ sudo apt-get install ros-melodic-visp*
 ```
 
 ### Install modbus library `libmodbus`:
